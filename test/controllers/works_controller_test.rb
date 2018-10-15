@@ -8,7 +8,7 @@ describe WorksController do
   }
 
   let (:work_data) {
-    work_data = {
+    {
       work: {
         title: "new test work",
         category: "album"
@@ -17,7 +17,7 @@ describe WorksController do
   }
 
   let (:existing_work) {
-    existing_work = works(:poodr)
+    works(:poodr)
   }
 
   describe "root" do
@@ -165,24 +165,62 @@ describe WorksController do
 
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
-      
+
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :valid?, "Work data was invalid. Please fix."
+
+      expect{
+        patch work_path(existing_work.id), params: work_data
+      }.wont_change('Work.count')
+
+      existing_work.reload
+      (existing_work.title).must_equal test_work.title
+      (existing_work.category).must_equal test_work.category
+
+      must_redirect_to work_path(existing_work.id)
     end
 
     it "renders bad_request for bogus data" do
 
+      work_data[:work][:title] = existing_work.title
+      work_data[:work][:category] = "boooo"
+      test_work = Work.new(work_data[:work])
+      test_work.wont_be :valid?, "Work data wasn't invalid. Please fix."
+
+      patch work_path(existing_work.id), params: work_data
+
+      must_respond_with :bad_request
+
+
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      existing_work.destroy
 
+      patch work_path(existing_work.id), params: work_data
+
+      must_respond_with :not_found
     end
   end
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      expect{
+        delete work_path(existing_work.id)
+      }.must_change('Work.count', -1)
 
+      must_respond_with :redirect
+      must_redirect_to root_path
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      existing_work.destroy
+
+      expect{
+        delete work_path(existing_work.id)
+      }.wont_change('Work.count')
+
+      must_respond_with :not_found
 
     end
   end
@@ -190,6 +228,13 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
+
+      session[:user_id] = nil
+
+      post upvote_path(existing_work.id)
+
+      must_respond_with :not_found
+      must_redirect_to work_path(existing_work.id)
 
     end
 

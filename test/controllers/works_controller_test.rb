@@ -29,13 +29,23 @@ describe WorksController do
     end
 
     it "succeeds when there are no works" do
+      Work.first.destroy
+      Work.first.destroy
+      Work.first.destroy
+      Work.first.destroy
 
+      get works_path
+
+      # Assert
+      must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
+      get new_work_path
 
+      must_respond_with :success
     end
   end
 

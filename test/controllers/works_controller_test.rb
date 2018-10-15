@@ -81,37 +81,80 @@ end
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      # Arranges
+      work_hash[:work][:title] = nil
 
+      # Act-Assert
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
+      # Arranges
+      work_hash[:work][:category] = 'magazine'
 
+      # Act-Assert
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
     end
 
   end
 
   describe "show" do
-    it "succeeds for an extant work ID" do
+    it "succeeds for an existing work ID" do
+      # Arrange
+          id = works(:poodr).id
 
+          # Act
+          get work_path(id)
+
+          # Assert
+          must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      # Arrange - invalid id
+      id = -1
 
+      # Act
+      get work_path(id)
+
+      # Assert
+      must_respond_with :not_found
     end
   end
 
   describe "edit" do
-    it "succeeds for an extant work ID" do
+    it "succeeds for an existing work ID" do
+      id = works(:poodr).id
 
+      # Act
+      get edit_work_path(id)
+
+      # Assert
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      # Arrange - invalid id
+      id = -1
 
+      # Act
+      get work_path(id)
+
+      # Assert
+      must_respond_with :not_found
     end
   end
 
   describe "update" do
-    it "succeeds for valid data and an extant work ID" do
+    it "succeeds for valid data and an existing work ID" do
 
     end
 

@@ -5,6 +5,18 @@ describe WorksController do
   let(:another_album) {works(:another_album)}
   let(:poodr) {works(:poodr)}
   let(:movie) {works(:movie)} #only title and category
+  let(:mock_params) {
+        {
+          work:
+              {
+                title: "Get Out",
+                creator: "Jordan Peele",
+                description: "This was scary",
+                publication_year: 2016,
+                category: "movie"
+              }
+        }
+  }
 
   describe "root" do
     it "succeeds with all media types" do
@@ -62,19 +74,6 @@ describe WorksController do
   end
 
   describe "create" do
-
-    let(:mock_params) {
-          {
-            work:
-                {
-                  title: "Get Out",
-                  creator: "Jordan Peele",
-                  description: "This was scary",
-                  publication_year: 2016,
-                  category: "movie"
-                }
-          }
-    }
 
     it "creates a work with valid data for a real category" do
       expect {
@@ -143,16 +142,41 @@ describe WorksController do
   end
 
   describe "update" do
+
     it "succeeds for valid data and an extant work ID" do
+      expect{
+        patch work_path(album.id), params: mock_params
+      }.wont_change 'Work.count'
+
+      updated_work = Work.find(album.id)
+
+      expect(updated_work.title).must_equal mock_params[:work][:title]
+      expect(updated_work.creator).must_equal mock_params[:work][:creator]
+      expect(updated_work.description).must_equal mock_params[:work][:description]
+      expect(updated_work.publication_year).must_equal mock_params[:work][:publication_year]
+      expect(updated_work.category).must_equal mock_params[:work][:category]
+
+      must_redirect_to work_path(album.id)
 
     end
 
     it "renders bad_request for bogus data" do
+      mock_params[:work][:title] = ''
+
+      expect{
+        patch work_path(album.id), params: mock_params
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      expect{
+        patch work_path(-1), params: mock_params
+      }.wont_change 'Work.count'
 
+      must_respond_with :not_found
     end
   end
 

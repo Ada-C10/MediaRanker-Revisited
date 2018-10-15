@@ -162,12 +162,20 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      work = works(:movie)
 
+      expect {
+        delete work_path(work)
+      }.must_change('Work.count', -1)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
 
     end
+
   end
 
   describe "upvote" do

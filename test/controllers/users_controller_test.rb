@@ -35,14 +35,6 @@ describe UsersController do
       must_respond_with :not_found
 
     end
-
-  end
-
-
-  describe 'show' do
-
-
-    #render 404 if not found
   end
 
 end

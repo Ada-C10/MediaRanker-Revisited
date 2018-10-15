@@ -43,7 +43,7 @@ group :development, :test do
   # Improve the error message you get in the browser
   gem 'better_errors'
   gem 'binding_of_caller'
-
+  gem 'dotenv-rails'
   # Use pry for rails console
   gem 'pry-rails'
 end
@@ -66,3 +66,6 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+gem "omniauth"
+gem "omniauth-github"

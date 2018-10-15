@@ -161,6 +161,7 @@ describe WorksController do
         new_poodr = Work.find(id)
 
         must_respond_with :bad_request
+        
         expect(old_poodr.title).must_equal new_poodr.title
         expect(old_poodr.category).must_equal new_poodr.category
         expect(old_poodr.creator).must_equal new_poodr.creator
@@ -251,7 +252,7 @@ describe WorksController do
         delete work_path(id)
       }.wont_change 'Work.count'
 
-      must_respond_with :not_found 
+      must_respond_with :not_found
 
     end
   end
@@ -259,6 +260,15 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
+
+      # No one is logged in at the moment? How do I check?
+      # session[:user_id] = nil ??
+      # Do I need a work?
+      # work = works(:album)
+
+      # expect {
+      #   get login_path
+      # }.redirect_to fallback_location: work_path(work.id)
 
     end
 

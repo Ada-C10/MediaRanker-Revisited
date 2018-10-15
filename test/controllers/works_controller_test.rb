@@ -134,32 +134,42 @@ describe WorksController do
   end
 
   describe "show" do
-    it "succeeds for an extant work ID" do
-      existing_work = Work.first
 
+    let(:existing_work) { Work.first }
+
+    it "succeeds for an extant work ID" do
       get work_path(existing_work)
 
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      work = Work.first
-      id = work.id
-      work.destroy
+      id = existing_work.id
+      existing_work.destroy
 
-      get work_path(work)
+      get work_path(existing_work)
 
       must_respond_with 404
     end
   end
 
   describe "edit" do
-    it "succeeds for an extant work ID" do
 
+    let(:existing_work) { Work.first }
+
+    it "succeeds for an extant work ID" do
+      get edit_work_path(existing_work)
+
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      id = existing_work.id
+      existing_work.destroy
 
+      get edit_work_path(existing_work)
+
+      must_respond_with 404
     end
   end
 

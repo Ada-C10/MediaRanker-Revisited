@@ -13,12 +13,9 @@ describe WorksController do
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
-      all_works = Work.all
+      works = Work.where(category: "Albums")
       # binding.pry
-      all_works.destroy_all
-
-      loner = Work.new(title: "persimmon", creator: "Bob", description: "hhhdh", category: "Movies")
-      loner2 = Work.new(title: "cranberry", creator: "Bobie", description: "hhhddsfdh", category: "Books")
+      works.destroy_all
 
       get root_path
 

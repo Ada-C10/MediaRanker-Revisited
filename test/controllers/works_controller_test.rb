@@ -3,31 +3,66 @@ require 'pry'
 
 describe WorksController do
 
-  let (:book)  {
-    works(:poodr)
-  }
+  # let (:book)  {
+  #   works(:poodr)
+  # }
+  #
+  # let (:album) {
+  #   works(:album)
+  # }
+  #
+  # let (:movie) {
+  #   works(:movie)
+  # }
 
-  let (:album) {
-    works(:album)
-  }
-
-  let (:movie) {
-    works(:movie)
-  }
+  # let (:categories) {
+  #   %w(book album movie)
+  # }
 
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+
+      book = works(:poodr)
+      album = works(:album)
+      movie = works(:movie)
+
+      get root_path
+      must_respond_with :success
 
 
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      album = works(:album)
+      movie = works(:movie)
+
+      books = Work.where(category: "book")
+
+      books.each do |book|
+        book.destroy
+      end
+
+      ###need to confirm that books.count == 0?
+
+      get root_path
+      must_respond_with :success
 
     end
 
     it "succeeds with no media" do
+
+      works = Work.all
+
+      works.each do |work|
+        work.destroy
+      end
+
+      ###need to confirm that works.count == 0?
+
+      get root_path
+      must_respond_with :success
 
     end
   end
@@ -38,9 +73,25 @@ describe WorksController do
   describe "index" do
     it "succeeds when there are works" do
 
+      book = works(:poodr)
+      album = works(:album)
+      movie = works(:movie)
+
+      get works_path
+      must_respond_with :success
+
     end
 
     it "succeeds when there are no works" do
+
+      works = Work.all
+
+      works.each do |work|
+        work.destroy
+      end
+
+      get works_path
+      must_respond_with :success
 
     end
   end

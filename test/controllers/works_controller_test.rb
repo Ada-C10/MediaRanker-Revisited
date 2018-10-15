@@ -62,7 +62,33 @@ describe WorksController do
   end
 
   describe "create" do
+
+    let(:mock_params) {
+          {
+            work:
+                {
+                  title: "Get Out",
+                  creator: "Jordan Peele",
+                  description: "This was scary",
+                  publication_year: 2016,
+                  category: "movie"
+                }
+          }
+    }
+
     it "creates a work with valid data for a real category" do
+      expect {
+                post works_path, params: mock_params
+              }.must_change 'Work.count', 1
+
+      work = Work.find_by(title: mock_params[:work][:title])
+
+      expect(work.creator).must_equal mock_params[:work][:creator]
+      expect(work.description).must_equal mock_params[:work][:description]
+      expect(work.publication_year).must_equal mock_params[:work][:publication_year]
+      expect(work.category).must_equal mock_params[:work][:category]
+
+      must_redirect_to work_path(work)
 
     end
 

@@ -19,6 +19,7 @@ class WorksController < ApplicationController
   end
 
   def create
+
     @work = Work.new(media_params)
     @media_category = @work.category
     if @work.save
@@ -42,6 +43,7 @@ class WorksController < ApplicationController
 
   def update
     @work.update_attributes(media_params)
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"

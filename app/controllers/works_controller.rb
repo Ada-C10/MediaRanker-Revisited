@@ -4,7 +4,7 @@ class WorksController < ApplicationController
   before_action :category_from_work, except: [:root, :index, :new, :create]
 
   def root
-    @albums = Work.best_albums
+    @albums = Work.best_albumws
     @books = Work.best_books
     @movies = Work.best_movies
     @best_work = Work.order(vote_count: :desc).first
@@ -50,7 +50,7 @@ class WorksController < ApplicationController
       flash.now[:status] = :failure
       flash.now[:result_text] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
-      render :edit, status: :not_found
+      render :edit, status: :bad_request
     end
   end
 

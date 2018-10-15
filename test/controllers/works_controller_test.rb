@@ -1,9 +1,24 @@
 require 'test_helper'
+require 'pry'
 
 describe WorksController do
+
+  let (:book)  {
+    works(:poodr)
+  }
+
+  let (:album) {
+    works(:album)
+  }
+
+  let (:movie) {
+    works(:movie)
+  }
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+
 
     end
 

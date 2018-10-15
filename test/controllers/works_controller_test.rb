@@ -60,13 +60,45 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      work_data = {
+        work: {
+          category: 'book'
+        }
+      }
 
+      # Assumptions
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :invalid?, "Book data was invalid. Please come fix this test"
+
+      # Act-
+      expect {
+        post works_path, params: work_data
+      }.wont_change("Work.count")
+
+      # Assert
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
+      work_data = {
+        work: {
+          category: 'bogus',
+          title: 'test work'
+        }
+      }
 
+      # Assumptions
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :invalid?, "Book data was invalid. Please come fix this test"
+
+      # Act-
+      expect {
+        post works_path, params: work_data
+      }.wont_change("Work.count")
+
+      # Assert
+      must_respond_with :bad_request
     end
-
   end
 
   describe "show" do

@@ -172,10 +172,6 @@ describe WorksController do
       must_redirect_to root_path
     end
 
-    it "renders 404 not_found and does not update the DB for a bogus work ID" do
-
-    end
-
   end
 
   describe "upvote" do

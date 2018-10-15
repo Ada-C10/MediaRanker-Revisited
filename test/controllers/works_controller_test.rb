@@ -1,4 +1,5 @@
 require 'test_helper'
+require "pry"
 
 describe WorksController do
   describe "root" do
@@ -29,7 +30,8 @@ describe WorksController do
 
     it "succeeds when there are no works" do
       all_works = Work.all
-      all_works.destroy
+      # binding.pry
+      all_works.destroy_all
 
       get works_path
 

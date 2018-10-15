@@ -4,7 +4,7 @@ class WorksController < ApplicationController
   before_action :category_from_work, except: [:root, :index, :new, :create]
 
   def root
-    @albums = Work.best_albumws
+    @albums = Work.best_albums
     @books = Work.best_books
     @movies = Work.best_movies
     @best_work = Work.order(vote_count: :desc).first

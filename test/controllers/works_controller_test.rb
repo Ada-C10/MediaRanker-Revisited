@@ -38,11 +38,21 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
+      expect(Work.count).must_be :>=, 1, "No works are set up in fixtures"
 
+      get works_path
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+      all_work_count = Work.count
 
+      expect {
+        Work.destroy_all
+      }.must_change('Work.count', -all_work_count)
+
+      get works_path
+      must_respond_with :success
     end
   end
 

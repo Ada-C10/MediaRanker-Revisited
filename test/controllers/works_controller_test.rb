@@ -174,7 +174,16 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      work = works(:album)
+      # before_book_count = Book.count
+      work.destroy
+      # Act
+      expect {
+        delete work_path(work)
+      }.wont_change('Work.count')
 
+      # Assert
+      must_respond_with :not_found
     end
   end
 

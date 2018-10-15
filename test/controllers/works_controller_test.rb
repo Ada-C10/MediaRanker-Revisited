@@ -40,7 +40,7 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
-      get root_path
+      get works_path
       must_respond_with :success
     end
 
@@ -49,14 +49,15 @@ describe WorksController do
       Work.destroy_all
       expect(Work.all.empty?).must_equal true
 
-      get root_path
+      get works_path
       must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
-
+        get new_work_path
+        must_respond_with :success
     end
   end
 

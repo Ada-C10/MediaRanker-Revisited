@@ -6,6 +6,7 @@ describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+
       get root_path
 
       must_respond_with :success
@@ -13,6 +14,7 @@ describe WorksController do
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      
       expect {
         delete work_path(movie.id)
       }.must_change 'Work.count', -1

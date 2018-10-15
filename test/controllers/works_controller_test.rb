@@ -83,7 +83,7 @@ describe WorksController do
       work_data = {
         work: {
           title: "new test book",
-          category: "books"
+          category: "book"
         }
       }
 
@@ -113,18 +113,68 @@ describe WorksController do
   end
 
   describe "update" do
+    let (:work_hash) {
+      {
+            work: {
+              title: 'Peabody Times',
+              category: "movie",
+              description: 'This is totally fake.'
+            }
+      }
+    }
     it "succeeds for valid data and an extant work ID" do
+      changer = works(:movie).id
+      expect {
+        patch work_path(changer), params: work_hash
+      }.wont_change 'Work.count'
 
+      must_respond_with :redirect
+
+      work = Work.find_by(id: changer)
+      expect(work.title).must_equal 'Peabody Times'
+      expect(work.category).must_equal "movie"
+      expect(work.description).must_equal "This is totally fake."
     end
 
     it "renders bad_request for bogus data" do
+      changer = works(:movie).id
+      work = works(:movie)
+      work_hash[:work][:category] = "nope"
+      expect {
+         patch work_path(changer), params: work_hash
+       }.wont_change 'Work.count'
 
+      must_respond_with :bad_request
+
+      work = Work.find_by(id: changer)
+      expect(work.title).must_equal "test movie - has only required fields"
+      expect(work.category).must_equal "movie"
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      expect {
+         patch work_path(Work.last.id + 1), params: work_hash
+       }.wont_change 'Work.count'
 
+
+      must_respond_with 404
     end
   end
+
+
+
+
+  #
+  # it "will respond with not_found for invalid ids" do
+  #   id = -1
+  #
+  #   expect {
+  #     patch book_path(id), params: book_hash
+  #   }.wont_change 'Book.count'
+  #
+  #   must_respond_with :not_found
+  # end
+# end
 
   describe "destroy" do
     it "succeeds for an extant work ID" do

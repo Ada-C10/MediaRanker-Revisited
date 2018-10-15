@@ -22,7 +22,10 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
+      get works_path
 
+      # Assert
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
@@ -188,7 +191,6 @@ describe WorksController do
   end
 
   describe "upvote" do
-
     it "redirects to the work page if no user is logged in" do
 
     end

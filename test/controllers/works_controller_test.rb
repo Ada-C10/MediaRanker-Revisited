@@ -4,13 +4,11 @@ require "pry"
 describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
-      # Precondition: there is at least one media of each category
       get root_path
       must_respond_with :success
     end
 
     it "succeeds with one media type absent" do
-      # Precondition: there is at least one media in two of the categories
       works = Work.where(category: "Albums")
       works.destroy_all
       get root_path
@@ -161,20 +159,6 @@ describe WorksController do
     end
   end
 
-
-
-
-  #
-  # it "will respond with not_found for invalid ids" do
-  #   id = -1
-  #
-  #   expect {
-  #     patch book_path(id), params: book_hash
-  #   }.wont_change 'Book.count'
-  #
-  #   must_respond_with :not_found
-  # end
-# end
 
   describe "destroy" do
     it "succeeds for an extant work ID" do

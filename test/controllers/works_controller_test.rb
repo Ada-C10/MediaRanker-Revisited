@@ -4,15 +4,31 @@ describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+      get root_path
+
+      must_respond_with :success #its suceesful bc it can fetch the things in the controller?
 
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      work = works(:poodr)
+      work.category = "movie"
 
+      get root_path
+
+      must_respond_with :success
     end
 
     it "succeeds with no media" do
+      # original_num_of_works = Work.all.count #this is 4
+      Work.destroy_all #this makes it 0
+
+      get root_path
+
+      expect(Work.all.count).must_equal 0
+
+      must_respond_with :success
 
     end
   end
@@ -22,23 +38,59 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
+      get works_path
 
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
 
+      Work.destroy_all #this makes it
+
+      get root_path
+
+      expect(Work.all.count).must_equal 0
+      must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
-
+      #arrange nothing to arrange
+      #act
+      get new_work_path
+      #assert
+      must_respond_with :success
     end
   end
 
   describe "create" do
     it "creates a work with valid data for a real category" do
 
+      #arrange
+      #must create a new one here because we're testing create so dont just take from yml
+      work_hash = {
+        work: {
+          title: "Great Title",
+          creator: "Person",
+          description: "The best work on earth",
+          publication_year: 2018,
+          category: "album"
+        }
+      }
+
+      #act and assert
+      expect {
+        post works_path, params: work_hash
+      }.must_change 'Work.count', 1
+
+      must_respond_with :redirect
+
+      expect(Work.last.title).must_equal work_hash[:work][:title]
+      expect(Work.last.creator).must_equal work_hash[:work][:creator]
+      expect(Work.last.description).must_equal work_hash[:work][:description]
+      expect(Work.last.publication_year).must_equal work_hash[:work][:publication_year]
+      expect(Work.last.category).must_equal work_hash[:work][:category]
     end
 
     it "renders bad_request and does not update the DB for bogus data" do

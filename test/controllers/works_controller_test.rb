@@ -1,19 +1,33 @@
 require 'test_helper'
 
 describe WorksController do
+  let (:movie) {works(:movie)}
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+      get root_path
 
+      must_respond_with :success
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      movie.category = 'book'
+
+      get root_path
+
+      must_respond_with :success
 
     end
 
     it "succeeds with no media" do
 
+      Work.destroy_all
+
+     get root_path
+
+     must_respond_with :success
+     expect(Work.all.count).must_equal 0
     end
   end
 
@@ -22,30 +36,96 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
+      get works_path
 
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+
+       Work.destroy_all
+
+      get works_path
+
+      must_respond_with :success
+      expect(Work.all.count).must_equal 0
+
 
     end
   end
 
   describe "new" do
     it "succeeds" do
+      get new_work_path
+
+      must_respond_with :success
 
     end
   end
 
   describe "create" do
     it "creates a work with valid data for a real category" do
+      work_hash = {
+        work: {
+          title: "Fire Walk With Me",
+          creator: "David Lynch",
+          description: "The owls are not what they seem.",
+          publication_year: 2001-11-11,
+          category: "movie"
+
+        }
+      }
+
+      expect{
+        post works_path, params: work_hash}.must_change 'Work.count', 1
+
+
+      must_respond_with :redirect
+
+      expect(Work.last.title).must_equal work_hash[:work][:title]
+      expect(Work.last.creator).must_equal work_hash[:work][:creator]
+      expect(Work.last.description).must_equal work_hash[:work][:description]
+      expect(Work.last.publication_year).must_equal work_hash[:work][:publication_year]
+      expect(Work.last.category).must_equal work_hash[:work][:category]
+
 
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      work_hash = {
+        work: {
+          creator: "David Lynch",
+          description: "The owls are not what they seem.",
+          publication_year: 2001-11-11,
+          category: "movie"
+
+        }
+      }
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with  :bad_request
+
 
     end
 
     it "renders 400 bad_request for bogus categories" do
+      work_hash = {
+        work: {
+          title: "Fire Walk with Me",
+          creator: "David Lynch",
+          description: "The owls are not what they seem.",
+          publication_year: 2001-11-11,
+          category: INVALID_CATEGORIES.first
+
+        }
+      }
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with  :bad_request
 
     end
 

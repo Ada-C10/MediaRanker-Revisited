@@ -136,7 +136,9 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      get edit_work_path(-1)
 
+      must_respond_with :not_found
     end
   end
 

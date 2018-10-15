@@ -1,6 +1,10 @@
 require 'test_helper'
 
 describe WorksController do
+
+  CATEGORIES = %w(albums books movies)
+  INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
+
   describe "root" do
     it "succeeds with all media types" do
       get root_path
@@ -15,29 +19,29 @@ describe WorksController do
 
     it "succeeds with no media" do
       Work.destroy_all
-
       get root_path
       must_respond_with :success
     end
   end
 
-  CATEGORIES = %w(albums books movies)
-  INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
-
     it "succeeds when there are works" do
-      skip
+      get works_path
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
-      skip
+      Work.destroy_all
+      get root_path
+      must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
-      skip
+      get new_work_path
+      must_respond_with :success
     end
   end
 

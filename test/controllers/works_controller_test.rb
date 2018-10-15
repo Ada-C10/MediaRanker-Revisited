@@ -1,6 +1,17 @@
 require 'test_helper'
 
 describe WorksController do
+  let (:work_hash) do
+    {
+    work: {
+      title: "Light in the Attic",
+      creator: "Shell Silverstein",
+      description: "Chidrens classic poems",
+      category: "book",
+      publication_year: 1995
+      }
+    }
+  end
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -46,16 +57,6 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
-      work_hash = {
-        work: {
-          title: "Light in the Attic",
-          creator: "Shell Silverstein",
-          description: "Chidrens classic poems",
-          category: "book",
-          publication_year: 1995
-
-        }
-      }
       expect {
         post works_path, params: work_hash
       }.must_change 'Work.count', 1
@@ -70,14 +71,7 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
-      work_hash = {
-        new_book: {
-          creator: "Shell Silverstein",
-          description: "Chidrens classic poems",
-          publication_year: "1995",
-          category: CATEGORIES[1]
-        }
-      }
+      work_hash[:work][:title] = nil
 
       expect {
         post works_path, params: work_hash
@@ -87,14 +81,7 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
-      work_hash = {
-        new_book: {
-          creator: "Shell Silverstein",
-          description: "Chidrens classic poems",
-          publication_year: "1995",
-          category: "sandwiches"
-        }
-      }
+      work_hash[:work][:category] = "sandwiches"
 
       expect {
         post works_path, params: work_hash
@@ -141,21 +128,12 @@ describe WorksController do
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
       id = works(:album).id
-      work_hash = {
-        work: {
-          title: "New Title",
-          creator: "You Create",
-          description: "This is an older album",
-          publication_year: 1955,
-          category: "album"
-        }
-      }
-      
+
       expect {
         patch work_path(id), params: work_hash
       }.wont_change 'Work.count'
-      binding.pry
-      # must_respond_with :redirect
+
+      must_respond_with :redirect
 
       new_album = Work.find_by(id: id)
       expect(new_album.title).must_equal work_hash[:work][:title]
@@ -166,11 +144,27 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
+      work_hash[:work][:title] = nil
+      id = works(:album).id
+      old_work = works(:album)
 
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+      new_work = Work.find_by(id: id)
+
+      must_respond_with :bad_request
+      expect(old_work.title).must_equal new_work.title
+      expect(old_work.creator).must_equal new_work.creator
+      expect(old_work.description).must_equal new_work.description
+      expect(old_work.publication_year).must_equal new_work.publication_year
+      expect(old_work.category).must_equal new_work.category
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      expect { patch work_path(-1) }.wont_change 'Work.count'
 
+      must_respond_with :not_found
     end
   end
 

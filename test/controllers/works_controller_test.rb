@@ -93,27 +93,45 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      mock_params[:work][:title] = nil
 
+      expect {
+                post works_path, params: mock_params
+              }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
+      mock_params[:work][:category] = 'podcast'
+      expect {
+                post works_path, params: mock_params
+              }.wont_change 'Work.count'
 
+      must_respond_with :bad_request
     end
 
   end
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      get work_path(album.id)
 
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      get work_path(-1)
 
+      must_respond_with :not_found
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
+      get edit_work_path(album.id)
+
+      must_respond_with :success
 
     end
 

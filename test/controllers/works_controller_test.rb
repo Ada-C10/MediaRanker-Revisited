@@ -4,15 +4,52 @@ describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
-
+      get root_path
+      must_respond_with :success
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      # Arrange
+      movie = works(:movie)
+      id = movie.id
 
+      get work_path(id)
+      must_respond_with :success
+
+      movie.destroy
+
+      get root_path
+      must_respond_with :success
     end
 
     it "succeeds with no media" do
+      movie = works(:movie)
+      id = movie.id
+      get work_path(id)
+      must_respond_with :success
+      movie.destroy
+
+      album = works(:album)
+      id = album.id
+      get work_path(id)
+      must_respond_with :success
+      album.destroy
+
+      another_album = works(:another_album)
+      id = another_album.id
+      get work_path(id)
+      must_respond_with :success
+      another_album.destroy
+
+      book = works(:poodr)
+      id = book.id
+      get work_path(id)
+      must_respond_with :success
+      book.destroy
+
+      get root_path
+      must_respond_with :success
 
     end
   end
@@ -109,11 +146,31 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      # Arrange
+      existing_work = works(:poodr)
+
+      # Act
+      get work_path(existing_work.id)
+
+      # Assert
+      must_respond_with :success
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      # Arrange
+      album = works(:album)
+      id = album.id
 
+      get work_path(id)
+      must_respond_with :success
+
+      album.destroy
+
+        # Act
+        get work_path(id)
+      # Assert
+      must_respond_with :not_found
     end
   end
 

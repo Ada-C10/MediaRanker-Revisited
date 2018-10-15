@@ -133,40 +133,106 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      id = works(:poodr).id
 
+      get work_path(id)
+
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      id = -2
+      get work_path(id)
+      must_respond_with :not_found
 
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
+      id = works(:poodr).id
+      get edit_work_path(id)
+      must_respond_with :success
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      id = -1
+      get edit_work_path(id)
+      must_respond_with :not_found
 
     end
   end
 
   describe "update" do
+    let  (:work_hash) { {
+      work: {
+        title: "Fire Walk with Me",
+        creator: "David Lynch",
+        description: "The owls are not what they seem.",
+        publication_year: 2001-11-11,
+        category: "movie"
+
+      }
+    }
+  }
     it "succeeds for valid data and an extant work ID" do
+      id = works(:poodr).id
+      expect{
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+      must_respond_with :redirect
+
+      work = Work.find_by(id: id)
+      expect(work.title).must_equal work_hash[:work][:title]
+      expect(work.creator).must_equal work_hash[:work][:creator]
+      expect(work.description).must_equal work_hash[:work][:description]
+      expect(work.publication_year).must_equal work_hash[:work][:publication_year]
+      expect(work.category).must_equal work_hash[:work][:category]
+
 
     end
 
     it "renders bad_request for bogus data" do
+      id = works(:poodr).id
+      original_work = works(:poodr)
+      work_hash[:work][:category] = INVALID_CATEGORIES.first
+      expect{
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+      must_respond_with :bad_request
+
+      work = Work.find_by(id: id)
+      expect(work.title).must_equal original_work.title
+      expect(work.creator).must_equal original_work.creator
+      expect(work.description).must_equal original_work.description
+      expect(work.publication_year).must_equal original_work.publication_year
+      expect(work.category).must_equal original_work.category
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      id = -2
 
+      expect{
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
     end
   end
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      id = works(:poodr).id
+      title = works(:poodr).title
+      media = works(:poodr).category
+    expect {
+      delete work_path(id)
+    }.must_change 'Work.count', -1
+
+    must_respond_with :redirect
+    expect(flash[:result_text]).must_equal "Successfully destroyed #{media.singularize} #{id}"
 
     end
 

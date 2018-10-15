@@ -250,6 +250,9 @@ describe WorksController do
 
     it "redirects to the work page if no user is logged in" do
       id = works(:poodr).id
+      post upvote_path(id)
+
+      must_respond_with :redirect
 
     end
 

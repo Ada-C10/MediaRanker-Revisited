@@ -30,7 +30,7 @@ describe WorksController do
       album.destroy
 
       get root_path
-      must_respond_with :success      
+      must_respond_with :success
     end
   end
 
@@ -38,18 +38,30 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
+    before do
+      book
+      movie
+      album
+    end
     it "succeeds when there are works" do
-
+      get users_path
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+      book.destroy
+      movie.destroy
+      album.destroy
 
+      get users_path
+      must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
-
+      get new_work_path
+      must_respond_with :success
     end
   end
 

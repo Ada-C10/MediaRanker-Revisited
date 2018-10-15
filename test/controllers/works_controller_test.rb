@@ -224,12 +224,25 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
-      skip
+      id = works(:movie).id
+
+      expect {
+        delete work_path(id)
+      }.must_change 'Work.count', -1
+
+      must_respond_with :redirect
+      must_redirect_to root_path
 
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
-      skip
+      id = -1
+
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
 
     end
   end
@@ -237,7 +250,15 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
-      skip
+      @login_user = nil
+      id = works(:movie).id
+
+      expect {
+        post upvote_path(id)
+      }.wont_change 'Vote.count'
+
+      must_respond_with :redirect
+      must_redirect_to work_path(id)
 
     end
 

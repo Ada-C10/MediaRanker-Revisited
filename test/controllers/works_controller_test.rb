@@ -164,10 +164,20 @@ describe WorksController do
     it "renders bad_request for bogus data" do
       mock_params[:work][:title] = ''
 
+      old_album = Work.find(album.id)
+
       expect{
         patch work_path(album.id), params: mock_params
       }.wont_change 'Work.count'
 
+      new_album = Work.find(album.id)
+
+      expect(old_album.title).must_equal new_album.title
+      expect(old_album.creator).must_equal new_album.creator
+      expect(old_album.description).must_equal new_album.description
+      expect(old_album.publication_year).must_equal new_album.publication_year
+      expect(old_album.category).must_equal new_album.category
+  
       must_respond_with :bad_request
 
     end

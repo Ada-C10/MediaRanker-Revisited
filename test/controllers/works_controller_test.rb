@@ -32,7 +32,8 @@ describe WorksController do
 
   describe "new" do
     it "succeeds" do
-
+      get new_work_path
+      must_respond_with :success
     end
   end
 
@@ -52,14 +53,23 @@ describe WorksController do
   end
 
   describe "show" do
-    it "succeeds for an extant work ID" do
+    it "succeeds for an existing work ID" do
 
+      existing_work = works(:album)
+
+      get work_path(existing_work.id)
+
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
 
+      get work_path(Work.last.id + 1)
+
+      must_respond_with 404
     end
   end
+
 
   describe "edit" do
     it "succeeds for an extant work ID" do

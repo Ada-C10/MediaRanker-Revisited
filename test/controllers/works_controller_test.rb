@@ -67,14 +67,68 @@ describe WorksController do
   describe "create" do
     it "creates a work with valid data for a real category" do
 
+      CATEGORIES.each do |category|
+        work_data = {
+          work: {
+            title: "Test Title",
+            category: category.singularize
+          }
+        }
+
+        test_work = Work.new(work_data[:work])
+        test_work.must_be :valid?, "Work data was invalid. Engineer, please fix this."
+
+        expect {
+          post works_path, params: work_data
+        }.must_change('Work.count', +1)
+
+        must_redirect_to work_path(Work.last)
+
+        expect(Work.last.title).must_equal work_data[:work][:title]
+        expect(Work.last.category).must_equal work_data[:work][:category]
+      end
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
 
+      CATEGORIES.each do |category|
+        work_data = {
+          work: {
+            title: nil,
+            category: category
+          }
+        }
+
+        test_work = Work.new(work_data[:work])
+        test_work.wont_be :valid?, "Work data was NOT invalid. Engineer, please fix this."
+
+        expect {
+          post works_path, params: work_data
+        }.wont_change('Work.count')
+
+        must_respond_with :bad_request
+      end
+
     end
 
     it "renders 400 bad_request for bogus categories" do
+      INVALID_CATEGORIES.each do |category|
+        work_data = {
+          work: {
+            title: "Test Title",
+            category: category
+          }
+        }
 
+        test_work = Work.new(work_data[:work])
+        test_work.wont_be :valid?, "Work data was NOT invalid. Engineer, please fix this."
+
+        expect {
+          post works_path, params: work_data
+        }.wont_change('Work.count')
+
+        must_respond_with :bad_request
+      end
     end
 
   end

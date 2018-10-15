@@ -1,18 +1,35 @@
 require 'test_helper'
 
 describe WorksController do
+  let(:album) {works(:album)}
+  let(:another_album) {works(:another_album)}
+  let(:poodr) {works(:poodr)}
+  let(:movie) {works(:movie)} #only title and category
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+      get root_path
 
+      must_respond_with :success
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      poodr.destroy
 
+      expect(Work.find_by(category: 'book')).must_equal nil
+      get root_path
+      must_respond_with :success
     end
 
     it "succeeds with no media" do
+      Work.destroy_all
+
+      expect(Work.all.empty?).must_equal true
+
+      get root_path
+      must_respond_with :success
 
     end
   end

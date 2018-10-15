@@ -11,13 +11,19 @@ describe WorksController do
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
-      movies = Work.all
-      movies = nil
+      work = works(:poodr)
+      work,category = 'movie'
       get root_path
+
       must_respond_with :success
     end
 
     it "succeeds with no media" do
+      works = Work.all
+      works = nil
+      get root_path
+
+      must_respond_with :success
 
     end
   end
@@ -27,23 +33,51 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
+      works = Work.all
+      get works_path
+
+      must_respond_with :success
 
     end
 
     it "succeeds when there are no works" do
 
+    Work.destroy_all
+
+      get works_path
+      must_respond_with :success
+     expect(Work.all.count).must_equal 0
     end
   end
 
   describe "new" do
     it "succeeds" do
+      get new_work_path
 
+          # Assert
+      must_respond_with :success
     end
   end
 
   describe "create" do
+    let (:work_hash) do
+  {
+    work: {
+        title: 'Eternal Sunshine of the spotless mind',
+        category: 'movie'
+    }
+  }
+end
     it "creates a work with valid data for a real category" do
+      # Act-Assert
+      expect {
+        post works_path, params: work_hash
+      }.must_change 'Work.count', 1
 
+      must_respond_with :redirect
+       must_redirect_to work_path(Work.last.id)
+      expect(Work.last.title).must_equal work_hash[:work][:title]
+      expect(Work.last.description).must_equal work_hash[:work][:description]
     end
 
     it "renders bad_request and does not update the DB for bogus data" do

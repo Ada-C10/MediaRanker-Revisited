@@ -237,13 +237,21 @@ describe WorksController do
       must_respond_with :redirect
       must_redirect_to root_path
 
-      expect(Work.find_by(id: id)).must_equal nil 
+      expect(Work.find_by(id: id)).must_equal nil
 
       expect(flash[:status]).must_equal :success
       expect(flash[:result_text]).must_equal "Successfully destroyed #{category} #{id}"
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+
+      id = -1
+
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found 
 
     end
   end

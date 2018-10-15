@@ -16,16 +16,17 @@ describe WorksController do
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      expect(Work.find_by(category: 'book')).must_equal poodr
       poodr.destroy
-
       expect(Work.find_by(category: 'book')).must_equal nil
+
       get root_path
       must_respond_with :success
     end
 
     it "succeeds with no media" do
+      expect(Work.all.empty?).must_equal false
       Work.destroy_all
-
       expect(Work.all.empty?).must_equal true
 
       get root_path
@@ -39,11 +40,17 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
-
+      get root_path
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+      expect(Work.all.empty?).must_equal false
+      Work.destroy_all
+      expect(Work.all.empty?).must_equal true
 
+      get root_path
+      must_respond_with :success
     end
   end
 

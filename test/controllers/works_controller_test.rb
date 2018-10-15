@@ -170,11 +170,16 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      album = works(:album)
 
+      expect { delete work_path(album.id) }.must_change 'Work.count', -1
+      expect(Work.find_by(id: album.id)).must_equal nil
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      expect { delete work_path(-1) }.wont_change 'Work.count'
 
+      must_respond_with :not_found
     end
   end
 

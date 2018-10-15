@@ -160,9 +160,9 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
-      work_hash[:work][:title] = nil
       id = works(:album).id
       old_work = works(:album)
+      work_hash[:work][:title] = nil
 
       expect {
         patch work_path(id), params: work_hash

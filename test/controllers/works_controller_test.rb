@@ -97,12 +97,16 @@ describe WorksController do
 
   describe "edit" do
     it "succeeds for an extant work ID" do
-
+      get edit_work_path(Work.first)
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-
+      first = Work.first.destroy
+      get edit_work_path(first)
+      must_respond_with :not_found
     end
+
   end
 
   describe "update" do

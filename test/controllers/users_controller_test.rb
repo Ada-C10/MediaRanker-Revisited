@@ -19,4 +19,25 @@ describe UsersController do
     end
   end
 
+  describe 'show' do
+
+    let(:existing_user) { User.first }
+
+    it 'succeeds for an existing user ID' do
+      get user_path(existing_user)
+
+      must_respond_with :success
+    end
+
+    it 'renders 404 not found is user is not in the database' do
+      id = existing_user.id
+      existing_user.destroy
+
+      get user_path(existing_user)
+
+      must_respond_with 404
+    end
+
+  end
+
 end

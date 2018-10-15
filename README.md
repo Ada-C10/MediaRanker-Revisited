@@ -42,7 +42,7 @@ Take some time to understand what each controller is doing. Add tests to the exi
 - Tests custom controller logic and custom routes when appropriate
   - Tests positive, negative, nominal and edge cases
 
-<!-- ## Wave 2: Authentication via OAuth
+## Wave 2: Authentication via OAuth
 
 Following the steps in the Textbook curriculum, add OAuth to your Media Ranker Application and enable a user to log in.
 
@@ -53,10 +53,10 @@ Following the steps in the Textbook curriculum, add OAuth to your Media Ranker A
 - All other requirements from in-class notes apply:
   - Managed via `session`
   - `SessionsController`
-  - `User` model -->
+  - `User` model
 
 
-<!-- ## Wave 3: Basic Authorization (Page Access)
+## Wave 3: Basic Authorization (Page Access)
 
 In this wave we will create authorization logic to enforce rules that govern what pages on the site users and guests (unauthenticated browsers) can view. The rule we'll use is that guests can only access the main page, and all logged-in users can access the show and index pages for all categories of work.
 

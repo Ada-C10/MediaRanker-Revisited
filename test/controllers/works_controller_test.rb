@@ -177,7 +177,7 @@ describe WorksController do
       expect(old_album.description).must_equal new_album.description
       expect(old_album.publication_year).must_equal new_album.publication_year
       expect(old_album.category).must_equal new_album.category
-  
+
       must_respond_with :bad_request
 
     end
@@ -212,9 +212,9 @@ describe WorksController do
   end
 
   describe "upvote" do
+    mock_params = {username: 'dan'}
 
     it "redirects to the work page if no user is logged in" do
-      #session[:user_id] = nil
 
       post upvote_path(album.id)
 
@@ -223,8 +223,11 @@ describe WorksController do
 
     it "redirects to the work page after the user has logged out" do
 
-      #session[:user_id] = dan.id
-      #session[:user_id] = nil
+      post login_path, params: mock_params
+      expect(session[:user_id]).must_equal dan.id
+
+      post logout_path
+      expect(session[:user_id]).must_equal nil
 
       post upvote_path(album.id)
 

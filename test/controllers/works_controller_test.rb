@@ -103,11 +103,31 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      # Arrange
+      existing_work = works(:album)
 
+      # Act
+      get work_path(existing_work.id)
+
+      # Assert
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      work = works(:album)
+      id = work.id
 
+      get work_path(id)
+      must_respond_with :success
+
+
+      work.destroy
+
+      # Act
+      get work_path(id)
+
+      # Assert
+      must_respond_with :missing
     end
   end
 

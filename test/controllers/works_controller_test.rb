@@ -3,16 +3,39 @@ require 'test_helper'
 describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
+
+      get root_path
+      must_respond_with :success
       # Precondition: there is at least one media of each category
 
     end
 
-    it "succeeds with one media type absent" do
-      # Precondition: there is at least one media in two of the categories
 
+
+    it "succeeds with one media type absent" do
+      no_book = works(:poodr)
+      no_book.destroy
+
+      get root_path
+      must_respond_with :success
+      # Precondition: there is at least one media in two of the categories
     end
 
+
+
     it "succeeds with no media" do
+      no_book = works(:poodr)
+      no_movie = works(:movie)
+      no_album1 = works(:album)
+      no_album2 = works(:album)
+
+      no_book.destroy
+      no_movie.destroy
+      no_album1.destroy
+      no_album2.destroy
+
+      get root_path
+      must_respond_with :success
 
     end
   end
@@ -22,6 +45,8 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
+      get works_path
+      must_respond_with :success
 
     end
 

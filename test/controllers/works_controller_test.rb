@@ -160,7 +160,17 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      work = works(:album)
+      # before_book_count = Book.count
 
+      # Act
+      expect {
+        delete work_path(work)
+      }.must_change('Work.count', -1)
+
+      # Assert
+      must_respond_with :redirect
+      must_redirect_to root_path
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do

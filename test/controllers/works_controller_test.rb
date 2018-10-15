@@ -17,6 +17,7 @@ describe WorksController do
               }
         }
   }
+  let(:dan) {users(:dan)}
 
   describe "root" do
     it "succeeds with all media types" do
@@ -203,10 +204,21 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
+      #session[:user_id] = nil
 
+      post upvote_path(album.id)
+
+      must_redirect_to work_path(album.id)
     end
 
     it "redirects to the work page after the user has logged out" do
+
+      #session[:user_id] = dan.id
+      #session[:user_id] = nil
+
+      post upvote_path(album.id)
+
+      must_redirect_to work_path(album.id)
 
     end
 

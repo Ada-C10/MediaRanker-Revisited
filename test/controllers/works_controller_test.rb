@@ -38,6 +38,24 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
+      work_data = {
+        work: {
+          category: 'book',
+          title: "new test book"
+        }
+      }
+
+      # Assumptions
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :valid?, "Book data was invalid. Please come fix this test"
+
+      # Act
+      expect {
+        post works_path, params: work_data
+      }.must_change('Work.count', +1)
+
+      # Assert
+      must_redirect_to work_path(Work.last)
 
     end
 

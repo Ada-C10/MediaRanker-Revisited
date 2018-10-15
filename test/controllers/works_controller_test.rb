@@ -154,25 +154,88 @@ end
   end
 
   describe "update" do
+          let (:work_hash) do
+        {
+          work: {
+            title: 'Eat Pray Love',
+            creator: "Elizabeth Gilbert",
+            description:"beautiful life memoir",
+            publication_year: 2004,
+            category: "book"
+          }
+        }
+      end
     it "succeeds for valid data and an existing work ID" do
 
+      id = works(:poodr).id
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :redirect
+       must_redirect_to work_path(id)
+
+      new_work = Work.find_by(id: id)
+
+      expect(new_work.title).must_equal work_hash[:work][:title]
+      expect(new_work.creator).must_equal work_hash[:work][:creator]
+      expect(new_work.description).must_equal work_hash[:work][:description]
     end
 
     it "renders bad_request for bogus data" do
+      work_hash[:work][:title] = nil
+      id = works(:poodr).id
+      old_poodr = works(:poodr)
 
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+      new_poodr = Work.find(id)
+
+      must_respond_with :bad_request
+      expect(old_poodr.title).must_equal new_poodr.title
+      expect(old_poodr.creator).must_equal new_poodr.creator
+      expect(old_poodr.description).must_equal new_poodr.description
     end
 
     it "renders 404 not_found for a bogus work ID" do
+        id = -1
+
+        expect {
+          patch work_path(id), params: work_hash
+        }.wont_change 'Work.count'
+
+        must_respond_with :not_found
 
     end
   end
 
   describe "destroy" do
-    it "succeeds for an extant work ID" do
+    it "succeeds for an existing work ID" do
+      id = works(:poodr).id
+      title = works(:poodr).title
 
+      # Act - Assert
+      expect {
+        delete work_path(id)
+      }.must_change 'Work.count', -1
+
+      must_respond_with :redirect
+       must_redirect_to root_path
+
+      expect(Work.find_by(id: id)).must_equal nil
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      id = -1
+      expect {
+        delete work_path(id)
+        # }.must_change 'Book.count', 0
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
 
     end
   end

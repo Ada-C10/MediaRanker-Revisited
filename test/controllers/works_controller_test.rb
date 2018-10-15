@@ -174,16 +174,63 @@ describe WorksController do
   end
 
   describe "update" do
+
+    let(:work_data) {
+      {
+        work: {
+          title: 'Fake Title',
+          category: CATEGORIES[0].singularize
+        }
+      }
+    }
+
+    let(:work_test) {
+      Work.new(work_data[:work])
+    }
+
+    let(:existing_work) {Work.first}
+    let(:existing_id) { existing_work.id }
+
     it "succeeds for valid data and an extant work ID" do
+      work_test.must_be :valid?, "Work data was invalid. Engineer, please fix this test."
+
+      expect {
+        patch work_path(existing_id), params: work_data
+      }.wont_change('Work.count')
+
+      must_respond_with :redirect
+      must_redirect_to work_path(existing_id)
+
+      work = Work.find_by(id: existing_id)
+    expect(work.title).must_equal work_data[:work][:title]
+    expect(work.category).must_equal work_data[:work][:category]
 
     end
 
     it "renders bad_request for bogus data" do
+      original_work_title = Work.first.title
+      work_data[:work][:title] = nil
 
+      work_test.wont_be :valid?, "Work data was NOT invalid. Engineer, please fix this test."
+
+      expect {
+        patch work_path(existing_id), params: work_data
+      }.wont_change('Work.count')
+
+      must_respond_with :bad_request
+
+      work = Work.find_by(id: existing_id)
+      expect(work.title).must_equal original_work_title
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      id = 0
 
+      expect {
+        patch work_path(0), params: work_data
+      }.wont_change('Work.count')
+
+      must_respond_with 404
     end
   end
 

@@ -2,6 +2,7 @@ class SessionsController < ApplicationController
   def create
     auth_hash = request.env['omniauth.auth']
     user = User.find_by(uid: auth_hash[:uid], provider: 'github')
+    #user = User.find_by(uid: auth_hash[:uid], provider: auth_hash[:provider])
     if user
       # User was found in the database
       flash[:success] = "Logged in as returning user #{user.name}"
@@ -16,9 +17,11 @@ class SessionsController < ApplicationController
         flash[:error] = "Could not create new user account: #{user.errors.messages}"
         redirect_to root_path
         return
+        #if unsuccessful, run above code redirecting, but not below code.
       end
     end
 
+    #if already logged in or created new user
     session[:user_id] = user.id
     redirect_to root_path
   end

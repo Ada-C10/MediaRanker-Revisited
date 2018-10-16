@@ -11,7 +11,9 @@ Rails.application.routes.draw do
   resources :users, only: [:index, :show]
 
   get "/auth/:provider/callback", to: "sessions#create"
+  # don't create a path helper because github doesn't like that.
 
   delete "/logout", to: "sessions#destroy", as: "logout"
+
 
 end

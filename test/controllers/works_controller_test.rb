@@ -51,8 +51,6 @@ describe WorksController do
   describe "index" do
     it "succeeds when there are works" do
 
-      works 
-
       get works_path
       must_respond_with :success
 
@@ -85,7 +83,7 @@ describe WorksController do
     it "creates a work with valid data for a real category" do
 
       #arrange
-      work_data = {
+      work_hash = {
         work: {
           title: "test book",
           category: "book"
@@ -93,18 +91,18 @@ describe WorksController do
       }
 
       #assumptions
-      new_work = Work.new(work_data[:work])
+      new_work = Work.new(work_hash[:work])
       new_work.must_be :valid?, "Something was invalid. Please fix this test."
 
       #act
       expect {
-        post works_path, params: work_data
+        post works_path, params: work_hash
       }.must_change('Work.count', +1)
 
       #assert
       must_redirect_to work_path(Work.last)
 
-      expect(Work.last.title).must_equal work_data[:work][:title]
+      expect(Work.last.title).must_equal work_hash[:work][:title]
       expect(Work.last.category).must_equal "book"
 
     end
@@ -115,7 +113,7 @@ describe WorksController do
 
       book = Work.find_by(category: "book")
 
-      work_data = {
+      work_hash = {
         work: {
           title: book.title,
           category: "book"
@@ -123,23 +121,24 @@ describe WorksController do
       }
 
       # Assumptions
-      Work.new(work_data[:book]).wont_be :valid?, "Work data wasn't invalid. Please fix this test"
+      new_work = Work.new(work_hash[:work])
+
+      new_work.wont_be :valid?, "Work data wasn't invalid. Please fix this test."
 
       # Act
       expect {
-        post works_path, params: work_data
+        post works_path, params: work_hash
       }.wont_change('Work.count')
 
       # Assert
       must_respond_with :bad_request
-
 
     end
 
     it "renders 400 bad_request for bogus categories" do
 
       #arrange
-      work_data = {
+      work_hash = {
         work: {
           title: "test book",
           category: INVALID_CATEGORIES.sample
@@ -147,18 +146,19 @@ describe WorksController do
       }
 
       # Assumptions
-      Work.new(work_data[:book]).wont_be :valid?, "Work data wasn't invalid. Please fix this test"
+      new_work = Work.new(work_hash[:work])
+
+      new_work.wont_be :valid?, "Work data wasn't invalid. Please fix this test."
 
       # Act
       expect {
-        post works_path, params: work_data
+        post works_path, params: work_hash
       }.wont_change('Work.count')
 
       # Assert
       must_respond_with :bad_request
 
     end
-
   end
 
   describe "show" do
@@ -176,7 +176,9 @@ describe WorksController do
 
       work_id = Work.last.id + 1
 
-      get work_path()
+      get work_path(work_id)
+
+      must_respond_with :not_found
     end
   end
 

@@ -277,6 +277,10 @@ describe WorksController do
     it "redirects to the work page if no user is logged in" do
       post upvote_path(poodr.id)
 
+      expect{
+        post upvote_path(poodr.id)
+      }.wont_change 'Vote.count'
+
       must_respond_with :redirect
       must_redirect_to work_path(poodr.id)
     end

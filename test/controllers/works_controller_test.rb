@@ -58,7 +58,7 @@ describe WorksController do
   describe "create" do
     # it "creates a work with valid data for a real category" do
     #   movie_data = {
-    #     another_movie: {
+    #     work: {
     #       title: "Sound of Music",
     #       category: "movie"
     #     }

@@ -262,7 +262,13 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
-      skip
+      work = Work.first
+      # session[:user_id] = nil
+      # # expect(session[:user_id]).must_be_nil
+
+      post upvote_path(work)
+
+      must_redirect_to work_path(work)
 
     end
 

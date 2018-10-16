@@ -8,16 +8,16 @@ describe UsersController do
 
   describe "show" do
     it "should get a user's show page" do
-      id = users(:dan).id
+      uid = users(:dan).id
 
-      get user_path(id)
+      get user_path(uid)
 
       must_respond_with :success
     end
 
     it "should respond with not found if given an invalid user id" do
-      id = -2
-      get user_path(id)
+      uid = -2
+      get user_path(uid)
       must_respond_with :not_found
     end
   end

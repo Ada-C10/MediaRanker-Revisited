@@ -270,9 +270,25 @@ describe WorksController do
   describe "destroy" do
     it "succeeds for an extant work ID" do
 
+      id = works(:poodr).id
+
+      expect {
+        delete work_path(id)
+      }.must_change 'Work.count', -1
+
+      must_respond_with :redirect
+
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+
+      id = Work.last.id + 1
+
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
 
     end
   end
@@ -280,10 +296,31 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
+      # 
+      # binding.pry
+      #
+      # post login_path
+      #
+      #
+      # @login_user = nil
+      #
+      # id = works(:poodr).id
+      #
+      # post upvote_path(id)
+      #
+      # must_redirect_to work_path(id)
 
     end
 
+
     it "redirects to the work page after the user has logged out" do
+
+      # id = works(:poodr).id
+      #
+      # post upvote_path(id)
+      #
+      # must_redirect_to work_path(id)
+
 
     end
 

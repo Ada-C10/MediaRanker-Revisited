@@ -7,6 +7,6 @@ Rails.application.routes.draw do
 
   resources :works
   post '/works/:id/upvote', to: 'works#upvote', as: 'upvote'
-
+  get "/auth/:provider/callback", to: "sessions#create"
   resources :users, only: [:index, :show]
 end

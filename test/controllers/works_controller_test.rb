@@ -163,9 +163,22 @@ describe WorksController do
   describe "edit" do
     it "succeeds for an extant work ID" do
 
+      id = works(:poodr).id
+
+      get edit_work_path(id)
+
+      must_respond_with :success
+
     end
 
     it "renders 404 not_found for a bogus work ID" do
+
+      id = works(:poodr).id
+      works(:poodr).destroy
+
+      get edit_work_path(id)
+
+      must_respond_with :not_found
 
     end
   end

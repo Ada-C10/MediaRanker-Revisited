@@ -106,6 +106,7 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
+      #use INVALID_CATEGORIES
       work_hash = {
         work: {
           title: "New Title",
@@ -246,25 +247,56 @@ describe WorksController do
   end
 
   describe "upvote" do
-    # post '/works/:id/upvote', to: 'works#upvote', as: 'upvote'
+    before do
+      @user_hash =  { username: "jane" }
+      @id = works(:poodr).id
+    end
 
     it "redirects to the work page if no user is logged in" do
-      id = works(:poodr).id
-      post upvote_path(id)
+      post upvote_path(@id)
 
       must_respond_with :redirect
 
     end
 
     it "redirects to the work page after the user has logged out" do
+      post login_path, params: @user_hash
+      post logout_path, params: @user_hash
 
+      post upvote_path(@id)
+
+      must_respond_with :redirect
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      poodr_votes = works(:poodr).vote_count
+
+      post login_path, params: @user_hash
+
+      user = User.find_by(username: "jane")
+      expect(user.votes.count).must_equal 0
+
+      post upvote_path(@id)
+
+      poodr = Work.find_by(id: @id)
+      expect(poodr.vote_count).must_equal (poodr_votes + 1)
+      expect(user.votes.count).must_equal 1
+
+      expect(poodr.votes.last.user_id).must_equal user.id
+      must_respond_with :redirect
 
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+        post login_path, params: @user_hash
+        
+        post upvote_path(@id)
+
+        expect {
+          post upvote_path(@id)
+        }.wont_change 'works(:poodr).vote_count'
+
+        must_respond_with :redirect
 
     end
   end

@@ -1,3 +1,4 @@
+require 'pry'
 class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
@@ -63,7 +64,9 @@ class WorksController < ApplicationController
 
   def upvote
     flash[:status] = :failure
+
     if @login_user
+
       vote = Vote.new(user: @login_user, work: @work)
       if vote.save
         flash[:status] = :success

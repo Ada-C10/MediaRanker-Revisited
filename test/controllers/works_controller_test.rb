@@ -94,22 +94,71 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      #arrange
+      #must create a new one here because we're testing create so dont just take from yml
+      work_hash = {
+        work: {
+          #no title here! which is not valid
+          creator: "Person",
+          description: "The best work on earth",
+          publication_year: 2018,
+          category: "album"
+        }
+      }
 
+      #act and assert
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
+      #arrange
+      #must create a new one here because we're testing create so dont just take from yml
+      work_hash = {
+        work: {
+          #no title here! which is not valid
+          creator: "Person",
+          description: "The best work on earth",
+          publication_year: 2018,
+          category: "sculpture"
+        }
+      }
 
+      #act and assert
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
     end
 
   end
 
   describe "show" do
-    it "succeeds for an extant work ID" do
+    it "succeeds for an extant work ID /aka/ should get a book's show page" do
+      #arrange
+      id = works(:poodr).id
+
+      #act
+      get work_path(id)
+
+      #assert
+      must_respond_with :success
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      #arrange create invalid id
+      id = -1
 
+      #act
+      get work_path(id)
+
+      #assert
+      must_respond_with :not_found #this goes thru the category_from_work
     end
   end
 
@@ -139,11 +188,33 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      #arrange
+      media_type = works(:poodr).category
+      id = works(:poodr).id
+      #concattinate media
 
+      #act
+      expect {
+        delete work_path(id)
+      }.must_change 'Work.count', -1
+
+      #assert
+      must_respond_with :redirect
+      expect(flash[:result_text]).must_equal "Successfully destroyed #{media_type} #{id}"
+      expect(Work.find_by(id: id)).must_equal nil #if its deleted it must equal nil, this is an overkill but just here as example
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      #arrange
+      id = -1
 
+      #act
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
+
+      #assert
+      must_respond_with :not_found
     end
   end
 
@@ -151,6 +222,18 @@ describe WorksController do
 
     it "redirects to the work page if no user is logged in" do
 
+      #arrange
+
+      #act
+      id = works(:poodr).id
+
+      #assert
+      expect {
+        post upvote_path(id)
+      }.wont_change 'Vote.count'
+
+      must_respond_with :redirect
+      # post '/works/:id/upvote', to: 'works#upvote', as: 'upvote'
     end
 
     it "redirects to the work page after the user has logged out" do

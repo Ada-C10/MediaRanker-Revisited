@@ -18,6 +18,7 @@
     </h1>
 
     <nav class="app-header__nav">
+      <% if @login_user %>
       <ul class="nav app-header__site-nav-container">
         <li class="nav-item app-header__nav_item">
           <%= link_to "View top media", root_path, class: "nav-link" %>
@@ -32,6 +33,7 @@
           <%= link_to "View all users", users_path, class: "nav-link" %>
         </li>
       </ul>
+      <% end %>
       <ul class="nav app-header__user-nav-container">
         <% if @login_user %>
 

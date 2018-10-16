@@ -1,9 +1,13 @@
+<% if @login_user %>
 <section class="top-ten__list-container">
-  <h2 class="top-ten__header">
-    Top <%= media_category.pluralize.capitalize %>
-  </h2>
-  <ul class="list-group top-ten__list">
-    <% data.each do |datum| %>
+  <% else %>
+  <section class="top-ten__list-container inactive-link">
+    <% end %>
+    <h2 class="top-ten__header">
+      Top <%= media_category.pluralize.capitalize %>
+    </h2>
+    <ul class="list-group top-ten__list">
+      <% data.each do |datum| %>
       <li class="list-group-item">
         <h4>
           <%= link_to datum.title, work_path(datum) %>
@@ -11,7 +15,7 @@
         </h4>
         <p><%= datum.vote_count %> votes</p>
       </li>
-    <% end %>
-  </ul>
-  <!-- <%= link_to "View More #{media_category.pluralize.capitalize}", works_path(media_category.pluralize.downcase) %> -->
-</section>
+      <% end %>
+    </ul>
+    <!-- <%= link_to "View More #{media_category.pluralize.capitalize}", works_path(media_category.pluralize.downcase) %> -->
+  </section>

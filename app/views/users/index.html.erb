@@ -1,3 +1,4 @@
+<% if   @login_user %>
 <h2>List of Users</h2>
 <table class="table">
   <thead>
@@ -19,3 +20,6 @@
 </table>
 
 <%= link_to "Back to Media List", root_path, class: "btn btn-secondary" %>
+<% else %>
+<h1>You must be logged in to view this page.</h1>
+<% end %>

@@ -1,3 +1,4 @@
+<% if @login_user %>
 <section>
   <h2><%= @work.title %></h2>
   <p>Created by: <%= @work.creator %></p>
@@ -29,3 +30,6 @@
     <% end %>
   </ul>
 </section>
+<% else %>
+<h1>You must be logged in to view this page.</h1>
+<% end %>

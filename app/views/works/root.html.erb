@@ -1,5 +1,9 @@
 <% if @best_work %>
-  <section class="spotlight">
+<% if @login_user %>
+<section class="spotlight">
+  <% else %>
+  <section class="spotlight inactive-link">
+    <% end %>
     <h2 class="spotlight__header">
       <span class="spotlight__header--prefix">Media Spotlight</span>
       <%= link_to @best_work.title, work_path(@best_work), class: "spotlight__link-to" %> by <%= @best_work.creator %>
@@ -8,24 +12,24 @@
       <%= @best_work.vote_count %> votes - <%= @best_work.description %>
     </p>
   </section>
-<% end %>
+  <% end %>
 
-<hr class="root__hr" />
+  <hr class="root__hr" />
 
-<section class="top-ten__container">
-  <%= render partial: "top_ten", locals: {
-    media_category: "movie",
-    data: @movies
-  }
-  %>
-  <%= render partial: "top_ten", locals: {
-    media_category: "book",
-    data: @books
-  }
-  %>
-  <%= render partial: "top_ten", locals: {
-    media_category: "album",
-    data: @albums
-  }
-  %>
-</section>
+  <section class="top-ten__container">
+    <%= render partial: "top_ten", locals: {
+      media_category: "movie",
+      data: @movies
+    }
+    %>
+    <%= render partial: "top_ten", locals: {
+      media_category: "book",
+      data: @books
+    }
+    %>
+    <%= render partial: "top_ten", locals: {
+      media_category: "album",
+      data: @albums
+    }
+    %>
+  </section>

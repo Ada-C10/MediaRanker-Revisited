@@ -110,24 +110,32 @@ describe WorksController do
   end
 
   describe "show" do
-
     it "succeeds for an extant work ID" do
-      skip
+      get work_path(works(:poodr).id)
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      skip
+      id = works(:poodr).id
+      works(:poodr).destroy
+
+      get work_path(id)
+      must_respond_with :not_found
     end
   end
 
   describe "edit" do
-
     it "succeeds for an extant work ID" do
-      skip
+      get edit_work_path(works(:poodr).id)
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      skip
+      id = works(:poodr).id
+      works(:poodr).destroy
+
+      get edit_work_path(id)
+      must_respond_with :not_found
     end
   end
 

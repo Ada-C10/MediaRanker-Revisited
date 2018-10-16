@@ -308,6 +308,7 @@ describe WorksController do
 
     it "redirects to the work page if the user has already voted for that work" do
       dan = users(:dan)
+
       get "/auth/github/", params: user_params
       expect(session[:user_id]).must_equal dan.id
 

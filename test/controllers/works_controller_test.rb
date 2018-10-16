@@ -22,6 +22,8 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
+      get works_path
+      must_respond_with :success
 
     end
 

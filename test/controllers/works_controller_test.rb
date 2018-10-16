@@ -2,7 +2,8 @@ require 'test_helper'
 
 describe WorksController do
 
-  CATEGORIES = %w(albums books movies)
+  # MADE CATEGORIES SINGULAR
+  CATEGORIES = %w(album book movie)
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "root" do
@@ -46,17 +47,64 @@ describe WorksController do
   end
 
   describe "create" do
-
-    it "creates a work with valid data for a real category" do
-      skip
+    before do
+      @data = {
+        work: {
+          title: 'A title',
+          creator: 'An author',
+          description: 'A description',
+          publication_year: 2016,
+          category: nil
+        }
+      }
     end
 
+    it "creates a work with valid data for a real category" do
+
+      CATEGORIES.each do |c|
+        @data[:work][:category] = c
+
+        work = Work.new(@data[:work])
+        work.must_be :valid?
+
+        expect {
+          post works_path, params: @data
+        }.must_change('Work.count', +1)
+
+        must_respond_with :redirect
+        must_redirect_to work_path(Work.last)
+      end
+    end
+
+
     it "renders bad_request and does not update the DB for bogus data" do
-      skip
+      # WITHOUT CHANGING THE CATEGORY FROM NIL IT DOESN'T WORK? ASK SOME1
+      @data[:work][:category] = "bogus"
+      @data[:work][:title] = "New Title"
+
+      work = Work.new(@data[:work])
+      work.wont_be :valid?
+
+      expect {
+        post works_path, params: @data
+      }.wont_change('Work.count')
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
-      skip
+      INVALID_CATEGORIES.each do |c|
+        @data[:work][:category] = c
+
+        work = Work.new(@data[:work])
+        work.wont_be :valid?
+
+        expect {
+          post works_path, params: @data
+        }.wont_change('Work.count')
+
+        must_respond_with :bad_request
+      end
     end
 
   end

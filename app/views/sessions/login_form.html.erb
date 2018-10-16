@@ -2,8 +2,8 @@
 
 <%= form_tag do %>
   <div class="form-group">
-    <%= label_tag :username, "Username" %>
-    <%= text_field_tag :username, nil, class: "form-control" %>
+    <%= label_tag :name, "name" %>
+    <%= text_field_tag :name, nil, class: "form-control" %>
   </div>
   <div class="form-group">
     <%= submit_tag "Log In", class: "btn btn-primary" %>
@@ -15,7 +15,7 @@
   <p>
     There is no password field. In fact, there is no indication whatsoever
     that you are who you say you are. There's nothing special about users -
-    username is just another piece of data that the user entered and we have to keep
+    name is just another piece of data that the user entered and we have to keep
     track of.
   </p>
 

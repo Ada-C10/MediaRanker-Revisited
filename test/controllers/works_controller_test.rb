@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pry'
 
 describe WorksController do
   describe "root" do
@@ -250,7 +251,12 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
-      @login_user = nil
+      user_hash = {
+        username: nil
+      }
+
+      post login_path, params: user_hash
+
       id = works(:movie).id
 
       expect {
@@ -262,18 +268,56 @@ describe WorksController do
 
     end
 
-    it "redirects to the work page after the user has logged out" do
-      skip
+    it "redirects to the root_path after the user has logged out" do
+      user_hash = {
+        username: users(:kari).username
+      }
+
+      post login_path, params: user_hash
+
+      id = works(:poodr).id
+
+      get work_path(id)
+
+      post logout_path
+
+      must_respond_with :redirect
+      must_redirect_to root_path
 
     end
 
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
-      skip
+    it "successfully upvotes for a logged-in user and a fresh user-vote pair" do
+      user_hash = {
+        username: users(:kari).username
+      }
+
+      post login_path, params: user_hash
+      id = works(:poodr).id
+
+      expect {
+        post upvote_path(id)
+      }.must_change 'Vote.count', 1
+
+      must_respond_with :redirect
+      must_redirect_to work_path(id)
 
     end
 
     it "redirects to the work page if the user has already voted for that work" do
-      skip
+      user_hash = {
+        username: users(:kari).username
+      }
+
+      post login_path, params: user_hash
+
+      id = works(:album).id
+
+      expect {
+        post upvote_path(id)
+      }.wont_change 'Vote.count'
+
+      must_respond_with :redirect
+      must_redirect_to work_path(id)
 
     end
   end

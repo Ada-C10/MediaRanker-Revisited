@@ -59,7 +59,7 @@ class SessionsController < ApplicationController
        # debugging easier.
        flash.now[:status] = :failure
        flash[:result_text] = "Could not create new user account: "
-       flash.now[:messages] = user.errors.messages
+       flash[:messages] = user.errors.messages
 
        redirect_to root_path
      end

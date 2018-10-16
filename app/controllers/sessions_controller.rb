@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   def create
     auth_hash = request.env['omniauth.auth']
     # raise
-    user = User.find_by(uid: auth_hash[:uid], provider: 'github')
+    user = User.find_by(uid: auth_hash[:uid], provider: auth_hash[:provider])
     # binding.pry
     if user
       # User was found in the database
@@ -15,6 +15,7 @@ class SessionsController < ApplicationController
       # User doesn't match anything in the DB
       # Attempt to create a new user
       user = User.build_from_github(auth_hash)
+      #build_from_github is a method in the user model
 
       if user.save
         flash[:status] = :success
@@ -29,7 +30,7 @@ class SessionsController < ApplicationController
         flash[:status] = :error
         flash[:result_text] = "Could not create new user account: #{user.errors.messages}"
         redirect_to root_path
-        return
+        return #if there is no render, or redirect, follow up with return
       end
     end
 
@@ -39,8 +40,8 @@ class SessionsController < ApplicationController
 
   end
 
-  def login_form
-  end
+  # def login_form
+  # end
 
 
   # def login

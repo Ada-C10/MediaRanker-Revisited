@@ -3,40 +3,17 @@ require 'pry'
 
 describe WorksController do
 
-  # let (:book)  {
-  #   works(:poodr)
-  # }
-  #
-  # let (:album) {
-  #   works(:album)
-  # }
-  #
-  # let (:movie) {
-  #   works(:movie)
-  # }
-
-  # let (:categories) {
-  #   %w(book album movie)
-  # }
-
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
 
-      book = works(:poodr)
-      album = works(:album)
-      movie = works(:movie)
-
       get root_path
       must_respond_with :success
-
 
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
-      album = works(:album)
-      movie = works(:movie)
 
       books = Work.where(category: "book")
 
@@ -74,9 +51,7 @@ describe WorksController do
   describe "index" do
     it "succeeds when there are works" do
 
-      book = works(:poodr)
-      album = works(:album)
-      movie = works(:movie)
+      works 
 
       get works_path
       must_respond_with :success
@@ -189,10 +164,19 @@ describe WorksController do
   describe "show" do
     it "succeeds for an extant work ID" do
 
+      work_id = Work.first.id
+
+      get work_path(work_id)
+
+      must_respond_with :success
+
     end
 
     it "renders 404 not_found for a bogus work ID" do
 
+      work_id = Work.last.id + 1
+
+      get work_path()
     end
   end
 

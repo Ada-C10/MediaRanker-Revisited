@@ -202,19 +202,43 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
+      id = works(:album).id
+      post upvote_path(id)
 
+      must_respond_with :redirect
+      must_redirect_to work_path(id)
     end
 
     it "redirects to the work page after the user has logged out" do
+      post login_path, params: { user: {username: 'Ada'}}
+      # could use delete logout
+      # but need to change logout verb in routes to delete
+      post logout_path
+      expect(session[:user_id]).must_equal nil
 
+      id = works(:album).id
+      post upvote_path(id)
+
+      must_redirect_to work_path(id)
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      post login_path, params: { user: {username: 'Ada'}}
+      id = works(:album).id
 
+      post upvote_path(id)
+
+      must_respond_with :redirect
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      post login_path, params: {user: {username: 'Dan'}}
+      id = works(:album).id
+      post upvote_path(id)
 
+      expect { post upvote_path(id) }.wont_change 'Vote.count'
+
+      must_redirect_to work_path(id)
     end
   end
 end

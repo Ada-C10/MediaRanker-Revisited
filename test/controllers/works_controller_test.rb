@@ -205,13 +205,64 @@ describe WorksController do
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
 
+      id = works(:poodr).id
+
+      work_hash = {
+        work: {
+          title: "test book",
+          category: "book"
+        }
+      }
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_redirect_to work_path(id)
+
+      work = Work.find_by(id: id)
+      expect(work.title).must_equal work_hash[:work][:title]
+      expect(work.category).must_equal work_hash[:work][:category]
+
     end
 
     it "renders bad_request for bogus data" do
 
+      id = works(:poodr).id
+
+      work_hash = {
+        work: {
+          title: "test book",
+          category: "book"
+        }
+      }
+
+      book = works(:poodr)
+
+      work_hash[:work][:title] = nil
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
     end
 
     it "renders 404 not_found for a bogus work ID" do
+
+      id = Work.last.id + 1
+
+      work_hash = {
+        work: {
+          title: "test book",
+          category: "book"
+        }
+      }
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
 
     end
   end

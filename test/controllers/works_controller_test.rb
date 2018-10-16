@@ -83,11 +83,30 @@ describe WorksController do
       }.must_change('Work.count', +1)
 
       must_redirect_to work_path(Work.last)
+      expect(Work.last.title).must_equal work_data[:work][:title]
       expect(Work.last.category).must_equal work_data[:work][:category]
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
 
+      INVALID_CATEGORIES.each do |c|
+        work = Work.new(category: c, title: 'a title')
+
+        work.must_be :invalid?, "Work data wasn't invalid, please fix me."
+      end
+
+      work_data = {
+        work: {
+          title: Work.first.title,
+          category: INVALID_CATEGORIES.first
+        }
+      }
+
+      expect {
+        post works_path, params: work_data
+      }.wont_change('Work.count')
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do

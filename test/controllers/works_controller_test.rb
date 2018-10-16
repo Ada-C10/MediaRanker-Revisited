@@ -172,6 +172,15 @@ describe WorksController do
       must_redirect_to root_path
     end
 
+    it "responsds with not_found if the book doesn't exist" do
+      w = Work.first.destroy
+
+      expect {
+        delete work_path(w)
+      }.wont_change('Work.count')
+
+      must_respond_with :not_found
+    end
   end
 
   describe "upvote" do

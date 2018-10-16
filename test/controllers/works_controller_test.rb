@@ -66,6 +66,20 @@ describe WorksController do
   describe "create" do
     it "creates a work with valid data for a real category" do
       skip
+      album_data = {
+        album: {
+          title: "New Album",
+          category: "album"
+        }
+      }
+
+      test_album = Work.new(album_data[:album])
+      test_album.must_be :valid?, "Album data was invalid"
+
+      post works_path(title: "Test create method", category: "album")
+
+      must_respond_with :success
+
     end
 
     it "renders bad_request and does not update the DB for bogus data" do

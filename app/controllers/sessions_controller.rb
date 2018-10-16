@@ -1,7 +1,33 @@
 class SessionsController < ApplicationController
   def create
     auth_hash = request.env['omniauth.auth']
-    raise
+    user = User.find_by(uid: auth_hash[:uid], provider: 'github')
+    if user
+      # User was found in the database
+      flash[:success] = "Logged in as returning user #{user.name}"
+    else
+      # user = User.create(auth_hash)
+      user = User.build_from_github(auth_hash)
+      if user.save
+        # session[:user_id] = user.id
+        flash[:status] = :success
+        flash[:result_text] = "Logged in as returning user #{user.name}"
+      else
+        flash[:error] = "Could not create new user account: #{user.errors.messages}"
+        redirect_to root_path
+        return
+      end
+    end
+
+    session[:user_id] = user.id
+    redirect_to root_path
+  end
+
+  def destroy
+    session[:user_id] = nil
+    flash[:status] = :success
+    flash[:result_text] = "Successfully logged out"
+    redirect_to root_path
   end
 
   # def login_form
@@ -30,10 +56,5 @@ class SessionsController < ApplicationController
   #   redirect_to root_path
   # end
 
-  def logout
-    session[:user_id] = nil
-    flash[:status] = :success
-    flash[:result_text] = "Successfully logged out"
-    redirect_to root_path
-  end
+
 end

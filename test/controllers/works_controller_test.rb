@@ -213,9 +213,22 @@ describe WorksController do
   describe "destroy" do
     it "succeeds for an extant work ID" do
 
+      expect {
+        delete work_path(@book)
+      }.must_change 'Work.count', -1
+
+      must_redirect_to root_path
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+
+      destroyed_work_id = bogus_work_id
+
+      expect{
+        delete work_path(destroyed_work_id)
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
 
     end
   end

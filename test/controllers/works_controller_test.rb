@@ -2,6 +2,8 @@ require 'test_helper'
 
 describe WorksController do
   let (:poodr) { works(:poodr) }
+  let (:movie) { works(:movie) }
+  let (:dan) { users(:dan) }
 
   describe "root" do
     it "succeeds with all media types" do
@@ -14,7 +16,7 @@ describe WorksController do
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
-      
+
       expect {
         delete work_path(movie.id)
       }.must_change 'Work.count', -1
@@ -275,20 +277,65 @@ describe WorksController do
     it "redirects to the work page if no user is logged in" do
       post upvote_path(poodr.id)
 
+      expect{
+        post upvote_path(poodr.id)
+      }.wont_change 'Vote.count'
+
       must_respond_with :redirect
       must_redirect_to work_path(poodr.id)
     end
 
     it "redirects to the work page after the user has logged out" do
+      user_hash = {
+        username: "dan"
+      }
 
+      post login_path, params: user_hash
+
+      expect(session[:user_id]).must_equal dan.id
+
+      post logout_path
+
+      expect(session[:user_id]).must_be_nil
+
+      expect{
+        post upvote_path(poodr.id)
+      }.wont_change 'dan.votes.count'
+
+      must_respond_with :redirect
+      must_redirect_to work_path(poodr.id)
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      user_hash = {
+        username: "jackie"
+      }
 
+      post login_path, params: user_hash
+
+      user = User.find_by(username: "jackie")
+
+      expect{
+        post upvote_path(poodr.id)
+      }.must_change 'user.votes.count', 1
+
+      must_respond_with :redirect
+      must_redirect_to work_path(poodr.id)
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      user_hash = {
+        username: "dan"
+      }
 
+      post login_path, params: user_hash
+
+      expect{
+        post upvote_path(works(:album).id)
+      }.wont_change 'dan.votes.count'
+
+      must_respond_with :redirect
+      must_redirect_to work_path(works(:album).id)
     end
   end
 end

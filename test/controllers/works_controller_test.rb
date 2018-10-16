@@ -140,17 +140,28 @@ describe WorksController do
   end
 
   describe "update" do
-
     it "succeeds for valid data and an extant work ID" do
-      skip
+      patch work_path(works(:movie)), params: {
+        work: {title: "new and improved title"}
+      }
+      must_redirect_to work_path(works(:movie))
     end
 
     it "renders bad_request for bogus data" do
-      skip
+      patch work_path(works(:movie)), params: {
+        work: {title: nil}
+      }
+      must_respond_with :not_found
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      skip
+      id = works(:poodr).id
+      works(:poodr).destroy
+      patch work_path(id), params: {
+        work: {title: 'poodr'}
+      }
+
+      must_respond_with :not_found
     end
   end
 

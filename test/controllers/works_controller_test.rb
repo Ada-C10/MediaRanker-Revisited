@@ -200,10 +200,23 @@ describe WorksController do
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      work = works(:movie)
+      username = "test username"
+      user1 = User.new(username: username, uid: 6, provider: "github")
+
+      post upvote_path(work)
+      must_redirect_to work_path(work)
 
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+
+      work = works(:movie)
+      username = "test username"
+      user1 = User.new(username: username, uid: 6, provider: "github")
+
+      post upvote_path(work)
+      must_redirect_to work_path(work)
 
     end
   end

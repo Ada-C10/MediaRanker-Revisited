@@ -151,7 +151,7 @@ describe WorksController do
       patch work_path(works(:movie)), params: {
         work: {title: nil}
       }
-      must_respond_with :not_found
+      must_respond_with :bad_request
     end
 
     it "renders 404 not_found for a bogus work ID" do
@@ -166,9 +166,8 @@ describe WorksController do
   end
 
   describe "destroy" do
-
     it "succeeds for an extant work ID" do
-      skip
+
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do

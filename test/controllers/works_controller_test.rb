@@ -1,15 +1,11 @@
 require 'test_helper'
-
+require 'pry'
 describe WorksController do
   let(:book) { works(:poodr) }
   let(:movie) { works(:movie) }
   let(:album) { works(:album) }
+  let(:album2) { works(:another_album) }
   describe "root" do
-    before do
-      book
-      movie
-      album
-    end
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
       get root_path
@@ -28,6 +24,7 @@ describe WorksController do
       book.destroy
       movie.destroy
       album.destroy
+      album2.destroy
 
       get root_path
       must_respond_with :success
@@ -38,11 +35,6 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
-    before do
-      book
-      movie
-      album
-    end
     it "succeeds when there are works" do
       get users_path
       must_respond_with :success
@@ -52,6 +44,7 @@ describe WorksController do
       book.destroy
       movie.destroy
       album.destroy
+      album2.destroy
 
       get users_path
       must_respond_with :success
@@ -67,11 +60,39 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
+      work_data = {
+        work: {
+          category: CATEGORIES[0],
+          title: "new title"
+        }
+      }
 
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :valid?, "Work data was invalid. Please fix this test."
+
+      expect {
+        post works_path, params: work_data
+      }.must_change('Work.count', +1)
+
+      must_redirect_to work_path(Work.last)
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      work_data = {
+        work: {
+          category: CATEGORIES[0],
+          title: 'Old Title'
+        }
+      }
 
+      test_work = Work.new(work_data[:work])
+      test_work.wont_be :valid?, "Work data was valid. Please fix this test."
+
+      expect {
+        post works_path, params: work_data
+      }.wont_change('Work.count')
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do

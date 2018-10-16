@@ -29,7 +29,7 @@ describe UsersController do
       must_respond_with :success
     end
 
-    it 'renders 404 not found is user is not in the database' do
+    it 'renders 404 not found if user is not in the database' do
       id = existing_user.id
       existing_user.destroy
 

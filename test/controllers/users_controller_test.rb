@@ -37,4 +37,11 @@ describe UsersController do
     end
   end
 
+
+  describe "auth_callback" do
+
+
+
+  end 
+
 end

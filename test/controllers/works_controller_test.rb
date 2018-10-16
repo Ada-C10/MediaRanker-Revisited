@@ -195,7 +195,7 @@ describe WorksController do
     it "redirects to the work page after the user has logged out" do
       work = works(:movie)
 
-      post logout_path(work)
+      delete logout_path(work)
       must_redirect_to root_path
     end
 

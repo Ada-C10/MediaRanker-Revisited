@@ -13,6 +13,9 @@ describe WorksController do
     @movie = works(:movie)
     @album = works(:album)
   end
+
+  let(:bogus_work_id) { Work.first.destroy.id }
+
   describe "root" do
 
     it "succeeds with all media types" do
@@ -126,20 +129,28 @@ describe WorksController do
   describe "show" do
     it "succeeds for an extant work ID" do
 
+      get work_path(@book)
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
 
+      get work_path(bogus_work_id)
+      must_respond_with :not_found
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
 
+      get edit_work_path(@book)
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
 
+      get edit_work_path(bogus_work_id)
+      must_respond_with :not_found
     end
   end
 

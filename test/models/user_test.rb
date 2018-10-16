@@ -28,12 +28,12 @@ describe User do
 
     it "requires a unique name" do
       name = "test name"
-      user1 = User.new(name: name)
+      user1 = User.new(name: name, uid: 10, provider: 'github')
 
       # This must go through, so we use create!
       user1.save!
 
-      user2 = User.new(name: name)
+      user2 = User.new(name: name, uid: 12, provider: 'github')
       result = user2.save
       result.must_equal false
       user2.errors.messages.must_include :name

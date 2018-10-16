@@ -237,25 +237,84 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      id = -1
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
 
+      must_respond_with :not_found
     end
   end
 
   describe "upvote" do
+    let(:user_params) {
+      {username: 'dan'}
+    }
+
+
 
     it "redirects to the work page if no user is logged in" do
+
+      expect{
+      post upvote_path(movie.id)
+    }.wont_change 'Vote.count'
+
+      must_respond_with :redirect
+      must_redirect_to work_path(movie.id)
+      expect(flash[:result_text]).must_equal "You must log in to do that"
+
+
 
     end
 
     it "redirects to the work page after the user has logged out" do
 
+            dan = users(:dan)
+            post login_path, params: user_params
+            expect(session[:user_id]).must_equal dan.id
+
+            post logout_path, params: user_params
+            expect(session[:user_id]).must_equal nil
+
+
+
+            post upvote_path(movie.id)
+
+            must_redirect_to work_path(movie.id)
+
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      dan = users(:dan)
+      post login_path, params: user_params
+      expect(session[:user_id]).must_equal dan.id
+
+
+      expect{
+        post upvote_path(movie.id)
+      }.must_change 'Vote.count', 1
+
+      must_redirect_to work_path(movie.id)
+      expect(flash[:result_text]).must_equal "Successfully upvoted!"
 
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      dan = users(:dan)
+      post login_path, params: user_params
+      expect(session[:user_id]).must_equal dan.id
+
+
+      expect{
+        post upvote_path(movie.id)
+      }.must_change 'Vote.count', 1
+
+      expect{
+        post upvote_path(movie.id)
+      }.wont_change 'Vote.count'
+
+      must_redirect_to work_path(movie.id)
+      expect(flash[:result_text]).must_equal "Could not upvote"
 
     end
   end

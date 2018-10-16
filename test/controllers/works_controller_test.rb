@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pry'
 
 describe WorksController do
   describe "root" do
@@ -248,7 +249,7 @@ describe WorksController do
 
   describe "upvote" do
     before do
-      @user_hash =  { username: "jane" }
+      @user = User.new(provider: "github", uid: 99999, username: "jane", email: "joke@joke.com")
       @id = works(:poodr).id
     end
 
@@ -260,10 +261,14 @@ describe WorksController do
     end
 
     it "redirects to the work page after the user has logged out" do
-      post login_path, params: @user_hash
-      post logout_path, params: @user_hash
+      perform_login(@user)
+      poodr_votes = works(:poodr).vote_count
+
+      delete logout_path
 
       post upvote_path(@id)
+      poodr = Work.find_by(id: @id)
+      expect(poodr.vote_count).must_equal poodr_votes
 
       must_respond_with :redirect
     end
@@ -271,7 +276,7 @@ describe WorksController do
     it "succeeds for a logged-in user and a fresh user-vote pair" do
       poodr_votes = works(:poodr).vote_count
 
-      post login_path, params: @user_hash
+      perform_login(@user)
 
       user = User.find_by(username: "jane")
       expect(user.votes.count).must_equal 0
@@ -288,15 +293,18 @@ describe WorksController do
     end
 
     it "redirects to the work page if the user has already voted for that work" do
-        post login_path, params: @user_hash
-        
-        post upvote_path(@id)
+      perform_login(@user)
+      post upvote_path(@id)
 
-        expect {
-          post upvote_path(@id)
-        }.wont_change 'works(:poodr).vote_count'
+      poodr_before = Work.find_by(id: @id)
+      poodr_before_votes = poodr_before.vote_count
 
-        must_respond_with :redirect
+      post upvote_path(@id)
+
+      poodr_after = Work.find_by(id: @id)
+
+      expect(poodr_after.vote_count).must_equal poodr_before_votes
+      must_respond_with :redirect
 
     end
   end

@@ -16,8 +16,8 @@ describe Vote do
   end
 
   describe "validations" do
-    let (:user1) { User.new(username: 'chris') }
-    let (:user2) { User.new(username: 'chris') }
+    let (:user1) { User.new(username: 'chris', uid: 8888, provider: 'github', email: "userchris@test.com") }
+    let (:user2) { User.new(username: 'joe', uid: 7777, provider: 'github', email: "userjoe@test.com") }
     let (:work1) { Work.new(category: 'book', title: 'House of Leaves') }
     let (:work2) { Work.new(category: 'book', title: 'For Whom the Bell Tolls') }
 

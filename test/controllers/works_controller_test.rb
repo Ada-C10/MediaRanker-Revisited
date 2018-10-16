@@ -87,7 +87,7 @@ describe WorksController do
       must_respond_with :success
     end
 
-    
+
   end
 
   describe "new" do
@@ -229,17 +229,11 @@ describe WorksController do
       {
         work: {
           title: "new test book",
-          category: "book"
+          category: "book",
+          description: "new test description"
         }
       }
     }
-
-    # work_data = {
-    #   work: {
-    #     title: "new test book",
-    #     category: "novel"
-    #   }
-    # }
 
     it "succeeds for valid data and an extant work ID" do
 
@@ -247,17 +241,15 @@ describe WorksController do
 
       expect {
         patch work_path(id), params: work_hash
-        must_respond_with :success
       }.wont_change 'Work.count'
 
       must_respond_with :redirect
 
-      book = Work.find_by(id: id)
+      work = Work.find_by(id: id)
 
-      must_respond_with :success
-      # expect(work.title).must_equal work_hash[:work][:title]
+      expect(work.title).must_equal "new test book"
       #
-      # expect(work.description).must_equal work_hash[:work][:category]
+      expect(work.description).must_equal "new test description"
     end
 
     it "renders bad_request for bogus data" do

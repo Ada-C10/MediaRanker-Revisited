@@ -13,5 +13,18 @@
 !/log/.keep
 !/tmp/.keep
 
+# Ignore uploaded files in development
+/storage/*
+!/storage/.keep
+
+/node_modules
+/yarn-error.log
+
+/public/assets
+.byebug_history
+/coverage
+.DS_Store
+.env
+
 # Ignore Byebug command history file.
 .byebug_history

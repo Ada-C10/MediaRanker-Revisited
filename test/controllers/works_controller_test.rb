@@ -237,10 +237,24 @@ describe WorksController do
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
 
+      post login_path, params: mock_params
+
+      expect {
+              post upvote_path(poodr.id)
+      }.must_change 'Vote.count', 1
+
+      must_redirect_to work_path(poodr.id)
     end
 
     it "redirects to the work page if the user has already voted for that work" do
 
+      post login_path, params: mock_params
+
+      expect{
+              post upvote_path(album.id)
+      }.wont_change 'Vote.count'
+
+      must_redirect_to work_path(album.id)
     end
   end
 end

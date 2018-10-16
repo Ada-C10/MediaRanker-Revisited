@@ -229,12 +229,6 @@ describe WorksController do
 
     it "redirects to the work page if no user is logged in" do
 
-      session[:user_id] = nil
-
-      post upvote_path(existing_work.id)
-
-      must_respond_with :not_found
-      must_redirect_to work_path(existing_work.id)
 
     end
 

@@ -49,33 +49,78 @@ describe WorksController do
 
       get works_path
       must_respond_with :success
-
     end
 
     it "succeeds when there are no works" do
 
+      @book.destroy
+      @movie.destroy
+      @album.destroy
+
+      get works_path
+      must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
 
+      get new_work_path(@book.id)
+      must_respond_with :success
     end
   end
 
   describe "create" do
     it "creates a work with valid data for a real category" do
 
+      work_data = {
+        work:
+        { title: "Unique Title", category: 'book' }
+        }
+
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :valid?, "Work data was invalid. Please come fix this test."
+
+      expect {
+        post works_path params: work_data
+      }.must_change 'Work.count', +1
+
+      must_redirect_to work_path(Work.last)
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
 
+      work_data = {
+        work:
+        { category: 'movie' }
+      }
+
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :invalid?, "Work data was valid. Please come fix this test."
+
+      expect {
+        post works_path params: work_data
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
 
-    end
+      work_data = {
+        work:
+        { category: 'bogus movie' }
+      }
 
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :invalid?, "Work data was valid. Please come fix this test."
+
+      expect {
+        post works_path params: work_data
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+    end
   end
 
   describe "show" do

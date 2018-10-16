@@ -245,6 +245,13 @@ describe WorksController do
   end
 
   describe "upvote" do
+    #Can also put this in the test helper....
+    #We have to tests this and call the sessions controller... but it's okay
+    # since this is a dependency
+    # post login_path, params: { user: {name: 'Ada'}}
+    # expect(session[:user_id]).wont_be_nil
+    # delete logout_path
+    # expect (session[:user_id]).to_equal nil
 
     it "redirects to the work page if no user is logged in" do
 

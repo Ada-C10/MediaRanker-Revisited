@@ -11,4 +11,5 @@ Rails.application.routes.draw do
   resources :users, only: [:index, :show]
 
   get "/auth/:provider/callback", to: "sessions#create"
+  delete "/logout", to: "sessions#destroy", as: "logout"
 end

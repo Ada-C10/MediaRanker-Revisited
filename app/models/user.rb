@@ -11,5 +11,6 @@ class User < ApplicationRecord
     user.username = auth_hash["info"]["name"]
     user.email = auth_hash["info"]["name"]
 
-    return user 
+    return user
+  end 
 end

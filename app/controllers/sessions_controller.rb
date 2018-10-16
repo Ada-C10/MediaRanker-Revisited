@@ -72,7 +72,7 @@ class SessionsController < ApplicationController
 
  def destroy
    session[:user_id] = nil
-   flash.now[:status] = :success
+   flash[:status] = :success
    flash[:result_text] = "Successfully logged out!"
 
    redirect_to root_path

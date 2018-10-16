@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pry'
 
 describe WorksController do
   let (:poodr) { works(:poodr) }
@@ -286,15 +287,11 @@ describe WorksController do
     end
 
     it "redirects to the work page after the user has logged out" do
-      user_hash = {
-        username: "dan"
-      }
-
-      post login_path, params: user_hash
+      perform_login(dan)
 
       expect(session[:user_id]).must_equal dan.id
 
-      post logout_path
+      delete logout_path
 
       expect(session[:user_id]).must_be_nil
 
@@ -307,13 +304,9 @@ describe WorksController do
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
-      user_hash = {
-        username: "jackie"
-      }
+      perform_login(dan)
 
-      post login_path, params: user_hash
-
-      user = User.find_by(username: "jackie")
+      user = User.find_by(username: "dan")
 
       expect{
         post upvote_path(poodr.id)
@@ -324,11 +317,7 @@ describe WorksController do
     end
 
     it "redirects to the work page if the user has already voted for that work" do
-      user_hash = {
-        username: "dan"
-      }
-
-      post login_path, params: user_hash
+      perform_login(dan)
 
       expect{
         post upvote_path(works(:album).id)

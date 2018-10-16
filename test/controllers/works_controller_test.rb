@@ -29,10 +29,7 @@ describe WorksController do
     end
 
     it "succeeds when there are no works" do
-      Work.first.destroy
-      Work.first.destroy
-      Work.first.destroy
-      Work.first.destroy
+      Work.destroy_all
 
       get works_path
 
@@ -159,7 +156,7 @@ describe WorksController do
 
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
-
+  
     end
 
     it "renders bad_request for bogus data" do

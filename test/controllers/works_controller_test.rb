@@ -177,11 +177,17 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
+      work = works(:movie)
 
+      post upvote_path(work)
+      must_redirect_to work_path(work)
     end
 
     it "redirects to the work page after the user has logged out" do
+      work = works(:movie)
 
+      post logout_path(work)
+      must_redirect_to root_path
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do

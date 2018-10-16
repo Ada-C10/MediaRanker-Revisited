@@ -7,19 +7,22 @@ require 'test_helper'
 
 
 describe WorksController do
+
+  before do
+    @book = works(:poodr)
+    @movie = works(:movie)
+    @album = works(:album)
+  end
   describe "root" do
 
     it "succeeds with all media types" do
-      # Precondition: there is at least one media of each category
-      book = works(:poodr)
-      movie = works(:movie)
-      album = works(:album)
-      expect(book).must_be_kind_of Work
-      expect(book.valid?).must_equal true
-      expect(movie).must_be_kind_of Work
-      expect(movie.valid?).must_equal true
-      expect(album).must_be_kind_of Work
-      expect(album.valid?).must_equal true
+      # Precondition: there is at least one media of each categoryc
+      expect(@book).must_be_kind_of Work
+      expect(@book.valid?).must_equal true
+      expect(@movie).must_be_kind_of Work
+      expect(@movie.valid?).must_equal true
+      expect(@album).must_be_kind_of Work
+      expect(@album.valid?).must_equal true
     end
 
     it "succeeds with one media type absent" do

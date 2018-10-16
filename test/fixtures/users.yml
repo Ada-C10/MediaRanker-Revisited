@@ -2,6 +2,10 @@
 
 dan:
   username: dan
+  uid: dan12345
+  provider: facebook
 
 kari:
   username: kari
+  uid: kari12345
+  provider: facebook

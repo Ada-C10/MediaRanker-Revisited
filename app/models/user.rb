@@ -8,8 +8,7 @@ class User < ApplicationRecord
    user = User.new
    user.uid = auth_hash[:uid]
    user.provider = auth_hash[:provider]
-   user.name = auth_hash['info']['name']
-   user.email = auth_hash['info']['email']
+   user.username = auth_hash['info']['name']
 
    # Note that the user has not been saved
    return user

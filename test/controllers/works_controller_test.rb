@@ -167,11 +167,21 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      expect{
+        delete work_path(works(:poodr))
+      }.must_change('Work.count', -1)
 
+      must_redirect_to root_path
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
-      skip
+      w = works(:poodr).destroy
+
+      expect{
+        delete work_path(w)
+      }.wont_change('Work.count')
+
+      must_respond_with :not_found
     end
   end
 

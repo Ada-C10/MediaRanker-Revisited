@@ -10,8 +10,8 @@ describe WorksController do
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
-      work_to_destroy = works(:album)
-      destroy_work = work_to_destroy.destroy
+      work_to_destroy = works(:movie)
+      work_to_destroy.destroy
 
       get works_path
       must_respond_with :success
@@ -56,17 +56,17 @@ describe WorksController do
   end
 
   describe "create" do
-    # it "creates a work with valid data for a real category" do
-    #   movie_data = {
-    #     work: {
-    #       title: "Sound of Music",
-    #       category: "movie"
-    #     }
-    #   }
-    #
-    #   expect{post works_path, params: movie_data}.must_change('Work.count', +1)
-    #   must_redirect_to work_path
-    # end
+    it "creates a work with valid data for a real category" do
+      work = {
+        work: {
+          title: "Sound of Music",
+          category: "movie"
+        }
+      }
+
+      expect{post works_path, params: work}.must_change('Work.count', +1)
+      must_redirect_to work_path(Work.last)
+    end
 
     it "renders bad_request and does not update the DB for bogus data" do
       movie_data = {
@@ -122,30 +122,30 @@ describe WorksController do
     end
   end
 
-  describe "update" do
-    it "succeeds for valid data and an extant work ID" do
-      work = works(:poodr)
-      new_work_title = "99 Bottles"
-      altered_work = {
-        work: {
-          title: new_work_title,
-          category: "movie"
-        }
-      }
+  # describe "update" do
+    # it "succeeds for valid data and an extant work ID" do
+    #   work = works(:poodr)
+    #   new_work_title = "99 Bottles"
+    #   altered_work = {
+    #     work: {
+    #       title: new_work_title,
+    #       category: "movie"
+    #     }
+    #   }
+    #
+    #   patch work_path(work.id), params: altered_work
+    #   # expect(work.title).must_equal new_work_title
+    #   must_redirect_to work_path
+    # end
 
-      patch work_path(work.id), params: altered_work
-      # expect(work.title).must_equal new_work_title
-      must_redirect_to work_path
-    end
+    # it "renders bad_request for bogus data" do
+    #
+    # end
 
-    it "renders bad_request for bogus data" do
-
-    end
-
-    it "renders 404 not_found for a bogus work ID" do
-
-    end
-  end
+    # it "renders 404 not_found for a bogus work ID" do
+    #
+    # end
+  # end
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
@@ -167,22 +167,22 @@ describe WorksController do
     end
   end
 
-  describe "upvote" do
-
-    it "redirects to the work page if no user is logged in" do
-
-    end
-
-    it "redirects to the work page after the user has logged out" do
-
-    end
-
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
-
-    end
-
-    it "redirects to the work page if the user has already voted for that work" do
-
-    end
-  end
+  # describe "upvote" do
+  #
+  #   it "redirects to the work page if no user is logged in" do
+  #
+  #   end
+  #
+  #   it "redirects to the work page after the user has logged out" do
+  #
+  #   end
+  #
+  #   it "succeeds for a logged-in user and a fresh user-vote pair" do
+  #
+  #   end
+  #
+  #   it "redirects to the work page if the user has already voted for that work" do
+  #
+  #   end
+  # end
 end

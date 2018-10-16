@@ -1,28 +1,31 @@
+require 'date'
+
 class SessionsController < ApplicationController
 
   def create
     auth_hash = request.env['omniauth.auth']
     # raise
-    user = User.find_by(uid: auth_hash[:uid], provider: 'github')
-    user_name = auth_hash[:nickname]
-    user_github_id = auth_hash[:uid]
-    user_email = auth_hash[:email]
+    user = User.find_by(uid: auth_hash[:uid], provider: auth_hash[:provider])
+
 
     if user
       session[:user_id] = user.id
       flash[:success] = "Successfully logged in as TEST ROUTE"
     else
       new_user = User.new(
-        username: user_name,
-        email: user_email,
-        uid: user_github_id,
-        provider: 'github')
+        username: auth_hash['info']['nickname'],
+        email: auth_hash['info']['email'],
+        uid: auth_hash['uid'],
+        provider: auth_hash['provider'],
+        created_at: Time.now
+      )
 
       if new_user.save
         session[:user_id] = new_user.id
         flash[:success] = "Successfully logged in as TEST ROUTE"
       else
         flash[:error] = "Could not log in TEST ROUTE"
+        redirect_to root_path
         return
       end
     end
@@ -30,6 +33,13 @@ class SessionsController < ApplicationController
 
   end
 
+  def logout
+    session[:user_id] = nil
+    flash[:status] = :success
+    flash[:result_text] = "Successfully logged out"
+    redirect_to root_path
+  end
+end
 
 
 
@@ -62,10 +72,3 @@ class SessionsController < ApplicationController
   #   redirect_to root_path
   # end
   #
-  # def logout
-  #   session[:user_id] = nil
-  #   flash[:status] = :success
-  #   flash[:result_text] = "Successfully logged out"
-  #   redirect_to root_path
-  # end
-end

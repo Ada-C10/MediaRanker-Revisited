@@ -48,14 +48,18 @@ describe WorksController do
       works = {}
 
       get works_path
-      
+
       must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
-      skip
+
+    new = get new_work_path
+
+    must_respond_with :success
+
     end
   end
 

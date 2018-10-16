@@ -1,3 +1,6 @@
+gem "omniauth"
+gem "omniauth-github"
+
 source 'https://rubygems.org'
 
 git_source(:github) do |repo_name|
@@ -47,6 +50,7 @@ group :development, :test do
 
   # Use pry for rails console
   gem 'pry-rails'
+  gem 'dotenv-rails'
 end
 
 group :test do

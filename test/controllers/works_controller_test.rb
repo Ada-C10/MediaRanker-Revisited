@@ -1,6 +1,11 @@
 require 'test_helper'
 
 describe WorksController do
+
+  let (:id) {
+    id = works(:album).id
+  }
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -49,25 +54,31 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
-      good_hash = {
-        work: {
-          title: 'The Bible',
-          creator: 'Jesus and God',
-          description: 'Very long book, very preoccupied with blood as a theme',
-          category: 'movie'
+      CATEGORIES.each do |category|
+        good_hash = {
+          work: {
+            title: 'The Bible',
+            creator: 'Jesus and God',
+            description: 'Very long book, very preoccupied with blood as a theme',
+            category: category
+          }
         }
-      }
 
-      expect {
-        post works_path, params: good_hash
-      }.must_change 'Work.count', +1
+        expect {
+          post works_path, params: good_hash
+        }.must_change 'Work.count', +1
 
-      must_respond_with :redirect
+        must_respond_with :redirect
 
-      expect(Work.last.title).must_equal good_hash[:work][:title]
-      expect(Work.last.creator).must_equal good_hash[:work][:creator]
-      expect(Work.last.description).must_equal good_hash[:work][:description]
-      expect(Work.last.category).must_equal good_hash[:work][:category]
+        # just did this to shorten my line lengths on the following assertions
+        hash = good_hash[:work]
+
+        expect(Work.last.title).must_equal hash[:title].singularize
+        expect(Work.last.creator).must_equal hash[:creator].singularize
+        expect(Work.last.description).must_equal hash[:description].singularize
+        expect(Work.last.category).must_equal hash[:category].singularize
+      end
+
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
@@ -106,14 +117,12 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
-      id = works(:album).id
-
       get work_path(id)
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      id = works(:album).id
+      # id references works(:album)
       works(:album).destroy
 
       get work_path(id)
@@ -123,14 +132,14 @@ describe WorksController do
 
   describe "edit" do
     it "succeeds for an extant work ID" do
-      id = works(:album).id
+
 
       get edit_work_path(id)
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      id = works(:album).id
+      # id references works(:album)
       works(:album).destroy
 
       get edit_work_path(id)
@@ -149,7 +158,7 @@ describe WorksController do
         }
       }
 
-      id = works(:album).id
+
       expect {
         patch work_path(id), params: good_hash
       }.wont_change 'Work.count'
@@ -172,7 +181,7 @@ describe WorksController do
       }
 
       original = works(:album)
-      id = works(:album).id
+
 
       expect {
         patch work_path(id), params: bad_hash
@@ -196,7 +205,7 @@ describe WorksController do
         }
       }
 
-      id = works(:album).id
+      # id references works(:album)
       works(:album).destroy
 
       expect {
@@ -209,7 +218,7 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
-      id = works(:album).id
+
 
       expect {
         delete work_path(id)
@@ -219,7 +228,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
-      id = works(:album).id
+      # id references works(:album)
       works(:album).destroy
 
       expect {
@@ -233,7 +242,7 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
-      
+
     end
 
     it "redirects to the work page after the user has logged out" do

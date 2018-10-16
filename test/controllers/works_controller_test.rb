@@ -1,10 +1,25 @@
 require 'test_helper'
 
+# Tests rendering, routing, and HTTP status when appropriate
+# Tests updates to the model when appropriate
+# Tests custom controller logic and custom routes when appropriate
+# Tests positive, negative, nominal and edge cases
+
+
 describe WorksController do
   describe "root" do
+
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
-
+      book = works(:poodr)
+      movie = works(:movie)
+      album = works(:album)
+      expect(book).must_be_kind_of Work
+      expect(book.valid?).must_equal true
+      expect(movie).must_be_kind_of Work
+      expect(movie.valid?).must_equal true
+      expect(album).must_be_kind_of Work
+      expect(album.valid?).must_equal true
     end
 
     it "succeeds with one media type absent" do

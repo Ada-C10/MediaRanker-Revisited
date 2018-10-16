@@ -154,17 +154,59 @@ describe WorksController do
     end
   end
 
+
+        # work_data = {
+        #   work:
+        #   { title: "Unique Title", category: 'book' }
+        #   }
+        #
+        # test_work = Work.new(work_data[:work])
+        # test_work.must_be :valid?, "Work data was invalid. Please come fix this test."
+        #
+        # expect {
+        #   post works_path params: work_data
+        # }.must_change 'Work.count', +1
+        #
+        # must_redirect_to work_path(Work.last)
+
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
 
+      updated_work_data = {
+        work:
+        { title: @movie.title }
+      }
+
+      expect{
+      put work_path(@book), params: updated_work_data
+    }.wont_change 'Work.count'
+
+    must_redirect_to work_path(@book)
     end
 
     it "renders bad_request for bogus data" do
 
+      bogus_work_data = {
+        work:
+        { title: nil }
+      }
+
+      expect{
+      put work_path(@book), params: bogus_work_data
+    }.wont_change 'Work.count'
+
+    must_respond_with :bad_request
     end
 
     it "renders 404 not_found for a bogus work ID" do
 
+      destroyed_work_id = bogus_work_id
+
+      expect{
+        put work_path(destroyed_work_id)
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
     end
   end
 

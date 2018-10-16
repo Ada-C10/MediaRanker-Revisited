@@ -96,28 +96,57 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
+      work_data = {
+        work: {
+          category: INVALID_CATEGORIES[0],
+          title: 'new work title'
+        }
+      }
 
+      test_work = Work.new(work_data[:work])
+      test_work.wont_be :valid?, "Work data was valid. Please fix this test."
+
+      expect {
+        post works_path, params: work_data
+      }.wont_change('Work.count')
+
+      must_respond_with :bad_request
     end
 
   end
 
   describe "show" do
     it "succeeds for an extant work ID" do
-
+      expect {
+        get work_path(book.id)
+        must_respond_with :success
+      }
     end
 
     it "renders 404 not_found for a bogus work ID" do
-
+      book.destroy
+      expect {
+        get work_path(book.id)
+        must_respond_with :not_found
+      }
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
+      expect {
+        get edit_work_path(Work.first)
+        must_respond_with :success
+      }
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
-
+      book.destroy
+      expect {
+        get edit_work_path(book.id)
+        must_respond_with :not_found
+      }
     end
   end
 

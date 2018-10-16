@@ -97,19 +97,20 @@ describe WorksController do
       expect(Work.last.publication_year).must_equal book_hash[:work][:publication_year]
     end
 
-    it "renders bad_request and does not update the DB for bogus data" do
+    it "renders 400 bad_request for bogus categories" do
+      response = post works_path(bogus_hash)
+
+      expect(response).must_equal 400
+
+    end
+
+    it "renders bad_request and does not update the DB for bogus title" do
+      bogus_hash[:title] = nil
       expect {
           post works_path, params: bogus_hash
         }.must_change 'Work.count', 0
 
       must_respond_with :bad_request
-    end
-
-    it "renders 400 bad_request for bogus categories" do
-      response = post works_path(bogus_hash)
-
-      expect(response).must_equal 400
-      # How do I test the flash messages or error messages for this create?
     end
 
   end
@@ -228,19 +229,16 @@ describe WorksController do
   end
 
   describe "upvote" do
+    let(:user_params) {
+      {username: 'jackie'}
+    }
+
 
     it "redirects to the work page if no user is logged in" do
     test_work = works(:album)
 
-    vote_hash = { vote:
-        {
-          user: nil,
-          work: test_work
-        }
-      }
-
       expect {
-        post upvote_path(test_work.id), params: vote_hash
+        post upvote_path(test_work.id)
       }.must_change 'Vote.count', 0
 
       must_redirect_to work_path(test_work.id)
@@ -248,45 +246,55 @@ describe WorksController do
     end
 
     it "redirects to the work page after the user has logged out" do
-      test_work = works(:album)
+      jackie = users(:jackie)
 
-      vote_hash = { vote:
-          {
-            user: nil,
-            work: test_work
-          }
-        }
+      post login_path, params: user_params
+      expect(session[:user_id]).must_equal jackie.id
 
-        expect {
-          post upvote_path(test_work.id), params: vote_hash
-        }.must_change 'Vote.count', 0
+      post logout_path
+      expect(session[:user_id]).must_equal nil
 
-        must_redirect_to work_path(test_work.id)
+      album = works(:album)
+
+      post upvote_path(album.id)
+
+      must_redirect_to work_path(album.id)
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
-      test_work = works(:poodr)
-      test_user = users(:dan)
-      @login_user = test_user
+      jackie = users(:jackie)
 
-      vote_hash = { vote:
-          {
-            user: test_user,
-            work: test_work
-          }
-        }
+      post login_path, params: user_params
+      expect(session[:user_id]).must_equal jackie.id
 
-        expect {
-          post upvote_path(test_work), params: vote_hash
-        }.must_change 'Vote.count', 1
+      test_work = works(:movie)
 
-        binding.pry
-        must_redirect_to work_path(test_work.id)
-        expect(flash[:result_text]).must_equal "Successfully upvoted!"
+      expect {
+        post upvote_path(test_work.id)
+      }.must_change 'Vote.count', 1
 
+      must_redirect_to work_path(test_work.id)
+      expect(flash[:result_text]).must_equal "Successfully upvoted!"
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      jackie = users(:jackie)
+
+      post login_path, params: user_params
+      expect(session[:user_id]).must_equal jackie.id
+
+      test_work = works(:movie)
+
+      expect {
+        post upvote_path(test_work.id)
+      }.must_change 'Vote.count', 1
+
+      expect {
+        post upvote_path(test_work.id)
+      }.wont_change 'Vote.count'
+
+      must_redirect_to work_path(test_work.id)
+      expect(flash[:result_text]).must_equal "Could not upvote"
 
     end
   end

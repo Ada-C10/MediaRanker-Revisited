@@ -29,40 +29,90 @@ describe WorksController do
       must_respond_with :success
     end
   end
+
+  CATEGORIES = %w(albums books movies)
+  INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
+
+  describe "index" do
+    it "succeeds when there are works" do
+
+      get works_path
+      must_respond_with :success
+    end
   #
-  # CATEGORIES = %w(albums books movies)
-  # INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
-  #
-  # describe "index" do
-  #   it "succeeds when there are works" do
-  #
-  #   end
-  #
-  #   it "succeeds when there are no works" do
-  #
-  #   end
-  # end
-  #
-  # describe "new" do
-  #   it "succeeds" do
-  #
-  #   end
-  # end
-  #
-  # describe "create" do
-  #   it "creates a work with valid data for a real category" do
-  #
-  #   end
-  #
-  #   it "renders bad_request and does not update the DB for bogus data" do
-  #
-  #   end
-  #
-  #   it "renders 400 bad_request for bogus categories" do
-  #
-  #   end
-  #
-  # end
+    it "succeeds when there are no works" do
+
+    works = Work.all
+    works.destroy_all
+
+    get works_path
+    must_respond_with :success
+    end
+  end
+
+  describe "new" do
+    it "succeeds" do
+
+    get new_work_path
+    must_respond_with :success
+    end
+  end
+
+  describe "create" do
+    it "creates a work with valid data for a real category" do
+      work_hash = {
+        work: {
+          title: "Bad Cherry",
+          creator: "Nuna the Doe",
+          description: "Southern Fried Pixie Trapp",
+          publication_year: 2018,
+          category: "album"
+        }
+      }
+
+      expect {
+        post works_path, params: work_hash
+      }.must_change 'Work.count', 1
+
+      must_respond_with :redirect
+
+      expect(Work.last.title).must_equal work_hash[:work][:title]
+    end
+
+    it "renders bad_request and does not update the DB for bogus data" do
+      work_hash = {
+        work: {
+          title: "Old Title",
+          creator: "Stella",
+          category: "album"
+        }
+      }
+
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+    end
+
+    it "renders 400 bad_request for bogus categories" do
+      work_hash = {
+        work: {
+          title: "Bad Cherry",
+          creator: "Lucy",
+          category: "booky"
+        }
+      }
+
+      # work_hash[:work][:category] = "rock"
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+    end
+
+  end
   #
   # describe "show" do
   #   it "succeeds for an extant work ID" do

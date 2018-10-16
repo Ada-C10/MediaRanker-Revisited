@@ -2,6 +2,9 @@
 
 dan:
   username: dan
-
+  uid: 123
+  provider: blah
 kari:
   username: kari
+  uid: 456
+  provider: blahblah

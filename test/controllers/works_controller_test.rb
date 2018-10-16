@@ -156,11 +156,17 @@ describe WorksController do
 
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
-  
+      work = Work.create!(category: "book", title: "test")
+      put work_path(work), params: {work: { title: "the new title of this work"}}
+
+      must_redirect_to work_path(work)
     end
 
     it "renders bad_request for bogus data" do
+      work = Work.create!(category: "book", title: "test")
+      put work_path(work), params: {work: { title: nil}}
 
+      must_respond_with :not_found
     end
 
     it "renders 404 not_found for a bogus work ID" do

@@ -213,7 +213,7 @@ describe WorksController do
       post login_path, params: { user: {username: 'Ada'}}
       # could use delete logout
       # but need to change logout verb in routes to delete
-      post logout_path
+      delete logout_path
       expect(session[:user_id]).must_equal nil
 
       id = works(:album).id

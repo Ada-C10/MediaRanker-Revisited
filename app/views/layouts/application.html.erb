@@ -34,9 +34,9 @@
       </ul>
       <ul class="nav app-header__user-nav-container">
 
-        <% if session[:user_id] %>
+        <% if @login_user %>
         <p>Currently logged in as user
-          <%= User.find(session[:user_id]).name %>
+          <%= @login_user.name %>
         <%= link_to "Log out", logout_path, method: "delete"   %>
         <% else %>
         <%= link_to "Login with Github", "/auth/github" %>

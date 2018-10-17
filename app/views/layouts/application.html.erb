@@ -68,6 +68,13 @@
         <% end %>
       </div>
     </section>
+    <% else %>
+      <% flash.each do |name, message| %>
+      <section class="alert-<%= name %> flashmessage">
+              <p><%= message %> </p>
+      <% end %>
+    </section>
+
   <% end %>
 
   <main>

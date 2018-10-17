@@ -20,6 +20,11 @@ describe WorksController do
     works(:poodr)
   }
 
+  before do
+    user = users(:dan)
+    session[:user_id] = user.id
+  end
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category

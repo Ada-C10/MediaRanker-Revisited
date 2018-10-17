@@ -207,6 +207,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+
       # Arrange
       album = works(:album)
       id = album.id
@@ -217,7 +218,7 @@ describe WorksController do
       album.destroy
 
         # Act
-        get work_path(id)
+      get work_path(id)
       # Assert
       must_respond_with :not_found
     end
@@ -248,25 +249,59 @@ describe WorksController do
       work = Work.find_by(id: id)
 
       expect(work.title).must_equal "new test book"
-      #
+      expect(work.category).must_equal "book"
       expect(work.description).must_equal "new test description"
     end
 
     it "renders bad_request for bogus data" do
+      # Arrange
+      id = " "
+
+      patch work_path(id)
+
+      # Assert
+      must_respond_with :not_found
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      # Arrange
+      id = " "
 
+      patch work_path(id), params: work_hash
+
+      # Assert
+      must_respond_with :not_found
     end
   end
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
 
+      # arrange
+      id = works(:album).id
+      #act
+      expect{
+        delete work_path(id)
+      }.must_change 'Work.count', -1
+
+      # assert
+      must_respond_with :redirect
+      expect(Work.find_by_id(id)).must_equal nil
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+
+      # arrange
+      id = " "
+      # act
+      expect{
+        delete work_path(id)
+      }.wont_change 'Work.count'
+
+      #assert
+      must_respond_with :not_found
+      #expect(Work.find_by_id(id)).must_equal nil
 
     end
   end

@@ -183,8 +183,28 @@ describe WorksController do
     end
   end
 
+
+
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
+
+      work = works(:poodr)
+
+
+      work_hash = {
+        poodr: {
+          title: 'something different',
+          creator: 'New Editted Author',
+          description: 'something new'
+        }
+      }
+      # binding.pry
+
+      expect {
+        put work_path(work.id), params: work_hash
+      }.wont_change('Work.count')
+
+      must_redirect_to work_path(work.id)
 
     end
 
@@ -200,9 +220,27 @@ describe WorksController do
   describe "destroy" do
     it "succeeds for an extant work ID" do
 
+      work = works(:poodr)
+      before_work_count = Work.count
+
+      expect {
+        delete work_path(work)
+      }.must_change('Work.count', -1)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      bad_work_id = Work.first.destroy.id
+
+      id = bad_work_id
+      expect {
+        delete work_path(id)
+      }.wont_change('Work.count')
+
+      must_respond_with :not_found
 
     end
   end

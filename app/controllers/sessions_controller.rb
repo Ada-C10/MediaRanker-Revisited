@@ -6,17 +6,19 @@ class SessionsController < ApplicationController
     user = User.find_by(uid: auth_hash[:uid], provider: 'github')
     if user
       # User was found in the database
-      puts "Found user"
-      flash[:success] = "Logged in as returning user #{user.name}"
+      flash[:status] = "success"
+      flash[:result_text] = "Logged in as existing user #{user.username}"
+      flash[:messages] = user.errors.messages
 
     else
       # User doesn't match anything in the DB
       # Attempt to create a new user
-      puts "Creating user"
       user = User.build_from_github(auth_hash)
 
       if user.save
-        flash[:success] = "Logged in as new user #{user.name}"
+        flash[:status] = "success"
+        flash[:result_text] = "Logged in as #{user.username}"
+        flash[:messages] = user.errors.messages
 
       else
         # Couldn't save the user for some reason. If we
@@ -33,7 +35,6 @@ class SessionsController < ApplicationController
     end
 
     # If we get here, we have a valid user instance
-    puts "setting session"
     session[:user_id] = user.id
     redirect_to root_path
   end
@@ -73,7 +74,9 @@ class SessionsController < ApplicationController
 
   def destroy
   session[:user_id] = nil
-  flash[:success] = "Successfully logged out!"
+  flash[:status] = "success"
+  flash[:result_text] = "Successfully logged out"
+  # flash[:messages] = user.errors.messages
 
   redirect_to root_path
 end

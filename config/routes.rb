@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :users, only: [:index, :show]
 
   #oath stuff
+  # TODO: add view helper?? need login path + add to view
   get "/auth/:provider/callback", to: "sessions#create"
   delete "/logout", to: "sessions#destroy", as: "logout"
 

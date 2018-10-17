@@ -11,6 +11,7 @@ class User < ApplicationRecord
     user.name = auth_hash['info']['name']
     user.email = auth_hash['info']['email']
     user.username = auth_hash['info']['nickname']
+  #TODO: ADD PROVIDER TO DB
 
 
     # Note that the user has not been saved

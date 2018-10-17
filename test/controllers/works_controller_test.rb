@@ -56,7 +56,7 @@ describe WorksController do
   describe "new" do
     it "succeeds" do
 
-    new = get new_work_path
+    get new_work_path
 
     must_respond_with :success
 
@@ -65,74 +65,161 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
-      skip
-      album_data = {
-        album: {
-          title: "New Album",
+      work_hash = {
+        work: {
+          title: "new test album",
           category: "album"
         }
       }
 
-      test_album = Work.new(album_data[:album])
-      test_album.must_be :valid?, "Album data was invalid"
+      expect {
+        post works_path, params: work_hash
+      }.must_change 'Work.count', 1
+      # Assert
+      must_respond_with :redirect
 
-      post works_path(title: "Test create method", category: "album")
-
-      must_respond_with :success
-
+      expect(Work.last.title).must_equal work_hash[:work][:title]
+      expect(Work.last.category).must_equal work_hash[:work][:category]
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
-      skip
+      work_hash = {
+        work: {
+          title: "",
+          category: "album"
+        }
+      }
+
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
-      skip
-    end
+      work_hash = {
+        work: {
+          title: "work with no category",
+          category: "nope"
+        }
+      }
 
+      expect {
+        post works_path, params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+    end
   end
 
   describe "show" do
     it "succeeds for an extant work ID" do
-      skip
+      id = works(:poodr).id
+
+      get work_path(id)
+
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      skip
+      id = works(:poodr)
+
+      works(:poodr).destroy
+
+      get work_path(id)
+
+      must_respond_with :not_found
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
-      skip
+      id = works.first.id
+
+      get edit_work_path(id)
+
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      skip
+      id = works(:poodr)
+      works(:poodr).destroy
+
+      get edit_work_path(id)
+
+      must_respond_with :not_found
     end
   end
 
   describe "update" do
+    let (:work_hash) {
+      {
+        work: {
+          title: "new test album",
+          category: "album"
+        }
+      }
+    }
     it "succeeds for valid data and an extant work ID" do
-      skip
+      id = works(:poodr).id
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :redirect
+
+      work = Work.find_by(id: id)
+      expect(work.title).must_equal work_hash[:work][:title]
+      expect(work.category).must_equal work_hash[:work][:category]
     end
 
     it "renders bad_request for bogus data" do
-      skip
+      id = works(:poodr).id
+      original_work = works(:poodr)
+      work_hash[:work][:category] = -1
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+
+      work = Work.find_by(id: id)
+      expect(work.title).must_equal original_work.title
+      expect(work.category).must_equal original_work.category
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      skip
+      id = -1
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
     end
   end
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
-      skip
+      id = works(:poodr).id
+
+      expect {
+        delete work_path(id)
+      }.must_change 'Work.count', -1
+
+      must_redirect_to root_path
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
-      skip
+      id = -1
+
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
     end
   end
 
@@ -140,6 +227,11 @@ describe WorksController do
 
     it "redirects to the work page if no user is logged in" do
       skip
+      # id = works(:poodr)
+      #
+      # post upvote_path, works(id)
+      #
+      # must_redirect_to work_path(id)
     end
 
     it "redirects to the root page after the user has logged out" do

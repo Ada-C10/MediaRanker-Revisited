@@ -35,6 +35,11 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
+    before do
+      @user = users(:dan)
+      perform_login(@user)
+    end
+    
     it "succeeds when there are works" do
       get works_path
 
@@ -305,6 +310,7 @@ describe WorksController do
 
       expect(poodr_after.vote_count).must_equal poodr_before_votes
       must_respond_with :redirect
+      # must_redirect_to root_path
 
     end
   end

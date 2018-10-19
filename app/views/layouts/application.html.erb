@@ -33,6 +33,14 @@
         </li>
       </ul>
       <ul class="nav app-header__user-nav-container">
+        <!-- <li class="nav-item app-header__nav_item">
+          <section>
+            <%= form_tag(works_path, method: 'get', class: 'navbar-form navbar-right form-inline') do %>
+              <%= text_field_tag :term, params[:term], class: 'form-control', placeholder: 'Search'  %>
+              <%= submit_tag "Submit", class: 'btn btn-default', :name => nil %>
+            <% end %>
+          </section>
+        </li> -->
         <% if @login_user %>
 
         <li class="nav-item app-header__nav_item">

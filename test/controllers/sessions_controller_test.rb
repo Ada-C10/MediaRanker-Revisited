@@ -11,5 +11,6 @@ describe SessionsController do
 
     must_redirect_to root_path
     expect(session[:user_id]).must_equal kari.id
+    expect(flash[:success]).must_equal "Logged in as existing user #{kari.name}"
   end
 end

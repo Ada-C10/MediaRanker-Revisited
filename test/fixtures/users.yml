@@ -1,11 +1,13 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 dan:
-  name: dan
+  name: dan with the plan
+  email: dan@adaacademy.org
   provider: github
-  uid: fdsl
+  uid: 1
 
 kari:
-  name: kari
+  name: kari barry
+  email: kari@adaacademy.org
   provider: github
-  uid: fdsl
+  uid: 2

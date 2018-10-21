@@ -18,7 +18,7 @@ describe SessionsController do
 
 
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(kari))
+    perform_login(kari)
 
     get callback_path(:github)
 
@@ -31,7 +31,7 @@ describe SessionsController do
 
     expect(new_user).must_be :valid?, "User is not valid. Please fix. "
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash( new_user ))
+    perform_login(new_user)
 
     expect{
       get callback_path(:github)
@@ -45,8 +45,9 @@ describe SessionsController do
 
   it "prevents user for logging in for invalid user" do
     new_user.name = nil
+    expect(new_user).wont_be :valid?, "User is not invalid. Please fix."
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash( new_user ))
+    perform_login(new_user)
 
     get callback_path(:github)
 

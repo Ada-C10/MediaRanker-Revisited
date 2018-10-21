@@ -1,6 +1,2 @@
-<% if @login_user %>
 <h2>Edit This <%= @media_category.singularize.capitalize %></h2>
 <%= render partial: "form" %>
-<% else %>
-<h1>You must be logged in to view this page.</h1>
-<% end %>

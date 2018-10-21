@@ -56,4 +56,5 @@ describe SessionsController do
     expect(flash[:status]).must_equal :failure
 
   end
+
 end

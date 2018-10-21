@@ -73,6 +73,7 @@ describe WorksController do
     before do
       perform_login(users(:dan))
     end
+
     describe "index" do
       it "succeeds when there are works" do
         get works_path
@@ -243,8 +244,6 @@ describe WorksController do
 
       it "succeeds for a logged-in user and a fresh user-vote pair" do
 
-        binding.pry
-
         expect{
           post upvote_path(existing_work.id)
         }.must_change('existing_work.votes.length', +1)
@@ -252,9 +251,19 @@ describe WorksController do
         must_redirect_to work_path(existing_work.id)
       end
       it "redirects to the work page after the user has logged out" do
-
+        
       end
       it "redirects to the work page if the user has already voted for that work" do
+
+        dan = users(:dan)
+        vote = Vote.create!(user: dan, work: existing_work)
+
+        expect{
+          post upvote_path(existing_work.id)
+        }.wont_change('existing_work.votes.length')
+
+        expect(flash[:status]).must_equal :failure
+        expect(flash[:result_text]).must_equal "Could not upvote"
 
       end
     end

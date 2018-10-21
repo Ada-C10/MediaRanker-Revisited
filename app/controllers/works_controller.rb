@@ -4,6 +4,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   skip_before_action :require_login, only: [:root]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :require_work_user, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -22,6 +23,7 @@ class WorksController < ApplicationController
 
   def create
     @work = Work.new(media_params)
+    @work.user = @login_user
     @media_category = @work.category
     if @work.save
       flash[:status] = :success
@@ -83,6 +85,14 @@ class WorksController < ApplicationController
     # Refresh the page to show either the updated vote count
     # or the error message
     redirect_back fallback_location: work_path(@work)
+  end
+
+  def require_work_user
+    if @login_user != @work.user
+      flash[:status] = :failure
+      flash[:result_text] = "You must own that work to change it."
+      redirect_to root_path
+    end
   end
 
 private

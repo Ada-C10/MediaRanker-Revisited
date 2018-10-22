@@ -224,26 +224,52 @@ describe WorksController do
   end
 
   describe "upvote" do
+    let (:user_hash) {
+      {
+        user: {
+          uid: "5",
+          provider: "github",
+          username: "user 5"
+        }
+      }
+    }
 
     it "redirects to the work page if no user is logged in" do
-      skip
-      # id = works(:poodr)
-      #
-      # post upvote_path, works(id)
-      #
-      # must_redirect_to work_path(id)
+      id = works(:poodr).id
+
+      post upvote_path(id)
+
+      must_redirect_to work_path(id)
+
     end
 
     it "redirects to the root page after the user has logged out" do
-      skip
+      get login_path(params: user_hash)
+      id = works(:poodr).id
+
+      post upvote_path(id)
+      delete logout_path
+
+      must_redirect_to root_path
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
-      skip
+      get login_path(params: user_hash)
+      id = works(:poodr)
+
+      post upvote_path(id)
+
+      must_redirect_to work_path(id)
     end
 
     it "redirects to the work page if the user has already voted for that work" do
-      skip
+      get login_path(params: user_hash)
+      id = works(:poodr)
+
+      post upvote_path(id)
+      post upvote_path(id)
+
+      must_redirect_to work_path(id)
     end
   end
 end

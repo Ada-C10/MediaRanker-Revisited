@@ -80,6 +80,8 @@ describe WorksController do
 
       must_respond_with :redirect
 
+      # must_redirect_to work_path(work.id)
+
       expect(Work.last.title).must_equal work_hash[:work][:title]
       expect(Work.last.creator).must_equal work_hash[:work][:creator]
       expect(Work.last.description).must_equal work_hash[:work][:description]
@@ -226,7 +228,7 @@ describe WorksController do
 
       must_respond_with :redirect
       expect(flash[:result_text]).must_equal "Successfully destroyed #{media} #{id}"
-      expect(Work.find_by(id: id)).must_equal nil
+      expect(Work.find_by(id: id)).must_be_nil
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
@@ -251,18 +253,44 @@ describe WorksController do
 
       must_respond_with :redirect
     end
-  end
-  #
-  #   it "redirects to the work page after the user has logged out" do
-  #
-  #   end
-  #
-  #   it "succeeds for a logged-in user and a fresh user-vote pair" do
-  #
-  #   end
-  #
-  #   it "redirects to the work page if the user has already voted for that work" do
-  #
-  #   end
-   # end
+
+
+    it "redirects to the work page after the user has logged out" do
+    skip
+       get "/auth/github", params: {username: "dan"}
+       expect(session[:user_id]).wont_be_nil
+
+       post logout_path, params: {name: "dan"}
+       expect(session[:user_id]).must_be_nil
+
+        expect {
+           post logout_path(id)
+        }.wont_change 'User.count'
+
+
+        must_respond_with :redirect
+        must_redirect_to works_path
+        expect(flash[:result_text]).must_equal "Successfully logged out"
+    end
+
+    it "succeeds for a logged-in user and a fresh user-vote pair" do
+      skip
+      #log in with oAuth on friday
+
+
+
+        expect {
+          post upvote_path(id)
+        }.must_change 'Vote.count', 1
+
+        must_respond_with :success
+        expect(work.votes).must_equal
+        expect(flash[:result_text]).must_equal "Successfully upvoted!"
+
+    end
+
+    it "redirects to the work page if the user has already voted for that work" do
+      skip
+    end
+   end
 end

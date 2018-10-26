@@ -4,8 +4,10 @@ dan:
   username: dan
   uid: 234
   provider: github
+  email: ada@adadevelopersacademy.org
 
 kari:
   username: kari
   uid: 245
   provider: github
+  email: grace@hooper.net

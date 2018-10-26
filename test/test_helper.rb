@@ -29,4 +29,23 @@ class ActiveSupport::TestCase
     # A request to /auth/provider will redirect immediately to /auth/provider/callback.
     OmniAuth.config.test_mode = true
   end
+
+ # Test helper method to generate a mock auth hash
+ # for fixture data
+ # Turn an instance of class user into a fake auth hash
+ def mock_auth_hash(user)
+   return {
+     provider: user.provider,
+     uid: user.uid,
+     info: {
+       email: user.email,
+       username: user.username
+     }
+   }
+ end
+
+ def perform_login(user)
+  OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+  get auth_callback_path(:github)
+ end
 end

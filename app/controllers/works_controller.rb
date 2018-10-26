@@ -39,6 +39,11 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if @work.user_id != @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner of this work to edit it."
+      redirect_back(fallback_location: root_path)
+    end
   end
 
   def update
@@ -57,10 +62,16 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if @work.user_id != @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You must be the owner of this work to delete it."
+      redirect_back(fallback_location: root_path)
+    else
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    end
   end
 
   def upvote
@@ -85,7 +96,7 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
 
   def category_from_work

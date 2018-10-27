@@ -18,7 +18,8 @@ private
 
   def require_login
     unless @login_user
-      flash[:error] = "You must be logged in to continue"
+      flash[:status] = :failure
+      flash[:result_text] = "You must be logged in to continue"
       redirect_to root_path
     end
   end

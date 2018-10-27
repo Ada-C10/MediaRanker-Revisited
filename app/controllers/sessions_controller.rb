@@ -22,9 +22,9 @@ class SessionsController < ApplicationController
 
       if new_user.save
         session[:user_id] = new_user.id
-        flash[:success] = "Successfully logged in as TEST ROUTE"
+        flash[:success] = "Successfully logged in"
       else
-        flash[:error] = "Could not log in TEST ROUTE"
+        flash[:error] = "Could not log in"
         redirect_to root_path
         return
       end

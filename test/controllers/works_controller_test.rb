@@ -35,13 +35,20 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
+    let (:login) do
+      user = users(:jackie)
+      perform_login(user)
+    end
+
     it "succeeds when there are works" do
+      login
       get works_path
 
       must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+      login
       Vote.delete_all
       Work.delete_all
 
@@ -49,17 +56,39 @@ describe WorksController do
 
       must_respond_with :success
     end
+
+    it "won't display works index unless user logged in" do
+      get works_path
+      must_redirect_to root_path
+      expect(flash[:warning]).must_equal "You must be logged in to view this section"
+    end
   end
 
   describe "new" do
-    it "succeeds" do
+
+    it "succeeds in returning the new work page if user is signed in" do
+      user = users(:jackie)
+      perform_login(user)
+
       get new_work_path
 
       must_respond_with :success
     end
+
+    it "will not return the new work page if user is not signed in" do
+      get new_work_path
+
+      must_redirect_to root_path
+      expect(flash[:warning]).must_equal "You must be logged in to view this section"
+    end
   end
 
   describe "create" do
+    let (:login) do
+      user = users(:jackie)
+      perform_login(user)
+    end
+
     let (:book_hash) do
       {
         work: {
@@ -85,6 +114,8 @@ describe WorksController do
     end
 
     it "creates a work with valid data for a real category" do
+      login
+
       expect {
           post works_path, params: book_hash
         }.must_change 'Work.count', 1
@@ -98,6 +129,8 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
+      login
+
       response = post works_path(bogus_hash)
 
       expect(response).must_equal 400
@@ -105,6 +138,7 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus title" do
+      login
       bogus_hash[:title] = nil
       expect {
           post works_path, params: bogus_hash
@@ -113,10 +147,25 @@ describe WorksController do
       must_respond_with :bad_request
     end
 
+    it "will not create a new work unless user is signed in" do
+      expect {
+          post works_path, params: book_hash
+        }.wont_change 'Work.count'
+
+        must_redirect_to root_path
+        expect(flash[:warning]).must_equal "You must be logged in to view this section"
+    end
+
   end
 
   describe "show" do
+    let (:login) do
+      user = users(:jackie)
+      perform_login(user)
+    end
+
     it "succeeds for an extant work ID" do
+      login
       id = works(:album).id
 
       get work_path(id)
@@ -125,22 +174,32 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      login
       id = -1
 
       get work_path(id)
 
       must_respond_with :not_found
     end
+
+    it "will not display work show page without signed in user" do
+      id = works(:album).id
+
+      get work_path(id)
+      must_redirect_to root_path
+      expect(flash[:warning]).must_equal "You must be logged in to view this section"
+    end
+
   end
 
   describe "edit" do
-    before do
+    let (:login) do
       user = users(:jackie)
-      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
-      get auth_callback_path(:github)
+      perform_login(user)
     end
 
     it "succeeds for an extant work ID" do
+      login
       id = works(:album).id
 
       get work_path(id)
@@ -149,11 +208,21 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      login
       id = -1
 
       get work_path(id)
 
       must_respond_with :not_found
+    end
+
+    it "will not allow guest to edit work" do
+      id = works(:album).id
+
+      get work_path(id)
+
+      must_redirect_to root_path
+      expect(flash[:warning]).must_equal "You must be logged in to view this section"
     end
   end
 
@@ -170,13 +239,13 @@ describe WorksController do
       }
     end
 
-    before do
+    let (:login) do
       user = users(:jackie)
-      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
-      get auth_callback_path(:github)
+      perform_login(user)
     end
 
     it "succeeds for valid data and an extant work ID" do
+      login
       id = works(:poodr).id
 
       expect {
@@ -191,6 +260,7 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
+      login
       poodr_update[:work][:title] = nil
       id = works(:poodr).id
       old_poodr = works(:poodr)
@@ -203,18 +273,16 @@ describe WorksController do
     end
 
     it "ensure that guest users can't update works" do
-      poodr_update[:work][:title] = nil
       id = works(:poodr).id
-      old_poodr = works(:poodr)
 
-      expect {
-        patch work_path(id), params: poodr_update
-      }.wont_change 'Work.count'
+      patch work_path(id), params: poodr_update
 
-      must_respond_with :bad_request
+      must_redirect_to root_path
+      expect(flash[:warning]).must_equal "You must be logged in to view this section"
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      login
       id = -1
 
       expect {
@@ -226,7 +294,13 @@ describe WorksController do
   end
 
   describe "destroy" do
+    let (:login) do
+      user = users(:jackie)
+      perform_login(user)
+    end
+
     it "succeeds for an extant work ID" do
+      login
       id = works(:album).id
       title = works(:album).title
       category = works(:album).category
@@ -242,6 +316,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      login
       id = -1
 
       expect {
@@ -250,62 +325,46 @@ describe WorksController do
 
       must_respond_with :not_found
     end
+
+    it "fails to delete work if user is not logged in" do
+      id = works(:album).id
+      title = works(:album).title
+      category = works(:album).category
+
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
+
+      must_redirect_to root_path
+      expect(flash[:warning]).must_equal "You must be logged in to view this section"
+    end
   end
 
   describe "upvote" do
-    let(:user_params) {
-      {username: 'jackie'}
-    }
+    let (:login) do
+      user = users(:jackie)
+      perform_login(user)
+    end
+
+    # let(:user_params) {
+    #   {username: 'jackie'}
+    # }
+    # end
 
 
-    it "redirects to the work page if no user is logged in" do
-    test_work = works(:album)
+    it "ensures vote cannot be placed if user isn't signed in" do
+      test_work = works(:album)
 
       expect {
         post upvote_path(test_work.id)
-      }.must_change 'Vote.count', 0
+      }.wont_change 'Vote.count'
 
-      must_redirect_to work_path(test_work.id)
-      expect(flash[:result_text]).must_equal "You must log in to do that"
+      must_redirect_to root_path
+      expect(flash[:warning]).must_equal "You must be logged in to view this section"
     end
 
-    it "redirects to the work page after the user has logged out" do
-      jackie = users(:jackie)
-
-      post login_path, params: user_params
-      expect(session[:user_id]).must_equal jackie.id
-
-      post logout_path
-      expect(session[:user_id]).must_equal nil
-
-      album = works(:album)
-
-      post upvote_path(album.id)
-
-      must_redirect_to work_path(album.id)
-    end
-
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
-      jackie = users(:jackie)
-
-      post login_path, params: user_params
-      expect(session[:user_id]).must_equal jackie.id
-
-      test_work = works(:movie)
-
-      expect {
-        post upvote_path(test_work.id)
-      }.must_change 'Vote.count', 1
-
-      must_redirect_to work_path(test_work.id)
-      expect(flash[:result_text]).must_equal "Successfully upvoted!"
-    end
-
-    it "redirects to the work page if the user has already voted for that work" do
-      jackie = users(:jackie)
-
-      post login_path, params: user_params
-      expect(session[:user_id]).must_equal jackie.id
+    it "it won't allow a user to vote for the same work more than once" do
+      login
 
       test_work = works(:movie)
 
@@ -319,7 +378,19 @@ describe WorksController do
 
       must_redirect_to work_path(test_work.id)
       expect(flash[:result_text]).must_equal "Could not upvote"
+    end
 
+    it "succeeds for a logged-in user and a fresh user-vote pair" do
+      login
+
+      test_work = works(:movie)
+
+      expect {
+        post upvote_path(test_work.id)
+      }.must_change 'Vote.count', 1
+
+      must_redirect_to work_path(test_work.id)
+      expect(flash[:result_text]).must_equal "Successfully upvoted!"
     end
   end
 end

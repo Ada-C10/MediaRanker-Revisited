@@ -18,8 +18,7 @@ describe SessionsController do
 
       it "can login an existing user" do
         user = users(:jackie)
-
-        OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+        perform_login(user)
 
         expect {
            get auth_callback_path(:github)
@@ -32,7 +31,6 @@ describe SessionsController do
       it "can create a new user given needed attributes " do
         jackie = users(:jackie)
         jackie.destroy
-
         OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(jackie))
 
         expect {
@@ -46,6 +44,7 @@ describe SessionsController do
       it "fails to login user without needed github username" do
         jackie = users(:jackie)
         jackie.destroy
+
         OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(bad_login)
 
         expect {

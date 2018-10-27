@@ -2,6 +2,22 @@ require "test_helper"
 
 describe SessionsController do
 
+  describe 'create' do
+    it 'can log in an existing user' do
+      user = users(:dan)
+
+      OmniAuth.config.mock_auth[:github] = OmniAuth:AuthHash.new[mock_auth_hash(user)]
+
+      get auth_callback_path('github')
+    end
+
+    it 'can log in a new user with good data' do
+    end
+
+    it 'rejects a user with invalid data' do
+    end
+  end
+
   # describe 'login_form' do
   #   it 'successfully gets the login form' do
   #     get login_path

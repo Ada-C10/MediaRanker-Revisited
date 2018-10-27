@@ -336,7 +336,7 @@ describe WorksController do
       # Tell OmniAuth to use this user's info when it sees
      # an auth callback from github
       OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
-      binding.pry
+      # binding.pry
       get auth_callback_path('github')
 
 

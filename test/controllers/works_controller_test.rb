@@ -134,6 +134,12 @@ describe WorksController do
   end
 
   describe "edit" do
+    before do
+      user = users(:jackie)
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      get auth_callback_path(:github)
+    end
+
     it "succeeds for an extant work ID" do
       id = works(:album).id
 
@@ -164,6 +170,12 @@ describe WorksController do
       }
     end
 
+    before do
+      user = users(:jackie)
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      get auth_callback_path(:github)
+    end
+
     it "succeeds for valid data and an extant work ID" do
       id = works(:poodr).id
 
@@ -179,6 +191,18 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
+      poodr_update[:work][:title] = nil
+      id = works(:poodr).id
+      old_poodr = works(:poodr)
+
+      expect {
+        patch work_path(id), params: poodr_update
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+    end
+
+    it "ensure that guest users can't update works" do
       poodr_update[:work][:title] = nil
       id = works(:poodr).id
       old_poodr = works(:poodr)

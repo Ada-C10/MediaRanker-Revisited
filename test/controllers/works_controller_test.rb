@@ -131,29 +131,76 @@ describe WorksController do
     end
   end
 
-  # describe "edit" do
-  #   it "succeeds for an extant work ID" do
-  #
-  #   end
-  #
-  #   it "renders 404 not_found for a bogus work ID" do
-  #
-  #   end
-  # end
-  #
-  # describe "update" do
-  #   it "succeeds for valid data and an extant work ID" do
-  #
-  #   end
-  #
-  #   it "renders bad_request for bogus data" do
-  #
-  #   end
-  #
-  #   it "renders 404 not_found for a bogus work ID" do
-  #
-  #   end
-  # end
+  describe "edit" do
+    it "succeeds for an extant work ID" do
+      existing_work = works(:album)
+      get edit_work_path(existing_work.id)
+
+      must_respond_with :success
+    end
+
+    it "renders 404 not_found for a bogus work ID" do
+      deleted_work = works(:poodr)
+      deleted_work.destroy
+      get edit_work_path(deleted_work.id)
+
+      must_respond_with :missing
+    end
+  end
+
+  describe "update" do
+    let (:work_hash) {
+      {
+      work: {
+        title: "Binti",
+        creator: "Nnedi Orokafor",
+        category: "book"
+        }
+      }
+    }
+
+    it "succeeds for valid data and an extant work ID" do
+      existing_work = works(:another_album)
+      existing_id = existing_work.id
+
+      expect {
+        patch work_path(existing_id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :redirect
+
+      updated_work = Work.find_by(id: existing_id)
+
+      expect(updated_work.title).must_equal work_hash[:work][:title]
+      expect(updated_work.creator).must_equal work_hash[:work][:creator]
+      expect(updated_work.category).must_equal work_hash[:work][:category]
+    end
+
+    it "renders bad_request for bogus data" do
+      original_id = works(:movie).id
+      original_work = works(:movie)
+      work_hash[:work][:category] = "invalid category"
+
+      expect {
+        patch work_path(original_id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+
+      failed_update = Work.find_by(id: original_id)
+      expect(failed_update.title).must_equal original_work.title
+      expect(failed_update.category).must_equal original_work.category
+    end
+
+    it "renders 404 not_found for a bogus work ID" do
+      id = 0
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
+    end
+  end
   #
   # describe "destroy" do
   #   it "succeeds for an extant work ID" do

@@ -1,10 +1,11 @@
 require 'test_helper'
-require 'pry'
+
 describe WorksController do
   let(:book) { works(:poodr) }
   let(:movie) { works(:movie) }
   let(:album) { works(:album) }
   let(:album2) { works(:another_album) }
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -74,6 +75,8 @@ describe WorksController do
         post works_path, params: work_data
       }.must_change('Work.count', +1)
 
+      expect(flash[:result_text]).must_include "Successfully created"
+
       must_redirect_to work_path(Work.last)
     end
 
@@ -81,7 +84,7 @@ describe WorksController do
       work_data = {
         work: {
           category: CATEGORIES[0],
-          title: 'Old Title'
+          title: album.title
         }
       }
 
@@ -91,6 +94,8 @@ describe WorksController do
       expect {
         post works_path, params: work_data
       }.wont_change('Work.count')
+
+      expect(flash[:result_text]).must_include "Could not create"
 
       must_respond_with :bad_request
     end
@@ -109,6 +114,8 @@ describe WorksController do
       expect {
         post works_path, params: work_data
       }.wont_change('Work.count')
+
+      expect(flash[:result_text]).must_include "Could not create"
 
       must_respond_with :bad_request
     end

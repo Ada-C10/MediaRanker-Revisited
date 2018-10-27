@@ -42,10 +42,6 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
-      # Does this set one media per category?
-      @books = works(:poodr)
-      @movies = works(:movie)
-      @albums = works(:album)
 
       get works_path
 
@@ -53,10 +49,18 @@ describe WorksController do
     end
 
     it "succeeds when there are no works" do
-      @books = nil
-      @albums = nil
-      @movies = nil
-
+      # @books = nil
+      # @albums = nil
+      # @movies = nil
+      # Does not seem to work, still has works
+      Work.destroy_all
+      # This doesn't work either, says violates FK constraint with votes even though
+      # there's a dependent destroy
+      # binding.pry
+      # Work.all.each do |work|
+      #   work.delete
+      # end
+      # binding.pry
       get works_path
 
       must_respond_with :success
@@ -258,9 +262,25 @@ describe WorksController do
   end
 
   describe "upvote" do
-    # Wait on this? 
+    # Wait on this?
     it "redirects to the work page if no user is logged in" do
+      # No on is logged in at this point
+      @login_user = nil
+      work = works(:album)
+      id = work.id
+      # binding.pry
+      # Vote will not get added
 
+      # Says no conversion of integer into string? Route requires an integer...why?
+
+      post upvote_path(id)
+      expect(work.vote_count).must_equal 0
+
+      # errors will flash
+      expect(flash[:result_text]).must_equal "You must log in to do that"
+      # Will redirect
+      must_respond_with :redirect
+      must_redirect_to work_path(work)
 
     end
 

@@ -44,13 +44,14 @@ describe UsersController do
 
       OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
 
-      get auth_callback_path(:github)
+      expect {
+             get auth_callback_path('github')
+           }.wont_change('User.count')
 
       must_redirect_to root_path
 
-      session[:user_id].must_equal user.id
+      expect(session[:user_id]).must_equal user.id
 
-      User.count.must_equal start_count
     end
 
   end

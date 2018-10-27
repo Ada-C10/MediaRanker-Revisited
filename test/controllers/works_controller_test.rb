@@ -285,14 +285,74 @@ describe WorksController do
     end
 
     it "redirects to the work page after the user has logged out" do
+      # Log user in
+      user = users(:dan)
+      # Make fake session
+      # Tell OmniAuth to use this user's info when it sees
+     # an auth callback from github
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      get auth_callback_path('github')
+
+      # Log them out
+      delete logout_path
+
+      # Do expectations
+      expect(flash[:status]).must_equal :success
+      expect(flash[:result_text]).must_equal "Successfully logged out"
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(session[:user_id]).must_be_nil
 
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      # loggin user in
+      user = users(:dan)
+      # Make fake session
+      # Tell OmniAuth to use this user's info when it sees
+     # an auth callback from github
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      get auth_callback_path('github')
+
+      # Doing a new vote -
+      work = Work.find_by(id: 547668523)
+      start_count = work.vote_count
+      post upvote_path(work.id)
+
+      # expectations
+      expect(flash[:status]).must_equal :success
+      expect(flash[:result_text]).must_equal "Successfully upvoted!"
+      expect(work.vote_count).must_equal (start_count + 1)
+      must_respond_with :redirect
+      must_redirect_to work_path(work)
+
 
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      # loggin user in - not working for some reason
+      user = users(:dan)
+      # Make fake session
+      # Tell OmniAuth to use this user's info when it sees
+     # an auth callback from github
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      binding.pry
+      get auth_callback_path('github')
+
+
+      # Doing a new vote -
+      work = Work.find_by(id: 547668523)
+      post upvote_path(work.id)
+      start_count = work.vote_count
+
+      # Doing second vote
+      post upvote_path(work.id)
+      # expectations
+      expect(flash[:result_text]).must_equal "Could not upvote"
+      expect(flash[:messages]).must_equal vote.errors.messages
+      expect(work.vote_count).must_equal start_count
+      must_respond_with :redirect
+      must_redirect_to work_path(work)
 
     end
   end

@@ -2,6 +2,7 @@ require "test_helper"
 
 describe SessionsController do
   let(:dan) {users(:dan)}
+  let(:chris) {users(:chris)}
 
   describe 'create' do
     it 'can log in an existing user' do
@@ -18,6 +19,16 @@ describe SessionsController do
     end
 
     it 'can log in a new user with good data' do
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new[mock_auth_hash(chris)]
+      chris.delete  #sorry dude
+
+      expect {
+        get auth_callback_path('github')
+      }.must_change 'User.count', 1
+
+
+      must_redirect_to root_path
+      expect(session[:user_id]).wont_equal nil
     end
 
     it 'rejects a user with invalid data' do

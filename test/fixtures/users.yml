@@ -9,3 +9,8 @@ kari:
   username: kari
   uid: 9876543
   provider: github
+
+chris:
+  username: chris
+  uid: 2468357
+  provider: github

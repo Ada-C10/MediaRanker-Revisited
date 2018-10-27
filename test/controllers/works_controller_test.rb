@@ -137,15 +137,30 @@ describe WorksController do
 
     end
 
-    it "renders bad_request and does not update the DB for bogus title" do
-      login
-      bogus_hash[:title] = nil
+    let (:nil_hash) do
+      {
+        work: {
+          title: nil,
+          creator: 'Frank Herbert',
+          description: 'Fear is the mind killer!',
+          publication_year: 1963,
+          category: "book"
+        }
+      }
+    end
+
+    it "renders bad_request and does not create the work for bogus title" do
+      user = users(:jackie)
+      perform_login(user)
+
       expect {
-          post works_path, params: bogus_hash
+          post works_path, params: nil_hash
         }.must_change 'Work.count', 0
 
       must_respond_with :bad_request
     end
+
+
 
     it "will not create a new work unless user is signed in" do
       expect {
@@ -345,12 +360,6 @@ describe WorksController do
       user = users(:jackie)
       perform_login(user)
     end
-
-    # let(:user_params) {
-    #   {username: 'jackie'}
-    # }
-    # end
-
 
     it "ensures vote cannot be placed if user isn't signed in" do
       test_work = works(:album)

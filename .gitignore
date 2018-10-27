@@ -10,6 +10,9 @@
 # Ignore git credentials file
 .env
 
+# Ignore simple cov generate files in the coverage directory
+coverage/*
+
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*

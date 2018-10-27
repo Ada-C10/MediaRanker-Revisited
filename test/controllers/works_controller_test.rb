@@ -69,24 +69,25 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
-      movie_data = {
-          another_movie: {
-            title: "Sound of Music"
+      work = {
+          work: {
+            title: "Sound of Music",
+            category: "sparkly"
           }
         }
 
-      expect{post works_path, params: movie_data}.wont_change 'Work.count'
+      expect{post works_path, params: work}.wont_change 'Work.count'
       must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
-      movie_data = {
+      work = {
           another_movie: {
             title: "Sound of Music",
             category: "popcorn_head"
           }
         }
-      post works_path, params: movie_data
+      post works_path, params: work
       must_respond_with :bad_request
     end
 
@@ -117,24 +118,25 @@ describe WorksController do
     it "renders 404 not_found for a bogus work ID" do
       work = works(:album)
       work.id = 0
-      get edit_work_path(work)
+      get edit_work_path(work.id)
       must_respond_with :not_found
     end
   end
 
   # describe "update" do
     # it "succeeds for valid data and an extant work ID" do
-    #   work = works(:poodr)
+    #   work_to_change = works(:poodr)
     #   new_work_title = "99 Bottles"
-    #   altered_work = {
+    #   work = {
     #     work: {
     #       title: new_work_title,
     #       category: "movie"
     #     }
     #   }
     #
-    #   patch work_path(work.id), params: altered_work
-    #   # expect(work.title).must_equal new_work_title
+    #
+    #   patch work_path(work_to_change.id), params: work
+    #   expect(work_to_change.title).must_equal new_work_title
     #   must_redirect_to work_path
     # end
 

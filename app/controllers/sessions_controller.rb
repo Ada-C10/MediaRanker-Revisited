@@ -4,6 +4,7 @@ class SessionsController < ApplicationController
     auth_hash = request.env['omniauth.auth']
 
     user = User.find_by(uid: auth_hash[:uid], provider: auth_hash[:provider])
+
     if user
       # User was found in the database
       flash[:status] = :success

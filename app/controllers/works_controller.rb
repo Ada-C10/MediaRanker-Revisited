@@ -89,8 +89,6 @@ class WorksController < ApplicationController
       flash[:result_text] = "You must log in to do that"
     end
 
-    # Refresh the page to show either the updated vote count
-    # or the error message
     redirect_back fallback_location: work_path(@work)
   end
 

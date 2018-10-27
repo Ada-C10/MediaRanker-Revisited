@@ -4,7 +4,7 @@ describe WorksController do
   CATEGORIES = %w(albums books movies)
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
-  let(:user) { users(:dan) }
+  let(:dan) { users(:dan) }
   let(:work_hash) do
     {
       work: {
@@ -53,18 +53,18 @@ describe WorksController do
   end
 
   describe "Logged in users" do
-    before do
-      perform_login(user)
-    end
-
     describe "index" do
       it "succeeds when there are works" do
+        perform_login(dan)
+
         get works_path
 
         must_respond_with :success
       end
 
       it "succeeds when there are no works" do
+        perform_login(dan)
+
         works.each do |work|
           work.destroy
         end
@@ -80,6 +80,8 @@ describe WorksController do
 
     describe "new" do
       it "succeeds" do
+        perform_login(dan)
+
         get new_work_path
 
         must_respond_with :success
@@ -88,6 +90,8 @@ describe WorksController do
 
     describe "create" do
       it "creates a work with valid data for a real category" do
+        perform_login(dan)
+
         expect {
           post works_path, params: work_hash
         }.must_change 'Work.count', 1
@@ -102,6 +106,8 @@ describe WorksController do
       end
 
       it "renders bad_request and does not update the DB for bogus data" do
+        perform_login(dan)
+
         work_hash[:work][:title] = nil
 
         expect {
@@ -115,6 +121,8 @@ describe WorksController do
       end
 
       it "renders 400 bad_request for bogus categories" do
+        perform_login(dan)
+
         INVALID_CATEGORIES.each do |category|
           work_hash[:work][:category] = category
           expect {
@@ -131,12 +139,16 @@ describe WorksController do
 
     describe "show" do
       it "succeeds for an extant work ID" do
+        perform_login(dan)
+
         get work_path(works(:album).id)
 
         must_respond_with :success
       end
 
       it "renders 404 not_found for a bogus work ID" do
+        perform_login(dan)
+
         id = -1
 
         get work_path(id)
@@ -147,6 +159,8 @@ describe WorksController do
 
     describe "edit" do
       it "succeeds for an extant work ID" do
+        perform_login(dan)
+
         get edit_work_path(works(:album).id)
 
         must_respond_with :success
@@ -154,16 +168,30 @@ describe WorksController do
 
 
       it "renders 404 not_found for a bogus work ID" do
+        perform_login(dan)
+
         id = -1
 
         get edit_work_path(id)
 
         must_respond_with 404
       end
+
+      it "redirects with error message if work does not belong to user" do
+        perform_login(dan)
+
+        get edit_work_path(works(:poodr).id)
+
+        must_respond_with :redirect
+        expect(flash[:status]).must_equal :failure
+        expect(flash[:result_text]).must_equal "You must be the owner of this work to edit it."
+      end
     end
 
     describe "update" do
       it "succeeds for valid data and an extant work ID" do
+        perform_login(dan)
+
         id = works(:poodr).id
 
         expect{
@@ -185,6 +213,8 @@ describe WorksController do
       end
 
       it "renders bad_request for bogus data" do
+        perform_login(dan)
+
         work_hash[:work][:title] = nil
 
         id = works(:poodr).id
@@ -205,6 +235,8 @@ describe WorksController do
       end
 
       it "renders 404 not_found for a bogus work ID" do
+        perform_login(dan)
+
         id = -1
 
         expect {
@@ -217,6 +249,8 @@ describe WorksController do
 
     describe "destroy" do
       it "succeeds for an extant work ID" do
+        perform_login(dan)
+
         work = works(:album)
         expect {
           delete work_path(work.id)
@@ -231,6 +265,8 @@ describe WorksController do
       end
 
       it "renders 404 not_found and does not update the DB for a bogus work ID" do
+        perform_login(dan)
+
         id = -1
 
         expect {
@@ -239,13 +275,27 @@ describe WorksController do
 
         must_respond_with 404
       end
+
+      it "redirects with error message if work does not belong to current user" do
+        perform_login(dan)
+
+        expect {
+          delete work_path(works(:poodr).id)
+        }.wont_change 'Work.count'
+
+        must_respond_with :redirect
+        expect(flash[:status]).must_equal :failure
+        expect(flash[:result_text]).must_equal "You must be the owner of this work to delete it."
+      end
     end
 
     describe "upvote" do
       it "redirects to the root path after the user has logged out" do
+        perform_login(dan)
+
         work = works(:album)
 
-        expect(session[:user_id]).must_equal user.id
+        expect(session[:user_id]).must_equal dan.id
 
         get work_path(work.id)
 
@@ -258,7 +308,9 @@ describe WorksController do
       end
 
       it "succeeds for a logged-in user and a fresh user-vote pair" do
-        expect(session[:user_id]).must_equal user.id
+        perform_login(dan)
+
+        expect(session[:user_id]).must_equal dan.id
 
         work = works(:movie)
 
@@ -271,7 +323,9 @@ describe WorksController do
       end
 
       it "redirects to the work page if the user has already voted for that work" do
-        expect(session[:user_id]).must_equal user.id
+        perform_login(dan)
+
+        expect(session[:user_id]).must_equal dan.id
 
         work = works(:album)
 
@@ -292,15 +346,54 @@ describe WorksController do
       flash[:result_text].must_equal "You must be logged in to view this section"
     end
 
-    # should redirect guest if given an invalid id, must redirect to root, doesn't need to get to 404
+    it "cannot access new" do
+      get new_work_path
 
-    describe 'upvote' do
-      it "redirects to the work page if no user is logged in" do
-        work = works(:album)
-        post upvote_path(work.id)
-        must_respond_with :redirect
-        must_redirect_to root_path
-      end
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access create" do
+      post works_path, params: work_hash
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access show" do
+      get work_path(works(:album).id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access edit" do
+      get edit_work_path(works(:poodr).id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access update" do
+      patch work_path(works(:poodr).id), params: work_hash
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access destroy" do
+      delete work_path(works(:poodr).id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access upvote" do
+      work = works(:album)
+      post upvote_path(work.id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
     end
   end
 end

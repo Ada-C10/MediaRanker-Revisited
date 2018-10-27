@@ -29,6 +29,13 @@ describe SessionsController do
     end
 
     it 'rejects a user with invalid data' do
+      chris.uid = nil
+      chris.destroy #sorry again
+
+      expect {
+        perform_login(chris)
+      }.wont_change 'User.count'
+
     end
   end
 

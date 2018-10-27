@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
     user = User.find_by(uid: auth_hash[:uid], provider: auth_hash[:provider])
 
     if user
-      flash[:success] =  flash[:success] = "Logged in as returning user #{user.name}"
+      flash[:success] = "Logged in as returning user #{user.name}"
     else
       flash[:notice] = "Log in not successful."
       # User doesn't match anything in the DB

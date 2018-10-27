@@ -124,36 +124,31 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
-      expect {
-        get work_path(book.id)
-        must_respond_with :success
-      }
+      get work_path(book.id)
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
       book.destroy
-      expect {
-        get work_path(book.id)
-        must_respond_with :not_found
-      }
+
+      get work_path(book.id)
+      must_respond_with :not_found
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
-      expect {
-        get edit_work_path(Work.first)
-        must_respond_with :success
-      }
+
+      get edit_work_path(Work.first)
+      must_respond_with :success
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
       book.destroy
-      expect {
-        get edit_work_path(book.id)
-        must_respond_with :not_found
-      }
+
+      get edit_work_path(book.id)
+      must_respond_with :not_found
     end
   end
 

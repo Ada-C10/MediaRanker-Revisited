@@ -156,13 +156,6 @@ describe WorksController do
 
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
-      work_data = {
-        work: {
-          category: book.category,
-          title: book.title,
-          publication_year: book.publication_year - 1
-        }
-      }
 
       patch work_path(book.id), params: work_data
 
@@ -172,12 +165,8 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
-      work_data = {
-        work: {
-          category: '',
-          title: book.title,
-        }
-      }
+
+      work_data[:work][:title] = album.title
 
       patch work_path(book.id), params: work_data
 
@@ -187,15 +176,8 @@ describe WorksController do
 
     it "renders 404 not_found for a bogus work ID" do
 
-      work_data = {
-        work: {
-          category: book.category,
-          title: book.title,
-          publication_year: book.publication_year - 1
-        }
-      }
-
       bad_id = Work.all.last.id + 1
+      #bad_id = 0 - which is better?
 
       patch work_path(bad_id), params: work_data
       must_respond_with :not_found

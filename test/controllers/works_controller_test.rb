@@ -16,6 +16,8 @@ describe WorksController do
     }
   }
 
+  let(:bad_id) {0}
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -176,9 +178,6 @@ describe WorksController do
 
     it "renders 404 not_found for a bogus work ID" do
 
-      bad_id = Work.all.last.id + 1
-      #bad_id = 0 - which is better?
-
       patch work_path(bad_id), params: work_data
       must_respond_with :not_found
     end
@@ -186,11 +185,19 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      expect {
+        delete work_path(book)
+      }.must_change('Work.count', -1)
 
+      must_redirect_to root_path
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      expect {
+        delete work_path(bad_id)
+      }.wont_change('Work.count')
 
+      must_respond_with :not_found
     end
   end
 

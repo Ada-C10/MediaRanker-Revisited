@@ -8,10 +8,19 @@ class ApplicationController < ActionController::Base
     raise ActionController::RoutingError.new('Not Found')
   end
 
-private
+  private
   def find_user
     if session[:user_id]
       @login_user = User.find_by(id: session[:user_id])
     end
   end
+
+  def require_login
+    if find_user.nil?
+      flash[:warning] = "You must be logged in to view this section"
+      redirect_to root_path
+    end
+  end
+
+
 end

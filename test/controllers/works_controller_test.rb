@@ -167,13 +167,12 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
-
       work_data[:work][:title] = album.title
 
       patch work_path(book.id), params: work_data
 
       expect(flash[:status]).must_equal :failure
-      must_respond_with :not_found
+      must_respond_with :bad_request
     end
 
     it "renders 404 not_found for a bogus work ID" do

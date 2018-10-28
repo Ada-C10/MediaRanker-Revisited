@@ -1,8 +1,14 @@
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_filter '/bin/'
+  add_filter '/db/'
+  add_filter '/spec/' # for rspec
+  add_filter '/test/' # for minitest
+end
 ENV["RAILS_ENV"] = "test"
 require File.expand_path("../../config/environment", __FILE__)
 require "rails/test_help"
 require "minitest/rails"
-require "minitest/skip_dsl"
 require "minitest/reporters"  # for Colorized output
 
 #  For colorful output!
@@ -23,4 +29,14 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
   # Add more helper methods to be used by all tests here...
+  def perform_login(username)
+    user_hash = {
+      username: username
+    }
+    post login_path, params: user_hash
+  end
+
+  def perform_logout
+    post logout_path
+  end
 end

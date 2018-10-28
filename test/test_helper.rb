@@ -39,13 +39,13 @@ class ActiveSupport::TestCase
      uid: user.uid,
      info: {
        email: user.email,
-       username: user.username
+       name: user.username
      }
    }
  end
 
  def perform_login(user)
-  OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
-  get auth_callback_path(:github)
+  OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+  get auth_callback_path(:google_oauth2)
  end
 end

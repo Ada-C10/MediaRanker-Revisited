@@ -10,7 +10,7 @@ describe SessionsController do
       perform_login(dan)
 
       expect {
-        get auth_callback_path('github')
+        get auth_callback_path('google_oauth2')
       }.wont_change 'User.count'
 
       must_redirect_to root_path
@@ -20,10 +20,7 @@ describe SessionsController do
     end
 
     it "creates an account for a new user and logs them in" do
-      # Is still loaded, and can be used even if destroyed
-      user = users(:kari)
-      # Is destroyed in database
-      user.destroy
+      user = User.new(provider: "google_oauth2", uid: "99999", username: "Sandy Safari", email: "test@user.com")
 
       expect {
         perform_login(user)
@@ -35,7 +32,7 @@ describe SessionsController do
     end
 
     it "redirects to the login route if given invalid user data" do
-      user = User.new(provider: "github", uid: 99999, username: nil, email: "test@user.com")
+      user = User.new(provider: "google_oauth2", uid: "99999", username: nil, email: "test@user.com")
 
       expect {
         perform_login(user)

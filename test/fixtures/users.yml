@@ -3,7 +3,7 @@
 dan:
   username: dan
   uid: 123
-  provider: blah
+  provider: github
 kari:
   username: kari
   uid: 456

@@ -16,7 +16,7 @@ describe SessionsController do
     it "can log in a new user with good data" do
       user = users(:chris)
       user.destroy
-
+    
       expect { perform_login(user) }.must_change('User.count', +1)
 
       must_redirect_to root_path
@@ -27,7 +27,7 @@ describe SessionsController do
       start_count = User.count
       user  = User.new(provider: "github", uid: 99999, email: "test@user.com")
       perform_login(user)
-      
+
       User.count.must_equal start_count
 
       expect(session[:user_id]).must_be_nil

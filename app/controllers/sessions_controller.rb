@@ -41,11 +41,12 @@ class SessionsController < ApplicationController
       flash[:result_text] = "Successfully logged in as existing user #{user.username}"
     else
       user = User.build_from_github(auth_hash)
-
+      
       if user.save
         session[:user_id] = user.id
         flash[:status] = :success
-        flash[:result_text] = "Successfully created new user #{user.username} with ID #{user.id}"
+        flash[:result_text] = "Successfully created new user #{user.username}
+        with ID #{user.id}"
 
       else
         flash.now[:status] = :failure

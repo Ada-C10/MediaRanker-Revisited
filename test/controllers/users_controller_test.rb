@@ -5,19 +5,30 @@ describe UsersController do
     users(:dan)
   }
 
+  let (:user_hash) {
+    {
+      provider: 'github',
+      uid: 99,
+      info: {
+        name: 'test user',
+        email: 'testemail@gmail.com'
+      }
+    }
+  }
+
   # Logging in
+
   before do
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(existing_user))
-    get callback_path(:github)
+    perform_login(existing_user)
   end
 
   describe "index" do
     it "succeeds with users present" do
+
       get users_path
 
       must_respond_with :success
-  end
-
+    end
   end
 
   describe "show" do
@@ -28,9 +39,11 @@ describe UsersController do
     end
 
     it "renders 404 not_found for a bogus user ID" do
-      get user_path(0)
 
-      must_respond_with :not_found
+      existing_user.destroy
+
+      get user_path(existing_user.id)
+
     end
   end
 
@@ -63,10 +76,35 @@ describe UsersController do
 
     it "creates an account for a new user and redirects to the root route" do
 
+      new_user = User.new(name: 'test user', email: 'testemail@gmail.com', uid: 3, provider: 'github')
+
+      expect(new_user).must_be :valid?, "User is not valid. Please fix test."
+
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(new_user))
+
+      expect{
+        get callback_path(:github)
+      }.must_change('User.count', +1)
+
+      expect(session[:user_id]).must_equal User.last.id
+      must_redirect_to root_path
+
     end
 
     it "redirects to the login route if given invalid user data" do
 
+      new_user = User.new(name: nil, email: 'testemail@gmail.com', uid: 3, provider: 'github')
+
+      expect(new_user).wont_be :valid?, "User is not invalid. Please fix."
+
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(new_user))
+
+      expect{
+        get callback_path(:github)
+      }.wont_change('User.count')
+
+      must_redirect_to root_path
+      expect(session[:user_id]).must_be_nil
     end
   end
 

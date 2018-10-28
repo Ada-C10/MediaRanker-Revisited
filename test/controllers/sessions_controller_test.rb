@@ -16,8 +16,6 @@ describe SessionsController do
 
   it "can successfully log in github as existing user" do
 
-
-
     perform_login(kari)
 
     get callback_path(:github)

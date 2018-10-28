@@ -2,6 +2,7 @@ require 'test_helper'
 
 describe WorksController do
   let (:movie) {works(:movie)}
+  let (:dan) {users(:dan)}
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -34,8 +35,12 @@ describe WorksController do
   CATEGORIES = %w(albums books movies)
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
+
+describe "logged in users" do
+
   describe "index" do
     it "succeeds when there are works" do
+      perform_login(dan)
       get works_path
 
       must_respond_with :success
@@ -43,6 +48,7 @@ describe WorksController do
 
     it "succeeds when there are no works" do
 
+      perform_login(dan)
        Work.destroy_all
 
       get works_path
@@ -56,6 +62,8 @@ describe WorksController do
 
   describe "new" do
     it "succeeds" do
+      perform_login(dan)
+
       get new_work_path
 
       must_respond_with :success
@@ -65,6 +73,7 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
+      perform_login(dan)
       work_hash = {
         work: {
           title: "Fire Walk With Me",
@@ -92,6 +101,7 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      perform_login(dan)
       work_hash = {
         work: {
           creator: "David Lynch",
@@ -111,6 +121,7 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
+      perform_login(dan)
       work_hash = {
         work: {
           title: "Fire Walk with Me",
@@ -133,6 +144,7 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      perform_login(dan)
       id = works(:poodr).id
 
       get work_path(id)
@@ -141,6 +153,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      perform_login(dan)
       id = -2
       get work_path(id)
       must_respond_with :not_found
@@ -150,6 +163,7 @@ describe WorksController do
 
   describe "edit" do
     it "succeeds for an extant work ID" do
+      perform_login(dan)
       id = works(:poodr).id
       get edit_work_path(id)
       must_respond_with :success
@@ -157,7 +171,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
-
+      perform_login(dan)
       id = -1
       get edit_work_path(id)
        must_respond_with :not_found
@@ -166,6 +180,7 @@ describe WorksController do
   end
 
   describe "update" do
+
     let  (:work_hash) { {
       work: {
         title: "Fire Walk with Me",
@@ -178,6 +193,7 @@ describe WorksController do
     }
   }
     it "succeeds for valid data and an extant work ID" do
+      perform_login(dan)
       id = works(:poodr).id
       expect{
         patch work_path(id), params: work_hash
@@ -195,6 +211,7 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
+      perform_login(dan)
       id = works(:poodr).id
       original_work = works(:poodr)
       work_hash[:work][:category] = INVALID_CATEGORIES.first
@@ -213,6 +230,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      perform_login(dan)
       id = -2
 
       expect{
@@ -225,6 +243,7 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      perform_login(dan)
       id = works(:poodr).id
       title = works(:poodr).title
       media = works(:poodr).category
@@ -238,6 +257,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      perform_login(dan)
       id = -1
       expect {
         delete work_path(id)
@@ -248,22 +268,7 @@ describe WorksController do
   end
 
 
-#This all needs to be done, below this line!
   describe "upvote" do
-
-
-    it "redirects to the work page if no user is logged in" do
-
-      expect{
-      post upvote_path(movie.id)
-    }.wont_change 'Vote.count'
-
-
-      must_redirect_to root_path
-      must_respond_with :redirect
-
-
-    end
 
     it "redirects to the work page after the user has logged out" do
 
@@ -314,6 +319,85 @@ describe WorksController do
       must_redirect_to work_path(movie.id)
       expect(flash[:result_text]).must_equal "Could not upvote"
 
+    end
+  end
+end
+
+describe "Guest users" do
+    it "cannot access index" do
+      get works_path
+      must_redirect_to root_path
+      flash[:result_text].must_equal "You must be logged in to view this section"
+    end
+
+    it "cannot access new" do
+      get new_work_path
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access create" do
+      work_hash = {
+        work: {
+          title: "Fire Walk With Me",
+          creator: "David Lynch",
+          description: "The owls are not what they seem.",
+          publication_year: 2001-11-11,
+          category: "movie"
+
+        }
+      }
+      post works_path, params: work_hash
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access show" do
+      get work_path(works(:album).id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access edit" do
+      get edit_work_path(works(:poodr).id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access update" do
+      work_hash = {
+        work: {
+          title: "Fire Walk With Me",
+          creator: "David Lynch",
+          description: "The owls are not what they seem.",
+          publication_year: 2001-11-11,
+          category: "movie"
+
+        }
+      }
+      patch work_path(works(:poodr).id), params: work_hash
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access destroy" do
+      delete work_path(works(:album).id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "cannot access upvote" do
+      work = works(:movie)
+      post upvote_path(work.id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
     end
   end
 end

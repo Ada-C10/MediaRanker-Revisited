@@ -246,18 +246,9 @@ describe WorksController do
     end
   end
 
+
+#This all needs to be done, below this line!
   describe "upvote" do
-    let  (:user_params) { {
-      user: {
-        name: "dan",
-        uid: 3232,
-        provider: "github"
-
-
-      }
-    }
-  }
-
 
 
     it "redirects to the work page if no user is logged in" do
@@ -276,11 +267,11 @@ describe WorksController do
 
     it "redirects to the work page after the user has logged out" do
 
-            dan = users(:dan)
-            get "/auth/github/", params: user_params
-            expect(session[:user_id]).must_equal dan.uid
+      user = users(:dan)
+      perform_login(user)
+      expect(session[:user_id]).must_equal user.id
 
-            post logout_path, params: user_params
+            delete logout_path
             expect(session[:user_id]).must_equal nil
 
 
@@ -292,9 +283,9 @@ describe WorksController do
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
-      dan = users(:dan)
-      get "/auth/github", params: user_params
-      expect(session[:user_id]).must_equal dan.uid
+      user = users(:dan)
+      perform_login(user)
+      expect(session[:user_id]).must_equal user.id
 
 
       expect{
@@ -307,11 +298,9 @@ describe WorksController do
     end
 
     it "redirects to the work page if the user has already voted for that work" do
-      dan = users(:dan)
-
-      get "/auth/github/", params: user_params
-      expect(session[:user_id]).must_equal dan.id
-
+      user = users(:dan)
+      perform_login(user)
+      expect(session[:user_id]).must_equal user.id
 
       expect{
         post upvote_path(movie.id)

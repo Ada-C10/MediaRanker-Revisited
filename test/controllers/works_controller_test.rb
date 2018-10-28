@@ -2,18 +2,31 @@ require 'test_helper'
 
 describe WorksController do
   describe "root" do
+    let(:kari) {users(:kari)}
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
-
+      get root_path
+      must_respond_with :success
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      work = works(:movie)
+      work.delete
 
+      get root_path
+      must_respond_with :success
     end
 
     it "succeeds with no media" do
+      works(:album).destry
+      works(:another_album).destroy
+      works(:poodr).destroy
+      works(:movie).destroy
 
+      Work.all.count.must_equal 0
+      get root_path
+      must_respond_with :success
     end
   end
 
@@ -22,17 +35,23 @@ describe WorksController do
 
   describe "index" do
     it "succeeds when there are works" do
-
+      get works_path
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+      Work.all.each {|work| work.destory}
 
+      Work.all.count.must_equal 0
+      get root_path
+      must_respond_with :success
     end
   end
 
   describe "new" do
     it "succeeds" do
-
+      get new_work_path
+      must_respond_with :success
     end
   end
 

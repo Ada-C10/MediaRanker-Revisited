@@ -12,8 +12,8 @@ describe Work do
 
     it "has a list of voting users" do
       album = works(:album)
-      album.must_respond_to :ranking_users
-      album.ranking_users.each do |user|
+      album.must_respond_to :voting_users
+      album.voting_users.each do |user|
         user.must_be_kind_of User
       end
     end

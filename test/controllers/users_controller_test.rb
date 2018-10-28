@@ -2,34 +2,47 @@ require 'test_helper'
 
 describe UsersController do
   let(:id){users(:ada).id}
-  describe 'index' do
-    it 'succeeds when there are users' do
-      get users_path
-      must_respond_with :success
+  describe 'Logged-in users' do
+
+    describe 'index' do
+      it 'succeeds when there are users' do
+        perform_login(users(:ada))
+        get users_path
+        must_respond_with :success
+      end
     end
 
-    it 'succeed when there are no users' do
-      votes.each do |vote|
-        vote.destroy!
+    describe 'show' do
+      it 'succeeds for an existing user id' do
+        perform_login(users(:ada))
+        get user_path(id)
+        must_respond_with :success
       end
-      users.each do |user|
-        user.destroy!
+
+      it 'renders 404 for a bogus user id' do
+        perform_login(users(:ada))
+        id = -1
+        get user_path(id)
+        must_respond_with :missing
       end
-      get users_path
-      must_respond_with :success
     end
   end
 
-  describe 'show' do
-    it 'succeeds for an existing user id' do
-      get user_path(id)
-      must_respond_with :success
+  describe 'Guest users' do
+    describe 'index' do
+      it 'cannot access index' do
+        get users_path
+        must_respond_with :redirect
+        must_redirect_to root_path
+      end
     end
 
-    it 'renders 404 for a bogus user id' do
-      id = -1
-      get user_path(id)
-      must_respond_with :missing
+    describe 'show' do
+      it 'cannot access show' do
+        get user_path(id)
+        must_respond_with :redirect
+        must_redirect_to root_path
+      end
     end
   end
 end

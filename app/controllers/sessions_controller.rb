@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+  skip_before_action :require_login, only: [:create]
 
   def create
     # The login flow, from when the user clicks "Login"

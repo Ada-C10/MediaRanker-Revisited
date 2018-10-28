@@ -5,3 +5,9 @@ ada:
   email: ada@adadevelopersacademy.org
   uid: 12345
   provider: github
+
+kari:
+  username: countess kari
+  email: kari@adadevelopersacademy.org
+  uid: 67890
+  provider: github

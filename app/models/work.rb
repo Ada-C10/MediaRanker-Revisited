@@ -1,7 +1,7 @@
 class Work < ApplicationRecord
   CATEGORIES = %w(album book movie)
   has_many :votes, dependent: :destroy
-  has_many :ranking_users, through: :votes, source: :user
+  has_many :voting_users, through: :votes, source: :user
 
   validates :category,  presence: true,
                         inclusion: { in: CATEGORIES }

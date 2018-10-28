@@ -2,10 +2,11 @@
 
 dan:
   name: dan
+  email: dan@adaacademy.com
   uid: 1
-  provider: 'github'
-
+  provider: github
 kari:
   name: kari
+  email: kari@adacademy.com
   uid: 2
-  provider: 'github'
+  provider: github

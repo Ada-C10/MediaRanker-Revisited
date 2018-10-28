@@ -307,7 +307,7 @@ describe WorksController do
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
       # loggin user in
-      user = users(:dan)
+      user = users(:kari)
       # Make fake session
       # Tell OmniAuth to use this user's info when it sees
      # an auth callback from github
@@ -315,10 +315,11 @@ describe WorksController do
       get auth_callback_path('github')
 
       # Doing a new vote -
-      work = Work.find_by(id: 547668523)
+      work = Work.first
       start_count = work.vote_count
+      binding.pry
       post upvote_path(work.id)
-
+      binding.pry
       # expectations
       expect(flash[:status]).must_equal :success
       expect(flash[:result_text]).must_equal "Successfully upvoted!"
@@ -336,7 +337,6 @@ describe WorksController do
       # Tell OmniAuth to use this user's info when it sees
      # an auth callback from github
       OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
-      binding.pry
       get auth_callback_path('github')
 
 
@@ -349,7 +349,7 @@ describe WorksController do
       post upvote_path(work.id)
       # expectations
       expect(flash[:result_text]).must_equal "Could not upvote"
-      expect(flash[:messages]).must_equal vote.errors.messages
+      expect(flash[:messages]).must_equal work.errors.messages
       expect(work.vote_count).must_equal start_count
       must_respond_with :redirect
       must_redirect_to work_path(work)

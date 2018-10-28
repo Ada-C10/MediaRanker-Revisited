@@ -6,6 +6,16 @@ describe WorksController do
   let(:album) { works(:album) }
   let(:album2) { works(:another_album) }
 
+  let(:work_data) {
+    work_data = {
+      work: {
+        category: CATEGORIES[0],
+        title: 'new work title',
+        publication_year: 1234
+      }
+    }
+  }
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -61,12 +71,12 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
-      work_data = {
-        work: {
-          category: CATEGORIES[0],
-          title: "new title"
-        }
-      }
+      # work_data = {
+      #   work: {
+      #     category: CATEGORIES[0],
+      #     title: "new title"
+      #   }
+      # }
 
       test_work = Work.new(work_data[:work])
       test_work.must_be :valid?, "Work data was invalid. Please fix this test."
@@ -75,18 +85,20 @@ describe WorksController do
         post works_path, params: work_data
       }.must_change('Work.count', +1)
 
-      expect(flash[:result_text]).must_include "Successfully created"
+      expect(flash[:status]).must_equal :success
 
       must_redirect_to work_path(Work.last)
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
-      work_data = {
-        work: {
-          category: CATEGORIES[0],
-          title: album.title
-        }
-      }
+      # work_data = {
+      #   work: {
+      #     category: CATEGORIES[0],
+      #     title: album.title
+      #   }
+      # }
+
+      work_data[:work][:title] = album.title
 
       test_work = Work.new(work_data[:work])
       test_work.wont_be :valid?, "Work data was valid. Please fix this test."
@@ -95,18 +107,20 @@ describe WorksController do
         post works_path, params: work_data
       }.wont_change('Work.count')
 
-      expect(flash[:result_text]).must_include "Could not create"
+      expect(flash[:status]).must_equal :failure
 
       must_respond_with :bad_request
     end
 
     it "renders 400 bad_request for bogus categories" do
-      work_data = {
-        work: {
-          category: INVALID_CATEGORIES[0],
-          title: 'new work title'
-        }
-      }
+      # work_data = {
+      #   work: {
+      #     category: INVALID_CATEGORIES[0],
+      #     title: 'new work title'
+      #   }
+      # }
+
+      work_data[:work][:category] = INVALID_CATEGORIES[0]
 
       test_work = Work.new(work_data[:work])
       test_work.wont_be :valid?, "Work data was valid. Please fix this test."
@@ -115,7 +129,7 @@ describe WorksController do
         post works_path, params: work_data
       }.wont_change('Work.count')
 
-      expect(flash[:result_text]).must_include "Could not create"
+      expect(flash[:status]).must_equal :failure
 
       must_respond_with :bad_request
     end

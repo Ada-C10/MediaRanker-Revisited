@@ -24,6 +24,13 @@ describe SessionsController do
     end
 
     it "rejects a user with invalid data" do
+      start_count = User.count
+      user  = User.new(provider: "github", uid: 99999, email: "test@user.com")
+      perform_login(user)
+      
+      User.count.must_equal start_count
+
+      expect(session[:user_id]).must_be_nil
     end
   end
 

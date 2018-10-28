@@ -2,23 +2,21 @@ require 'test_helper'
 
 describe WorksController do
   let(:book) { works(:poodr) }
-  let(:movie) { works(:movie) }
-  let(:album) { works(:album) }
-  let(:album2) { works(:another_album) }
 
   let(:user) { users(:dan) }
+
+  let(:bad_id) {Work.last.id + 1}
 
   let(:work_data) {
     work_data = {
       work: {
-        category: CATEGORIES[0],
+        category: 'books',
         title: 'new work title',
         publication_year: 1234
       }
     }
   }
 
-  let(:bad_id) {0}
 
   describe "root" do
     it "succeeds with all media types" do
@@ -29,17 +27,16 @@ describe WorksController do
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
-      movie.destroy
+      book.destroy
 
       get root_path
       must_respond_with :success
     end
 
     it "succeeds with no media" do
-      book.destroy
-      movie.destroy
-      album.destroy
-      album2.destroy
+      Work.all.each do |work|
+        work.destroy
+      end
 
       get root_path
       must_respond_with :success
@@ -56,10 +53,9 @@ describe WorksController do
     end
 
     it "succeeds when there are no works" do
-      book.destroy
-      movie.destroy
-      album.destroy
-      album2.destroy
+      Work.all.each do |work|
+        work.destroy
+      end
 
       get users_path
       must_respond_with :success
@@ -94,7 +90,7 @@ describe WorksController do
 
     it "renders bad_request and does not update the DB for bogus data" do
 
-      work_data[:work][:title] = album.title
+      work_data[:work][:title] = book.title
 
       test_work = Work.new(work_data[:work])
       test_work.wont_be :valid?, "Work data was valid. Please fix this test."
@@ -135,41 +131,39 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      book.destroy
-
-      get work_path(book.id)
+      get work_path(bad_id)
       must_respond_with :not_found
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
-
       get edit_work_path(Work.first)
       must_respond_with :success
-
     end
 
     it "renders 404 not_found for a bogus work ID" do
-      book.destroy
-
-      get edit_work_path(book.id)
+      get edit_work_path(bad_id)
       must_respond_with :not_found
     end
   end
 
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
+      test_work = Work.new(work_data[:work])
+      test_work.must_be :valid?, "Work data was invalid. Please fix this test."
 
       patch work_path(book.id), params: work_data
 
       expect(flash[:status]).must_equal :success
       must_redirect_to work_path(book)
-
     end
 
     it "renders bad_request for bogus data" do
-      work_data[:work][:title] = album.title
+      work_data[:work][:title] = ''
+
+      test_work = Work.new(work_data[:work])
+      test_work.wont_be :valid?, "Work data was valid. Please fix this test."
 
       patch work_path(book.id), params: work_data
 
@@ -178,7 +172,6 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
-
       patch work_path(bad_id), params: work_data
       must_respond_with :not_found
     end
@@ -229,17 +222,20 @@ describe WorksController do
       }.must_change('Vote.count', +1)
 
       expect(flash[:status]).must_equal :success
+      must_redirect_to work_path(book)
     end
 
     it "redirects to the work page if the user has already voted for that work" do
       perform_login(user)
+      post upvote_path(book)
 
       expect {
-        post upvote_path(album)
+        post upvote_path(book)
       }.wont_change('Vote.count')
 
       expect(flash[:status]).must_equal :failure
       expect(flash[:messages]).wont_be_empty
+      must_redirect_to work_path(book)
     end
   end
 end

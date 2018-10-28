@@ -4,13 +4,15 @@ class SessionsController < ApplicationController
   def create
     auth_hash = request.env['omniauth.auth']
 
-    user = User.find_by(uid: auth_hash[:uid], provider: "github")
+    user = User.find_by(uid: auth_hash[:uid], provider: "google_oauth2")
+
     if user
       session[:user_id] = user.id
       flash[:status] = :success
       flash[:result_text] = "Successfully logged in as existing user #{user.username}"
     else
-      user = User.oauth_build_from_github(auth_hash)
+      user = User.oauth_build_from_google(auth_hash)
+
       if user.save
         session[:user_id] = user.id
         flash[:status] = :success

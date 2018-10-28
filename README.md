@@ -56,7 +56,7 @@ Following the steps in the Textbook curriculum, add OAuth to your Media Ranker A
   - `User` model
 
 
-<!-- ## Wave 3: Basic Authorization (Page Access)
+## Wave 3: Basic Authorization (Page Access)
 
 In this wave we will create authorization logic to enforce rules that govern what pages on the site users and guests (unauthenticated browsers) can view. The rule we'll use is that guests can only access the main page, and all logged-in users can access the show and index pages for all categories of work.
 
@@ -79,7 +79,7 @@ Create advanced authorization logic to enforce rules that govern what _changes_ 
 ### Tasks
 - Modify the edit and delete functionality to ensure that users can only change works they are associated with.
   - Consider how this could be implemented at the model layer.
-- Do some research into how to use Google or another OAuth provider for authentication and use that provider. -->
+- Do some research into how to use Google or another OAuth provider for authentication and use that provider.
 
 ## Due Date
 This project is due before class Monday October 29 via PR against Ada-C10/MediaRanker-Revisited.

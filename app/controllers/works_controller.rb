@@ -11,54 +11,95 @@ class WorksController < ApplicationController
   end
 
   def index
-    @works_by_category = Work.to_category_hash
+    if @login_user
+      @works_by_category = Work.to_category_hash
+    else
+      flash[:status] = :failure
+      flash[:result_text] = "Must be logged in to view page."
+      redirect_to root_path
+    end
   end
 
   def new
-    @work = Work.new
+    if @login_user
+      @work = Work.new
+    else
+      flash[:status] = :failure
+      flash[:result_text] = "Must be logged in to view page."
+      redirect_to root_path
+    end
   end
 
   def create
-    @work = Work.new(media_params)
-    @media_category = @work.category
-    if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
-      redirect_to work_path(@work)
+    if @login_user
+      @work = Work.new(media_params)
+      @media_category = @work.category
+      if @work.save
+        flash[:status] = :success
+        flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
+        redirect_to work_path(@work)
+      else
+        flash[:status] = :failure
+        flash[:result_text] = "Could not create #{@media_category.singularize}"
+        flash[:messages] = @work.errors.messages
+        render :new, status: :bad_request
+      end
     else
       flash[:status] = :failure
-      flash[:result_text] = "Could not create #{@media_category.singularize}"
-      flash[:messages] = @work.errors.messages
-      render :new, status: :bad_request
+      flash[:result_text] = "Must be logged in to create a work."
+      redirect_to root_path
     end
   end
 
   def show
-    @votes = @work.votes.order(created_at: :desc)
+    if @login_user
+      @votes = @work.votes.order(created_at: :desc)
+    else
+      flash[:status] = :failure
+      flash[:result_text] = "Must be logged in to view page."
+      redirect_to root_path
+    end
   end
 
   def edit
+    unless @login_user
+      flash[:status] = :failure
+      flash[:result_text] = "Must be logged in to edit work."
+      redirect_to root_path
+    end
   end
 
   def update
-    @work.update_attributes(media_params)
-    if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
-      redirect_to work_path(@work)
+    if @login_user
+      @work.update_attributes(media_params)
+      if @work.save
+        flash[:status] = :success
+        flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
+        redirect_to work_path(@work)
+      else
+        flash.now[:status] = :failure
+        flash.now[:result_text] = "Could not update #{@media_category.singularize}"
+        flash.now[:messages] = @work.errors.messages
+        render :edit, status: :bad_request
+      end
     else
-      flash.now[:status] = :failure
-      flash.now[:result_text] = "Could not update #{@media_category.singularize}"
-      flash.now[:messages] = @work.errors.messages
-      render :edit, status: :bad_request
+      flash[:status] = :failure
+      flash[:result_text] = "Must be logged in to update work."
+      redirect_to root_path
     end
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if @login_user
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    else
+      flash[:status] = :failure
+      flash[:result_text] = "Must be logged in to delete a work."
+      redirect_to root_path
+    end
   end
 
   def upvote
@@ -81,7 +122,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: work_path(@work)
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end

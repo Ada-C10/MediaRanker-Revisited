@@ -14,19 +14,18 @@ describe WorksController do
       # Precondition: there is at least one media in two of the categories
       works.each do |work|
         if work[:category] == "album"
-          work[:category] = ""
+          work.destroy
         end
+      end
 
       get root_path
 
       must_respond_with :success
-      end
+
     end
 
     it "succeeds with no media" do
-      works.each do |work|
-        work[:category] = ""
-      end
+      works = []
 
       get root_path
 
@@ -45,7 +44,7 @@ describe WorksController do
     end
 
     it "succeeds when there are no works" do
-      works = {}
+      works = []
 
       get works_path
 
@@ -255,21 +254,21 @@ describe WorksController do
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
       get login_path(params: user_hash)
-      id = works(:poodr)
+      work = works(:poodr)
 
-      post upvote_path(id)
+      post upvote_path(work)
 
-      must_redirect_to work_path(id)
+      must_redirect_to work_path(work)
     end
 
     it "redirects to the work page if the user has already voted for that work" do
       get login_path(params: user_hash)
-      id = works(:poodr)
+      work = works(:poodr)
 
-      post upvote_path(id)
-      post upvote_path(id)
+      post upvote_path(work)
+      post upvote_path(work)
 
-      must_redirect_to work_path(id)
+      must_redirect_to work_path(work)
     end
   end
 end

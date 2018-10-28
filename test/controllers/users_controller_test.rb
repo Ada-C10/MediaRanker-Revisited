@@ -1,7 +1,7 @@
 require 'test_helper'
 
 describe UsersController do
-  let(:id){users(:dan).id}
+  let(:id){users(:ada).id}
   describe 'index' do
     it 'succeeds when there are users' do
       get users_path

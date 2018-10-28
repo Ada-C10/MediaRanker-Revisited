@@ -226,7 +226,7 @@ describe WorksController do
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
-      perform_login("new user")
+      perform_login(users(:ada))
       expect {
         post upvote_path(id)
       }.wont_change 'Work.count'
@@ -239,7 +239,7 @@ describe WorksController do
     end
 
     it "redirects to the work page if the user has already voted for that work" do
-      perform_login("new user")
+      perform_login(users(:ada))
       2.times do
         expect {
           post upvote_path(id)

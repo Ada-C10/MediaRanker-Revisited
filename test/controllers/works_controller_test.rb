@@ -71,32 +71,24 @@ describe WorksController do
 
   describe "create" do
     it "creates a work with valid data for a real category" do
-      # work_data = {
-      #   work: {
-      #     category: CATEGORIES[0],
-      #     title: "new title"
-      #   }
-      # }
 
-      test_work = Work.new(work_data[:work])
-      test_work.must_be :valid?, "Work data was invalid. Please fix this test."
+      CATEGORIES.each do |category|
+        work_data[:work][:category] = category
 
-      expect {
-        post works_path, params: work_data
-      }.must_change('Work.count', +1)
+        test_work = Work.new(work_data[:work])
+        test_work.must_be :valid?, "Work data was invalid. Please fix this test."
 
-      expect(flash[:status]).must_equal :success
+        expect {
+          post works_path, params: work_data
+        }.must_change('Work.count', +1)
 
-      must_redirect_to work_path(Work.last)
+        expect(flash[:status]).must_equal :success
+
+        must_redirect_to work_path(Work.last)
+      end
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
-      # work_data = {
-      #   work: {
-      #     category: CATEGORIES[0],
-      #     title: album.title
-      #   }
-      # }
 
       work_data[:work][:title] = album.title
 
@@ -113,25 +105,21 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
-      # work_data = {
-      #   work: {
-      #     category: INVALID_CATEGORIES[0],
-      #     title: 'new work title'
-      #   }
-      # }
 
-      work_data[:work][:category] = INVALID_CATEGORIES[0]
+      INVALID_CATEGORIES.each do |invalid_category|
+        work_data[:work][:category] = invalid_category
 
-      test_work = Work.new(work_data[:work])
-      test_work.wont_be :valid?, "Work data was valid. Please fix this test."
+        test_work = Work.new(work_data[:work])
+        test_work.wont_be :valid?, "Work data was valid. Please fix this test."
 
-      expect {
-        post works_path, params: work_data
-      }.wont_change('Work.count')
+        expect {
+          post works_path, params: work_data
+        }.wont_change('Work.count')
 
-      expect(flash[:status]).must_equal :failure
+        expect(flash[:status]).must_equal :failure
 
-      must_respond_with :bad_request
+        must_respond_with :bad_request
+      end
     end
 
   end

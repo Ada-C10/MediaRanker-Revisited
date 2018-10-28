@@ -157,9 +157,10 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+
       id = -1
       get edit_work_path(id)
-      must_respond_with :not_found
+       must_respond_with :not_found
 
     end
   end
@@ -218,7 +219,7 @@ describe WorksController do
         patch work_path(id), params: work_hash
       }.wont_change 'Work.count'
 
-      must_respond_with :not_found
+      must_respond_with 404
     end
   end
 
@@ -257,10 +258,9 @@ describe WorksController do
       post upvote_path(movie.id)
     }.wont_change 'Vote.count'
 
-      must_respond_with :redirect
-      must_redirect_to work_path(movie.id)
-      expect(flash[:result_text]).must_equal "You must log in to do that"
 
+      must_redirect_to root_path
+      must_respond_with :redirect
 
 
     end
@@ -272,13 +272,13 @@ describe WorksController do
       expect(session[:user_id]).must_equal user.id
 
             delete logout_path
-            expect(session[:user_id]).must_equal nil
+            expect(session[:user_id]).must_be_nil
 
 
 
             post upvote_path(movie.id)
 
-            must_redirect_to work_path(movie.id)
+            must_redirect_to root_path
 
     end
 
@@ -292,6 +292,7 @@ describe WorksController do
         post upvote_path(movie.id)
       }.must_change 'Vote.count', 1
 
+      must_respond_with :redirect
       must_redirect_to work_path(movie.id)
       expect(flash[:result_text]).must_equal "Successfully upvoted!"
 

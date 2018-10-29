@@ -2,6 +2,7 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :check_owner, only: [:edit, :update, :destroy]
   skip_before_action :require_login, only: [:root]
 
   def root
@@ -85,12 +86,20 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
 
   def category_from_work
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def check_owner
+    unless @work.user.id == @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You can only edit works you added to the site"
+      redirect_to works_path
+    end
   end
 end

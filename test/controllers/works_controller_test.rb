@@ -11,7 +11,8 @@ describe WorksController do
         creator: "Tolkien",
         description: "Lord of the Rings",
         publication_year: 1955,
-        category: "book"
+        category: "book",
+        user_id: dan.id
       }
     }
   }
@@ -32,7 +33,7 @@ describe WorksController do
       # Precondition: there is at least one media in two of the categories
 
       expect {
-        perform_login(dan)
+        perform_login(users(:kari))
         delete work_path(movie.id)
       }.must_change 'Work.count', -1
 
@@ -101,7 +102,7 @@ describe WorksController do
         expect(Work.last.description).must_equal work_hash[:work][:description]
         expect(Work.last.publication_year).must_equal work_hash[:work][:publication_year]
         expect(Work.last.category).must_equal work_hash[:work][:category]
-        expect(Work.last.user).must_equal dan
+        expect(Work.last.user_id).must_equal dan.id
 
         expect(flash[:result_text]).must_equal "Successfully created #{Work.last.category} #{Work.last.id}"
       end
@@ -169,7 +170,7 @@ describe WorksController do
 
       it "does not permit access if logged in user is not the user the work belongs to" do
         perform_login(dan)
-        get work_path(movie.id)
+        get edit_work_path(movie.id)
 
         # Arrange
         must_respond_with :redirect
@@ -285,7 +286,7 @@ describe WorksController do
 
         must_respond_with :redirect
         must_redirect_to works_path
-        expect(flash[:result_text]).must_equal "You can only delete works you added to the site"
+        expect(flash[:result_text]).must_equal "You can only edit works you added to the site"
 
         # expect no change
         expect(Work.find_by(id: movie.id).title).must_equal movie.title

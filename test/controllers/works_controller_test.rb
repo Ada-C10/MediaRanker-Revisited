@@ -283,27 +283,8 @@ describe WorksController do
     end
 
     describe "upvote" do
-      # Wait on this?
-      it "redirects to the work page if no user is logged in" do
-        delete logout_path
-        # No on is logged in at this point
-        work = works(:album)
-        id = work.id
-        # binding.pry
-        # Vote will not get added
 
-        # Says no conversion of integer into string? Route requires an integer...why?
 
-        post upvote_path(id)
-        expect(work.vote_count).must_equal 0
-
-        # errors will flash
-        expect(flash[:result_text]).must_equal "You must log in to do that"
-        # Will redirect
-        must_respond_with :redirect
-        must_redirect_to work_path(work)
-
-      end
 
       it "redirects to the work page after the user has logged out" do
         # Log user in
@@ -378,4 +359,95 @@ describe WorksController do
       end
     end
   end
+
+  describe "Not logged in" do
+
+    describe "upvote" do
+      it "redirects to the work page if no user is logged in" do
+
+        # No on is logged in at this point
+        work = works(:album)
+        id = work.id
+        # binding.pry
+        # Vote will not get added
+
+        # Says no conversion of integer into string? Route requires an integer...why?
+
+        post upvote_path(id)
+        expect(work.vote_count).must_equal 0
+
+        # errors will flash
+        expect(flash[:result_text]).must_equal "You must log in to do that"
+        # Will redirect
+        must_respond_with :redirect
+        must_redirect_to work_path(work)
+
+      end
+    end
+
+
+    it "does not allow access to index" do
+      get works_path
+
+      # Assert
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(flash[:error]).must_equal "You must be logged in to view this section"
+
+    end
+
+    it "does not allow access to new" do
+      get new_work_path
+
+      # Assert
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(flash[:error]).must_equal "You must be logged in to view this section"
+
+    end
+
+    it "does not allow access to show" do
+
+      get work_path(works(:album).id)
+
+      # Assert
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(flash[:error]).must_equal "You must be logged in to view this section"
+
+    end
+
+    it "does not allow access to edit" do
+      get edit_work_path(works(:album).id)
+
+      # Assert
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(flash[:error]).must_equal "You must be logged in to view this section"
+
+    end
+
+    it "does not allow access to update" do
+      put work_path(works(:album).id)
+
+      # Assert
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(flash[:error]).must_equal "You must be logged in to view this section"
+
+    end
+
+    it "does not allow upvote" do
+
+      post upvote_path(works(:album).id)
+
+
+      # Assert
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(flash[:error]).must_equal "You must be logged in to view this section"
+
+    end
+  end
+
 end

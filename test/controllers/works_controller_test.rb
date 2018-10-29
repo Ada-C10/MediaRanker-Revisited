@@ -68,7 +68,6 @@ describe WorksController do
         }
 
         test_work = Work.new(work_hash[:work])
-
         test_work.must_be :valid?, "Data was invalid. Please come fix this test"
 
         expect {
@@ -80,11 +79,51 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      work_hash = {
+        work: {
+          title: "Practical Object Oriented Design in Ruby",
+          category: "books",
+        }
+      }
 
+      expect {
+        post works_path, params: work_hash
+      }.wont_change('Work.count')
+
+      must_respond_with :bad_request
+    end
+
+    it "does allow duplication of a title if the title exists in different category" do
+      work_hash = {
+        work: {
+          title: "Practical Object Oriented Design in Ruby",
+          category: "movies",
+        }
+      }
+
+      expect {
+        post works_path, params: work_hash
+      }.must_change('Work.count', +1)
+
+      must_redirect_to work_path(Work.last)
     end
 
     it "renders 400 bad_request for bogus categories" do
+      INVALID_CATEGORIES.each do |cat|
 
+        work_hash = {
+          work: {
+            title: "test title",
+            category: cat,
+          }
+        }
+
+        expect {
+          post works_path, params: work_hash
+        }.wont_change('Work.count')
+
+        must_respond_with :bad_request
+      end
     end
 
   end

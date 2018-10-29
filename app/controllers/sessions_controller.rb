@@ -27,10 +27,14 @@ class SessionsController < ApplicationController
   end
 
   def logout
-    session[:user_id] = nil
-    flash[:status] = :success
-    flash[:result_text] = "Successfully logged out"
-    redirect_to root_path
+    if !session[:user_id].nil?
+      session[:user_id] = nil
+      flash[:status] = :success
+      flash[:result_text] = "Successfully logged out"
+      redirect_to root_path
+    else
+      redirect_to root_path, status: :bad_request
+    end
   end
 
   def create
@@ -46,7 +50,7 @@ class SessionsController < ApplicationController
       user = User.build_from_github(auth_hash)
 
       if user.save
-        session[:user_id] = user.id 
+        session[:user_id] = user.id
         flash[:success] = "Logged in as new user #{user.username}"
       else
         # Couldn't save the user for some reason. If we

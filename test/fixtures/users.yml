@@ -24,3 +24,9 @@ grace:
   uid: 13371337
   email: grace@hooper.net
   username: graceful_hopps
+
+user1:
+  provider: github
+  uid: 144
+  email: grace@hooper.net
+  username: graceful_hopps

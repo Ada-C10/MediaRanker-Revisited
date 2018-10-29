@@ -12,6 +12,7 @@ require 'pry'
 describe UsersController do
 
 
+
   describe "Guest " do
     describe "index" do
       it "redirects when no user is logged in" do

@@ -97,7 +97,7 @@ describe Work do
       # Create users to do the voting
       test_users = []
       20.times do |i|
-        test_users << User.create!(username: "user#{i}")
+        test_users << User.create!(username: "user#{i}", uid: rand(1111111..9999999), provider: 'github')
       end
 
       # Create media to vote upon

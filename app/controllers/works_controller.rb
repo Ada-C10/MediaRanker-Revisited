@@ -3,7 +3,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
   skip_before_action :require_login, only: [:root]
-  
+
   def root
     @albums = Work.best_albums
     @books = Work.best_books
@@ -39,9 +39,11 @@ class WorksController < ApplicationController
   end
 
   def edit
+    # add ownership
   end
 
   def update
+    # add ownership
     @work.update_attributes(media_params)
     if @work.save
       flash[:status] = :success
@@ -56,6 +58,7 @@ class WorksController < ApplicationController
   end
 
   def destroy
+    #add ownership
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
@@ -63,8 +66,8 @@ class WorksController < ApplicationController
   end
 
   def upvote
-    flash[:status] = :failure
-    if @login_user
+    #prevent ownership
+
       vote = Vote.new(user: @login_user, work: @work)
       if vote.save
         flash[:status] = :success
@@ -73,9 +76,7 @@ class WorksController < ApplicationController
         flash[:result_text] = "Could not upvote"
         flash[:messages] = vote.errors.messages
       end
-    else
-      flash[:result_text] = "You must log in to do that"
-    end
+
 
     # Refresh the page to show either the updated vote count
     # or the error message
@@ -91,5 +92,9 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def is_this_yours?
+    return @work.user == @login_user
   end
 end

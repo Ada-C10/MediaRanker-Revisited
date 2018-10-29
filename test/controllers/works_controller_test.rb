@@ -137,7 +137,7 @@ describe WorksController do
     end
 
     describe "edit" do
-      it "succeeds for an extant work ID" do
+      it "succeeds for an extant work ID that logged-in user owns" do
         perform_login(dan)
         get edit_work_path(album.id)
 
@@ -151,6 +151,7 @@ describe WorksController do
 
         must_respond_with :not_found
       end
+
     end
 
     describe "update" do
@@ -369,6 +370,9 @@ describe WorksController do
 
   end
 
+  describe 'logged-in user ownership tests' do
+
+  end
 
 
 

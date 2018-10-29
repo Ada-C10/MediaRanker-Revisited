@@ -56,9 +56,9 @@ describe UsersController do
 
     it "creates an account for a new user and redirects to the root route" do
       start_count = User.count
-      user = User.new(provider: "github", uid: 99999, username: "test_user", email: "test@user.com")
+      user = User.create(provider: "github", uid: 1234567, username: "test_user_three", email: "test@user.com")
       OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
-     get auth_callback_path(:github)
+      get auth_callback_path(:github)
 
      must_redirect_to root_path
 

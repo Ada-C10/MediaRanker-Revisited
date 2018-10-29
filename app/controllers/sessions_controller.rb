@@ -13,6 +13,7 @@ class SessionsController < ApplicationController
       if user.save
         flash[:success] = "Logged in as new user #{user.username}"
       else
+        binding.pry
         flash[:error] = "Could not create new user account: #{user.errors.messages}"
         redirect_to root_path
         return

@@ -8,8 +8,8 @@ Rails.application.routes.draw do
   resources :works
   post '/works/:id/upvote', to: 'works#upvote', as: 'upvote'
 
-  get "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/:provider/callback", to: "sessions#create", as: 'auth_callback'
   delete "/logout", to: "sessions#destroy", as: "logout"
   resources :users, only: [:index, :show]
-  
+
 end

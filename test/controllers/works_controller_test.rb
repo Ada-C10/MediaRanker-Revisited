@@ -201,17 +201,24 @@ describe WorksController do
       must_respond_with :not_found
     end
   end
-  #
-  # describe "destroy" do
-  #   it "succeeds for an extant work ID" do
-  #
-  #   end
-  #
-  #   it "renders 404 not_found and does not update the DB for a bogus work ID" do
-  #
-  #   end
-  # end
-  #
+
+  describe "destroy" do
+    it "succeeds for an extant work ID" do
+      existing_id = works(:movie).id
+
+      expect {
+        delete work_path(existing_id)
+        }.must_change 'Work.count', -1
+
+        must_respond_with :redirect
+        must_redirect_to root_path
+    end
+
+    it "renders 404 not_found and does not update the DB for a bogus work ID" do
+
+    end
+  end
+
   # describe "upvote" do
   #
   #   it "redirects to the work page if no user is logged in" do

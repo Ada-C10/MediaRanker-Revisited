@@ -4,16 +4,27 @@ describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+      get root_path
 
+      must_respond_with :success
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      work = works(:poodr)
+      work.destroy
 
+      get root_path
+
+      must_respond_with :success
     end
 
     it "succeeds with no media" do
+      Work.destroy_all
+      
+      get root_path
 
+      must_respond_with :success
     end
   end
 
@@ -166,11 +177,17 @@ describe WorksController do
       work = Work.create!(category: "book", title: "test")
       put work_path(work), params: {work: { title: nil}}
 
-      must_respond_with :not_found
+      must_respond_with :bad_request
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      work = Work.create!(category: "book", title: "test")
+      work.destroy
 
+
+      put work_path(work), params: {work: { title: "the new title of this work"}}
+
+      must_respond_with :not_found
     end
   end
 
@@ -205,19 +222,53 @@ describe WorksController do
 
   describe "upvote" do
     it "redirects to the work page if no user is logged in" do
+      user = users(:dan)
+      work = works(:album)
 
+      post upvote_path(work), params: {user: user, work: work}
+
+      expect(flash[:result_text]).must_equal "You must log in to do that"
+      must_redirect_to work_path(work)
     end
 
     it "redirects to the work page after the user has logged out" do
+      # not understanding the direction.
+      # so you want the user to log out even before upvoting? or after upvoting?
 
+      work = works(:album)
+
+      user = users(:new_user)
+      perform_login(user)
+      delete logout_path(user)
+
+      post upvote_path(work), params: {user: user, work: work}
+
+      expect(flash[:result_text]).must_equal "You must log in to do that"
+      must_redirect_to work_path(work)
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      user = users(:new_user)
+      perform_login(user)
 
+      work = works(:album)
+
+      post upvote_path(work), params: {user: user, work: work}
+
+      expect(flash[:result_text]).must_equal "Successfully upvoted!"
+      must_redirect_to work_path(work)
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      user = users(:dan)
+      perform_login(user)
 
+      work = works(:album)
+
+      post upvote_path(work), params: {user: user, work: work}
+
+      expect(flash[:result_text]).must_equal "Could not upvote"
+      must_redirect_to work_path(work)
     end
   end
 end

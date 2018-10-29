@@ -49,9 +49,30 @@ describe SessionsController do
     end
   end
 
-  describe "destory" do
+  describe "destroy" do
     it "logs a user out if they are logged in" do
-      skip
+      perform_login(dan)
+      expect(session[:user_id]).must_equal dan.id
+
+      expect {
+        delete logout_path
+      }.wont_change 'User.count'
+
+      expect(session[:user_id]).must_be_nil
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+    end
+
+    it "redirects to the homepage even if no one is logged in" do
+      expect {
+        delete logout_path
+      }.wont_change 'User.count'
+
+      expect(session[:user_id]).must_be_nil
+
+      must_respond_with :redirect
+      must_redirect_to root_path
     end
   end
 

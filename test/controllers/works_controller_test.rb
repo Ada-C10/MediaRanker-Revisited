@@ -317,9 +317,9 @@ describe WorksController do
       # Doing a new vote -
       work = Work.first
       start_count = work.vote_count
-      binding.pry
+      # binding.pry
       post upvote_path(work.id)
-      binding.pry
+      # binding.pry
       # expectations
       expect(flash[:status]).must_equal :success
       expect(flash[:result_text]).must_equal "Successfully upvoted!"
@@ -337,10 +337,6 @@ describe WorksController do
       # Tell OmniAuth to use this user's info when it sees
      # an auth callback from github
       OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
-<<<<<<< HEAD
-      # binding.pry
-=======
->>>>>>> controller_tests
       get auth_callback_path('github')
 
 

@@ -4,6 +4,7 @@ describe User do
   describe "relations" do
     it "has a list of votes" do
       dan = users(:dan)
+      # binding.pry
       dan.must_respond_to :votes
       dan.votes.each do |vote|
         vote.must_be_kind_of Vote

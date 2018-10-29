@@ -1,12 +1,8 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 grace:
   provider: github
   uid: 12335
   email: grace@gmail.com
   username: grace_2018
-
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 dan:
   provider: github

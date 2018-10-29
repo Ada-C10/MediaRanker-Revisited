@@ -3,11 +3,11 @@
 dan:
   username: dan
   uid: 123
-  provider: google
+  provider: github
   email: dan@dan.com
 
 kari:
   username: kari
   uid: 321
-  provider: google
+  provider: github
   email: kari@kari.com

@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  get "/auth/:provider/callback", to: "sessions#create", as: 'auth_callback'
+  # get '/auth/github', as: 'github_login'
+  delete "/logout", to: "sessions#destroy", as: "logout"
+
+
   root 'works#root'
   # get '/login', to: 'sessions#login_form', as: 'login'
   # post '/login', to: 'sessions#login'
@@ -12,8 +17,8 @@ Rails.application.routes.draw do
 
   #oath stuff
   # TODO: add view helper?? need login path + add to view
-  get "/auth/:provider/callback", to: "sessions#create"
-  delete "/logout", to: "sessions#destroy", as: "logout"
+
+
 
 
 end

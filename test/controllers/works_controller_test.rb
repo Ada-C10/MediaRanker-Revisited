@@ -139,7 +139,7 @@ describe WorksController do
     describe "edit" do
       it "succeeds for an extant work ID that logged-in user owns" do
         perform_login(dan)
-        get edit_work_path(album.id)
+        get edit_work_path(poodr.id)
 
         must_respond_with :success
 
@@ -159,10 +159,10 @@ describe WorksController do
       it "succeeds for valid data and an extant work ID" do
         perform_login(dan)
         expect{
-          patch work_path(album.id), params: mock_params
+          patch work_path(poodr.id), params: mock_params
         }.wont_change 'Work.count'
 
-        updated_work = Work.find(album.id)
+        updated_work = Work.find(poodr.id)
 
         expect(updated_work.title).must_equal mock_params[:work][:title]
         expect(updated_work.creator).must_equal mock_params[:work][:creator]
@@ -170,7 +170,7 @@ describe WorksController do
         expect(updated_work.publication_year).must_equal mock_params[:work][:publication_year]
         expect(updated_work.category).must_equal mock_params[:work][:category]
 
-        must_redirect_to work_path(album.id)
+        must_redirect_to work_path(poodr.id)
 
       end
 
@@ -178,19 +178,19 @@ describe WorksController do
         perform_login(dan)
         mock_params[:work][:title] = ''
 
-        old_album = Work.find(album.id)
+        old_poodr = Work.find(poodr.id)
 
         expect{
-          patch work_path(album.id), params: mock_params
+          patch work_path(poodr.id), params: mock_params
         }.wont_change 'Work.count'
 
-        new_album = Work.find(album.id)
+        new_poodr = Work.find(poodr.id)
 
-        expect(old_album.title).must_equal new_album.title
-        expect(old_album.creator).must_equal new_album.creator
-        expect(old_album.description).must_equal new_album.description
-        expect(old_album.publication_year).must_equal new_album.publication_year
-        expect(old_album.category).must_equal new_album.category
+        expect(old_poodr.title).must_equal new_poodr.title
+        expect(old_poodr.creator).must_equal new_poodr.creator
+        expect(old_poodr.description).must_equal new_poodr.description
+        expect(old_poodr.publication_year).must_equal new_poodr.publication_year
+        expect(old_poodr.category).must_equal new_poodr.category
 
         must_respond_with :bad_request
 
@@ -210,10 +210,10 @@ describe WorksController do
       it "succeeds for an extant work ID" do
         perform_login(dan)
         expect{
-          delete work_path(album.id)
+          delete work_path(poodr.id)
         }.must_change 'Work.count', -1
 
-        expect(Work.find_by(id: album.id)).must_equal nil
+        expect(Work.find_by(id: poodr.id)).must_equal nil
 
         must_redirect_to root_path
       end
@@ -238,7 +238,7 @@ describe WorksController do
         delete logout_path
         expect(session[:user_id]).must_equal nil
 
-        post upvote_path(album.id)
+        post upvote_path(movie.id)
 
         must_redirect_to root_path
 
@@ -248,10 +248,10 @@ describe WorksController do
         perform_login(dan)
 
         expect {
-                post upvote_path(poodr.id)
+                post upvote_path(movie.id)
         }.must_change 'Vote.count', 1
 
-        must_redirect_to work_path(poodr.id)
+        must_redirect_to work_path(movie.id)
       end
 
       it "redirects to the work page if the user has already voted for that work" do

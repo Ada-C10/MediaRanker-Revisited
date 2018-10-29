@@ -39,11 +39,12 @@ class WorksController < ApplicationController
   end
 
   def edit
-    # add ownership
+    check_ownership
   end
 
   def update
-    # add ownership
+    check_ownership
+
     @work.update_attributes(media_params)
     if @work.save
       flash[:status] = :success
@@ -58,7 +59,8 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    #add ownership
+    check_ownership
+    
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
@@ -66,17 +68,16 @@ class WorksController < ApplicationController
   end
 
   def upvote
-    #prevent ownership
+    check_vote_eligibility
 
-      vote = Vote.new(user: @login_user, work: @work)
-      if vote.save
-        flash[:status] = :success
-        flash[:result_text] = "Successfully upvoted!"
-      else
-        flash[:result_text] = "Could not upvote"
-        flash[:messages] = vote.errors.messages
-      end
-
+    vote = Vote.new(user: @login_user, work: @work)
+    if vote.save
+      flash[:status] = :success
+      flash[:result_text] = "Successfully upvoted!"
+    else
+      flash[:result_text] = "Could not upvote"
+      flash[:messages] = vote.errors.messages
+    end
 
     # Refresh the page to show either the updated vote count
     # or the error message
@@ -94,7 +95,19 @@ private
     @media_category = @work.category.downcase.pluralize
   end
 
-  def is_this_yours?
-    return @work.user == @login_user
+  def check_ownership
+    unless @work.user == @login_user
+      flash[:status] = :failure
+      flash[:result_text] = "You may only modify your own works."
+      redirect_back(fallback_location: root_path)
+    end
+  end
+
+  def check_vote_eligibility
+    unless @work.user != @login_user
+      flash[:status] = :failure
+      flash[:result_text] = "You cannot vote on your own work."
+      redirect_back(fallback_location: root_path)
+    end
   end
 end

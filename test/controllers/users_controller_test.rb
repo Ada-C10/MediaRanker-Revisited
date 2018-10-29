@@ -71,6 +71,13 @@ describe UsersController do
     end
 
     it "redirects to the login route if given invalid user data" do
+      user = users(:grace)
+      user.uid = nil
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      get auth_callback_path(:github)
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(flash[:error]).must_equal "Could not create new user account: #{user.errors.messages}"
 
     end
 

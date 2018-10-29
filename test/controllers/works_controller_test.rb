@@ -311,7 +311,7 @@ describe WorksController do
         vote: { user: users(:nick), work: works(:album).id }
       }
       must_respond_with :redirect
-      must_redirect_to work_path(existing_work.id)
+      must_redirect_to root_path
     end
 
     it "redirects to the work page after the user has logged out" do

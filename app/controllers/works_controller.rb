@@ -66,6 +66,7 @@ class WorksController < ApplicationController
     if @login_user
       vote = Vote.new(user: @login_user, work: @work)
       if vote.save
+        # binding.pry
         flash[:status] = :success
         flash[:result_text] = "Successfully upvoted!"
       else

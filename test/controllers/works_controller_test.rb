@@ -187,18 +187,39 @@ describe WorksController do
 
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
-
+      # count = Work.count
       work = works(:poodr)
 
+      work_hash = {
+        work: {
+          title: nil,
+          creator: nil,
+          description: nil
+        }
+      }
+
+
+      expect {
+        patch work_path(work.id), params: work_hash
+      }.wont_change 'Work.count'
+
+      must_respond_with :bad_request
+      flash[:status].must_equal :failure
+
+
+
+    end
+
+    it "renders bad_request for bogus data" do
+      work = works(:poodr)
 
       work_hash = {
-        poodr: {
+        work: {
           title: 'something different',
           creator: 'New Editted Author',
           description: 'something new'
         }
       }
-      # binding.pry
 
       expect {
         put work_path(work.id), params: work_hash
@@ -206,13 +227,19 @@ describe WorksController do
 
       must_redirect_to work_path(work.id)
 
-    end
 
-    it "renders bad_request for bogus data" do
 
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      non_exisitant_work = 5000
+
+      expect {
+        put work_path(non_exisitant_work)
+      }.wont_change('Work.count')
+
+      must_respond_with 404
+
 
     end
   end
@@ -247,19 +274,42 @@ describe WorksController do
 
   describe "upvote" do
 
+    before do
+      @dan = users(:dan)
+      perform_login(@dan)
+    end
+
     it "redirects to the work page if no user is logged in" do
+
+      delete logout_path(@dan.id)
+      must_redirect_to root_path
 
     end
 
     it "redirects to the work page after the user has logged out" do
 
+      delete logout_path(@dan.id)
+      expect(session[:user_id]).must_equal nil
+      must_redirect_to root_path
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      work = works(:movie)
+      post upvote_path(work.id)
+      expect(flash[:result_text]).must_equal "Successfully upvoted!"
+      must_respond_with :redirect
+
 
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      work = works(:movie)
+      post upvote_path(work.id)
+      must_respond_with :redirect
+
+      post upvote_path(work.id)
+      expect(flash[:result_text]).must_equal "Could not upvote"
+      must_respond_with :redirect
 
     end
   end

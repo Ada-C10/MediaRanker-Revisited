@@ -5,7 +5,8 @@ Rails.application.routes.draw do
   # post '/login', to: 'sessions#login'
   # post '/logout', to: 'sessions#logout', as: 'logout'
 
-  get "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/:provider/callback", to: "sessions#create", as: 'user_callback'
+  
   delete "/logout", to: "sessions#destroy", as: "logout"
 
   resources :works

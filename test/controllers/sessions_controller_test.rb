@@ -1,20 +1,19 @@
 require "test_helper"
 
 describe SessionsController do
-  it 'should get login form' do
-    get login_path
-
-    must_respond_with :success
-  end
+  # it 'should get login form' do
+  #   get login_path
+  #
+  #   must_respond_with :success
+  # end
 
   describe 'login' do
     it 'can create a new user' do
-      user_hash = {
-        username: "New User"
-      }
+      user = users(:kari)
+      user.destroy
 
       expect {
-        post login_path, params: user_hash
+        perform_login(user)
       }.must_change 'User.count', 1
 
       must_respond_with :redirect
@@ -22,44 +21,37 @@ describe SessionsController do
     end
 
     it 'should login existing user without changing db' do
-      user_hash = {
-        username: users(:kari).username
-      }
+      user = users(:kari)
 
       expect {
-        post login_path, params: user_hash
+        perform_login(user)
       }.wont_change 'User.count'
 
       must_respond_with :redirect
       must_redirect_to root_path
-
+      session[:user_id].must_equal user.id
     end
 
-    it 'should return bad_request for invalid username' do
-      user_hash = {
-        username: nil
-      }
+    it 'cannot login user with invalid login data' do
+      user = users(:kari)
+      user.uid = nil
 
       expect {
-        post login_path, params: user_hash
+        perform_login(user)
       }.wont_change 'User.count'
 
-      must_respond_with :bad_request
-
+      expect(session[:user_id]).must_be_nil
     end
-
   end
 
   describe 'logout' do
     it 'should logout existing user and redirect_to root_path' do
-      user_hash = {
-        username: users(:kari).username
-      }
+      user = users(:kari)
 
-      post login_path, params: user_hash
+      perform_login(user)
       before_logout = session[:user_id]
 
-      post logout_path, params: user_hash
+      delete logout_path
       after_logout = session[:user_id]
 
       expect(before_logout).must_equal users(:kari).id

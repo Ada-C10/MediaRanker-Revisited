@@ -13,6 +13,7 @@ class WorksController < ApplicationController
 
   def index
     @works_by_category = Work.to_category_hash
+    # binding.pry
   end
 
   def new
@@ -63,6 +64,7 @@ class WorksController < ApplicationController
   end
 
   def upvote
+    # binding.pry
     flash[:status] = :failure
     if @login_user
       vote = Vote.new(user: @login_user, work: @work)

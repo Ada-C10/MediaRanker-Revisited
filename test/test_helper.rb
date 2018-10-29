@@ -1,5 +1,5 @@
-ENV["RAILS_ENV"] = "test"
-require File.expand_path("../../config/environment", __FILE__)
+# ENV["RAILS_ENV"] = "test"
+# require File.expand_path("../../config/environment", __FILE__)
 require "rails/test_help"
 require "minitest/rails"
 require "minitest/skip_dsl"
@@ -36,8 +36,14 @@ class ActiveSupport::TestCase
       uid: user.uid,
       info: {
         email: user.email,
-        nickname: user.username
+        name: user.username
       }
     }
+  end
+
+  # can't use test as first word, throw errors.
+  def login_test(user)
+    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+    get auth_callback_path(:github)
   end
 end

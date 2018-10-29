@@ -29,8 +29,8 @@ describe SessionsController do
     end
 
     it 'rejects a user with invalid data' do
-      chris.uid = nil
-      chris.destroy #sorry again
+      chris.username = 'dan' #model validates for username uniqueness
+      chris.destroy #sorry again!
 
       expect {
         perform_login(chris)

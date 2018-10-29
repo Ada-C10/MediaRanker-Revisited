@@ -2,10 +2,12 @@
 
 dan:
   username: dan
-  uid: dan12345
-  provider: facebook
+  uid: 00000000000000001
+  provider: github
+  email: dan@dan.com
 
 kari:
   username: kari
-  uid: kari12345
-  provider: facebook
+  uid: 00000000000000002
+  provider: github
+  email: kari@kari.com

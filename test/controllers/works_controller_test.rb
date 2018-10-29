@@ -12,9 +12,11 @@ describe WorksController do
     @book = works(:poodr)
     @movie = works(:movie)
     @album = works(:album)
+    @user = users(:dan)
   end
 
   let(:bogus_work_id) { Work.first.destroy.id }
+
 
   describe "root" do
 
@@ -47,14 +49,24 @@ describe WorksController do
   CATEGORIES = %w(albums books movies)
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
+  let (:logged_in_user) {
+    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(@user))
+
+    get auth_callback_path(:github)
+  }
+
   describe "index" do
     it "succeeds when there are works" do
+
+      logged_in_user
 
       get works_path
       must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+
+      logged_in_user
 
       @book.destroy
       @movie.destroy
@@ -68,6 +80,8 @@ describe WorksController do
   describe "new" do
     it "succeeds" do
 
+      logged_in_user
+
       get new_work_path(@book.id)
       must_respond_with :success
     end
@@ -76,10 +90,12 @@ describe WorksController do
   describe "create" do
     it "creates a work with valid data for a real category" do
 
+      logged_in_user
+
       work_data = {
         work:
         { title: "Unique Title", category: 'book' }
-        }
+      }
 
       test_work = Work.new(work_data[:work])
       test_work.must_be :valid?, "Work data was invalid. Please come fix this test."
@@ -92,6 +108,8 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+
+      logged_in_user
 
       work_data = {
         work:
@@ -109,6 +127,8 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
+
+      logged_in_user
 
       work_data = {
         work:
@@ -129,11 +149,15 @@ describe WorksController do
   describe "show" do
     it "succeeds for an extant work ID" do
 
+      logged_in_user
+
       get work_path(@book)
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+
+      logged_in_user
 
       get work_path(bogus_work_id)
       must_respond_with :not_found
@@ -143,11 +167,15 @@ describe WorksController do
   describe "edit" do
     it "succeeds for an extant work ID" do
 
+      logged_in_user
+
       get edit_work_path(@book)
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+
+      logged_in_user
 
       get edit_work_path(bogus_work_id)
       must_respond_with :not_found
@@ -155,22 +183,24 @@ describe WorksController do
   end
 
 
-        # work_data = {
-        #   work:
-        #   { title: "Unique Title", category: 'book' }
-        #   }
-        #
-        # test_work = Work.new(work_data[:work])
-        # test_work.must_be :valid?, "Work data was invalid. Please come fix this test."
-        #
-        # expect {
-        #   post works_path params: work_data
-        # }.must_change 'Work.count', +1
-        #
-        # must_redirect_to work_path(Work.last)
+  # work_data = {
+  #   work:
+  #   { title: "Unique Title", category: 'book' }
+  #   }
+  #
+  # test_work = Work.new(work_data[:work])
+  # test_work.must_be :valid?, "Work data was invalid. Please come fix this test."
+  #
+  # expect {
+  #   post works_path params: work_data
+  # }.must_change 'Work.count', +1
+  #
+  # must_redirect_to work_path(Work.last)
 
   describe "update" do
     it "succeeds for valid data and an extant work ID" do
+
+      logged_in_user
 
       updated_work_data = {
         work:
@@ -178,13 +208,15 @@ describe WorksController do
       }
 
       expect{
-      put work_path(@book), params: updated_work_data
-    }.wont_change 'Work.count'
+        put work_path(@book), params: updated_work_data
+      }.wont_change 'Work.count'
 
-    must_redirect_to work_path(@book)
+      must_redirect_to work_path(@book)
     end
 
     it "renders bad_request for bogus data" do
+
+      logged_in_user
 
       bogus_work_data = {
         work:
@@ -192,13 +224,15 @@ describe WorksController do
       }
 
       expect{
-      put work_path(@book), params: bogus_work_data
-    }.wont_change 'Work.count'
+        put work_path(@book), params: bogus_work_data
+      }.wont_change 'Work.count'
 
-    must_respond_with :bad_request
+      must_respond_with :bad_request
     end
 
     it "renders 404 not_found for a bogus work ID" do
+
+      logged_in_user
 
       destroyed_work_id = bogus_work_id
 
@@ -213,6 +247,8 @@ describe WorksController do
   describe "destroy" do
     it "succeeds for an extant work ID" do
 
+      logged_in_user
+
       expect {
         delete work_path(@book)
       }.must_change 'Work.count', -1
@@ -221,6 +257,8 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+
+      logged_in_user
 
       destroyed_work_id = bogus_work_id
 
@@ -234,15 +272,15 @@ describe WorksController do
 
   describe "upvote" do
 
-    it "redirects to the work page if no user is logged in" do
+    it "redirects to the work page if no user is #logged in" do
 
     end
 
-    it "redirects to the work page after the user has logged out" do
+    it "redirects to the work page after the user has #logged out" do
 
     end
 
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
+    it "succeeds for a #logged-in user and a fresh user-vote pair" do
 
     end
 

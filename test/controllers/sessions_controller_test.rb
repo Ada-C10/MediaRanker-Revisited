@@ -5,9 +5,7 @@ describe SessionsController do
 
     user = users.first
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new( mock_auth_hash(user))
-
-    get auth_callback_path(:github)
+    perform_login(user)
 
     must_redirect_to root_path
     expect(session[:user_id]).must_equal user.id
@@ -22,9 +20,7 @@ describe SessionsController do
 
     expect(new_user.valid?).must_equal true
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new( mock_auth_hash(new_user))
-
-    get auth_callback_path(:github)
+    perform_login(new_user)
 
     must_redirect_to root_path
 
@@ -39,9 +35,7 @@ describe SessionsController do
 
     expect(invalid_new_user.valid?).must_equal false
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new( mock_auth_hash( invalid_new_user ) )
-
-    get auth_callback_path(:github)
+    perform_login(invalid_new_user)
 
     must_redirect_to root_path
     expect( session[:user_id] ).must_equal nil

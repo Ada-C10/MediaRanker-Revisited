@@ -31,6 +31,7 @@ class ActiveSupport::TestCase
     return {
       provider: user.provider,
       uid: user.uid,
+      username: user.username,
       info: {
         nickname: user.username
       }

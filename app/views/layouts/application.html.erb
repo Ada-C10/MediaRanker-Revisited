@@ -49,14 +49,14 @@
         </li>
         <% end %> -->
         <% if session[:user_id] %>
-        <li class="nav-item app-header__nav_item">
-          <%= link_to "Logged in as #{@login_user.username}", logout_path, method: "delete", class: "btn btn-primary"   %>
-        </li>
+          <li class="nav-item app-header__nav_item">
+            <%= link_to "Logged in as #{@login_user.username}", logout_path, method: "delete", class: "btn btn-primary"   %>
+          </li>
         <% else %>
-        <li class="nav-item app-header__nav_item">
-          <%= link_to "Login with Github", "/auth/github", class: "btn btn-primary" %>
+          <li class="nav-item app-header__nav_item">
+            <%= link_to "Login with Github", "/auth/github", class: "btn btn-primary" %>
+          </li>
         <% end %>
-        </li>
       </ul>
     </nav>
   </header>

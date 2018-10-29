@@ -116,7 +116,7 @@ describe WorksController do
       # Act
       expect {
         post works_path, params: work_data
-      }.must_change('Work.count', +1)
+      }.must_change('Work.count', + 1)
 
       # Assert
       must_redirect_to work_path(Work.last)
@@ -301,7 +301,7 @@ describe WorksController do
 
       #assert
       must_respond_with :not_found
-      #expect(Work.find_by_id(id)).must_equal nil
+      expect(Work.find_by_id(id)).must_equal nil
 
     end
   end
@@ -310,18 +310,37 @@ describe WorksController do
 
     it "redirects to the work page if no user is logged in" do
 
+      # arrange
+      id = works(:movie).id
+      # act
+      post upvote_path(id)
+
+      # assert
+      must_respond_with :redirect
     end
 
     it "redirects to the work page after the user has logged out" do
+      # arrange
 
+      # act
+
+      # assert
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      # arrange
 
+      # act
+
+      # assert
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      # arrange
 
+      # act
+
+      # assert
     end
   end
 end

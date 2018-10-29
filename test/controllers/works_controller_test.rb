@@ -61,7 +61,8 @@ describe WorksController do
 
   describe "new" do
     it "succeeds" do
-      # log_user_in(kari)
+      log_user_in(kari)
+
       get new_work_path
       must_respond_with :success
     end
@@ -85,14 +86,36 @@ describe WorksController do
       must_redirect_to work_path(work.id)
     end
 #
-#     it "renders bad_request and does not update the DB for bogus data" do
-#
-#     end
-#
-#     it "renders 400 bad_request for bogus categories" do
-#
-#     end
-#
+    it "renders bad_request and does not update the DB for bogus data" do
+      log_user_in(kari)
+
+      new_work_params[:work][:title] = nil
+
+      expect {
+        post works_path, params: new_work_params
+      }.wont_change 'Work.count'
+
+      expect(flash[:status]).must_equal :failure
+
+      must_respond_with :bad_request
+    end
+
+    it "renders 400 bad_request for bogus categories" do
+      log_user_in(kari)
+
+      INVALID_CATEGORIES.each do |category|
+        new_work_params[:work][:category] = category
+
+        expect {
+          post works_path, params: new_work_params
+        }.wont_change 'Work.count'
+
+        expect(flash[:status]).must_equal :failure
+
+        must_respond_with :bad_request
+      end
+    end
+
   end
 #
 #   describe "show" do

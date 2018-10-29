@@ -2,6 +2,7 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
+    before_action :require_login, except: [:root]
 
   def root
     @albums = Work.best_albums
@@ -90,5 +91,13 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def require_login
+    unless session[:user_id]
+
+      flash[:error] = "You must be logged in to do that."
+      redirect_to root_path
+    end
   end
 end

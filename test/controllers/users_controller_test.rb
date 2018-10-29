@@ -17,6 +17,9 @@ describe UsersController do
           user.votes.each do |vote|
             vote.destroy
           end
+          user.works.each do |work|
+            work.destroy
+          end
           user.destroy
         end
 

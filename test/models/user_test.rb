@@ -10,6 +10,14 @@ describe User do
       end
     end
 
+    it "has a list of works the user added to the site" do
+      dan = users(:dan)
+      dan.must_respond_to :works
+      dan.works.each do |work|
+        work.must_be_kind_of Work
+      end
+    end
+
     it "has a list of ranked works" do
       dan = users(:dan)
       dan.must_respond_to :ranked_works
@@ -39,6 +47,16 @@ describe User do
       user2.errors.messages.must_include :username
     end
 
+    it "requires a uid" do
+      user = User.new
+      user.valid?.must_equal false
+      user.errors.messages.must_include :uid
+    end
 
+    it "requires a provider" do
+      user = User.new
+      user.valid?.must_equal false
+      user.errors.messages.must_include :uid
+    end
   end
 end

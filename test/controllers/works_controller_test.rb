@@ -5,6 +5,7 @@ describe WorksController do
   let(:movie) {works(:movie)}
   let(:album) {works(:album)}
   let(:another_album) {works(:another_album)}
+  let(:dan) {users(:dan)}
 
   describe "root" do
     it "succeeds with all media types" do
@@ -38,267 +39,578 @@ describe WorksController do
     end
   end
 
-  CATEGORIES = %w(albums books movies)
-  INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
-  describe "index" do
-    it "succeeds when there are works" do
+  describe "Logged in users" do
+   before do
+     perform_login(dan)
+   end
 
-      get works_path
-      must_respond_with :success
+   describe "index" do
+     it "succeeds when there are works" do
 
-    end
+       get works_path
+       must_respond_with :success
 
-    it "succeeds when there are no works" do
-      delete work_path(poodr.id)
-      delete work_path(movie.id)
-      delete work_path(album.id)
-      delete work_path(another_album.id)
-      expect(Work.all).must_equal []
+     end
 
-      get works_path
-      must_respond_with :success
-    end
-  end
+     it "succeeds when there are no works" do
+       delete work_path(poodr.id)
+       delete work_path(movie.id)
+       delete work_path(album.id)
+       delete work_path(another_album.id)
+       expect(Work.all).must_equal []
 
-  describe "new" do
-    it "succeeds" do
-      get new_work_path
-      must_respond_with :success
-    end
-  end
+       get works_path
+       must_respond_with :success
+     end
+   end
 
-  describe "create" do
-    let(:dan) {users(:dan)}
+   describe "new" do
+     it "succeeds" do
+       get new_work_path
+       must_respond_with :success
+     end
+   end
 
-    it "creates a work with valid data for a real category" do
+   describe "create" do
+     let(:dan) {users(:dan)}
 
-      work_hash = {
-        work: {
-        title: 'White Teeth',
-        creator: 'dan',
-        description: 'Good book',
-        publication_year: 2012,
-        category: 'book'
+     it "creates a work with valid data for a real category" do
+
+       work_hash = {
+         work: {
+         title: 'White Teeth',
+         creator: 'dan',
+         description: 'Good book',
+         publication_year: 2012,
+         category: 'book'
+         }
         }
-       }
 
-       expect {
-       post works_path, params: work_hash
-       }.must_change 'Work.count', 1
+        expect {
+        post works_path, params: work_hash
+        }.must_change 'Work.count', 1
 
-     must_respond_with  :redirect
-     must_redirect_to work_path(Work.last.id)
+      must_respond_with  :redirect
+      must_redirect_to work_path(Work.last.id)
 
-     id = Work.last.id
-     expect(flash.now[:result_text]).must_equal "Successfully created book #{id}"
+      id = Work.last.id
+      expect(flash.now[:result_text]).must_equal "Successfully created book #{id}"
 
-     expect(Work.last.title).must_equal work_hash[:work][:title]
-     expect(Work.last.creator).must_equal work_hash[:work][:creator]
-     expect(Work.last.description).must_equal work_hash[:work][:description]
-     expect(Work.last.publication_year).must_equal work_hash[:work][:publication_year]
-     expect(Work.last.category).must_equal work_hash[:work][:category]
+      expect(Work.last.title).must_equal work_hash[:work][:title]
+      expect(Work.last.creator).must_equal work_hash[:work][:creator]
+      expect(Work.last.description).must_equal work_hash[:work][:description]
+      expect(Work.last.publication_year).must_equal work_hash[:work][:publication_year]
+      expect(Work.last.category).must_equal work_hash[:work][:category]
 
-    end
+     end
 
-    it "renders bad_request and does not update the DB for bogus data" do
-      work_hash = {
-        work: {
+     it "renders bad_request and does not update the DB for bogus data" do
+       work_hash = {
+         work: {
 
-        creator: 'dan',
-        description: 'Good book',
-        publication_year: 2012,
-        category: 'book'
+         creator: 'dan',
+         description: 'Good book',
+         publication_year: 2012,
+         category: 'book'
+         }
         }
-       }
 
-       expect {
-       post works_path, params: work_hash
-       }.wont_change 'Work.count'
+        expect {
+        post works_path, params: work_hash
+        }.wont_change 'Work.count'
 
-       must_respond_with :bad_request
-       expect(flash.now[:result_text]).must_equal "Could not create book"
+        must_respond_with :bad_request
+        expect(flash.now[:result_text]).must_equal "Could not create book"
 
-    end
+     end
 
-    it "renders 400 bad_request for bogus categories" do
-      work_hash = {
-        work: {
-        title: 'White Teeth',
-        creator: 'dan',
-        description: 'Good book',
-        publication_year: 2012,
-        category: 'xxx'
+     it "renders 400 bad_request for bogus categories" do
+       work_hash = {
+         work: {
+         title: 'White Teeth',
+         creator: 'dan',
+         description: 'Good book',
+         publication_year: 2012,
+         category: 'xxx'
+         }
         }
-       }
 
-       expect {
-       post works_path, params: work_hash
-       }.wont_change 'Work.count'
+        expect {
+        post works_path, params: work_hash
+        }.wont_change 'Work.count'
 
-       must_respond_with :bad_request
-       expect(flash.now[:result_text]).must_equal "Could not create xxx"
+        must_respond_with :bad_request
+        expect(flash.now[:result_text]).must_equal "Could not create xxx"
 
-    end
+     end
 
-  end
+   end
 
-  describe "show" do
-    it "succeeds for an extant work ID" do
+   describe "show" do
+     it "succeeds for an extant work ID" do
 
-      get work_path(poodr.id)
+       get work_path(poodr.id)
 
-      must_respond_with :success
+       must_respond_with :success
 
-    end
+     end
 
-    it "renders 404 not_found for a bogus work ID" do
-     id = -1
-     get work_path(id)
-
-     must_respond_with :not_found
-
-    end
-  end
-
-  describe "edit" do
-    it "succeeds for an extant work ID" do
-      get edit_work_path(poodr.id)
-
-      must_respond_with :success
-
-    end
-
-    it "renders 404 not_found for a bogus work ID" do
+     it "renders 404 not_found for a bogus work ID" do
       id = -1
-      get edit_work_path(id)
+      get work_path(id)
 
       must_respond_with :not_found
 
-    end
-  end
-
-  describe "update" do
-    let (:work_hash) do
-    {
-      work: {
-      title: 'White Teeth',
-      creator: 'dan',
-      description: 'Good book',
-      publication_year: 2012,
-      category: 'book'
-      }
-    }
+     end
    end
 
-    it "succeeds for valid data and an extant work ID" do
-      id = works(:poodr).id
-      expect {
-       patch work_path(id), params: work_hash
-     }.wont_change 'Work.count'
+   describe "edit" do
+     it "succeeds for an extant work ID" do
+       get edit_work_path(poodr.id)
 
-      must_respond_with  :redirect
-      must_redirect_to work_path(id:id)
+       must_respond_with :success
 
-      poodr = Work.find_by(id:id)
+     end
 
-      expect(poodr.title).must_equal work_hash[:work][:title]
-      expect(poodr.creator).must_equal work_hash[:work][:creator]
-      expect(poodr.description).must_equal work_hash[:work][:description]
-      expect(poodr.publication_year).must_equal work_hash[:work][:publication_year]
-      expect(poodr.category).must_equal work_hash[:work][:category]
+     it "renders 404 not_found for a bogus work ID" do
+       id = -1
+       get edit_work_path(id)
+
+       must_respond_with :not_found
+
+     end
+   end
+
+   describe "update" do
+     let (:work_hash) do
+     {
+       work: {
+       title: 'White Teeth',
+       creator: 'dan',
+       description: 'Good book',
+       publication_year: 2012,
+       category: 'book'
+       }
+     }
     end
 
-    it "renders bad_request for bogus data" do
+     it "succeeds for valid data and an extant work ID" do
+       id = works(:poodr).id
+       expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
 
-      work_hash[:work][:title] = nil
+       must_respond_with  :redirect
+       must_redirect_to work_path(id:id)
 
-      id = works(:poodr).id
-      old_poodr = works(:poodr)
+       poodr = Work.find_by(id:id)
 
-      expect {
-       patch work_path(id), params: work_hash
-     }.wont_change 'Work.count'
+       expect(poodr.title).must_equal work_hash[:work][:title]
+       expect(poodr.creator).must_equal work_hash[:work][:creator]
+       expect(poodr.description).must_equal work_hash[:work][:description]
+       expect(poodr.publication_year).must_equal work_hash[:work][:publication_year]
+       expect(poodr.category).must_equal work_hash[:work][:category]
+     end
 
-     new_poodr = Work.find_by(id:id)
+     it "renders bad_request for bogus data" do
 
-     must_respond_with :bad_request
+       work_hash[:work][:title] = nil
 
-     expect(flash.now[:result_text]).must_equal "Could not update book"
-     expect(old_poodr.title).must_equal new_poodr.title
-     expect(old_poodr.creator).must_equal new_poodr.creator
-     expect(old_poodr.description).must_equal new_poodr.description
-     expect(old_poodr.publication_year).must_equal new_poodr.publication_year
-     expect(old_poodr.category).must_equal new_poodr.category
+       id = works(:poodr).id
+       old_poodr = works(:poodr)
 
-    end
+       expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
 
-    it "renders 404 not_found for a bogus work ID" do
-      id = -1
+      new_poodr = Work.find_by(id:id)
 
-    expect {
-     patch work_path(id), params: work_hash
-   }.wont_change 'Work.count'
+      must_respond_with :bad_request
 
-    must_respond_with :not_found
+      expect(flash.now[:result_text]).must_equal "Could not update book"
+      expect(old_poodr.title).must_equal new_poodr.title
+      expect(old_poodr.creator).must_equal new_poodr.creator
+      expect(old_poodr.description).must_equal new_poodr.description
+      expect(old_poodr.publication_year).must_equal new_poodr.publication_year
+      expect(old_poodr.category).must_equal new_poodr.category
 
-    end
-  end
+     end
 
-  describe "destroy" do
-    it "succeeds for an extant work ID" do
-      id = works(:poodr).id
-
-      expect {
-        delete work_path(id)
-      }.must_change 'Work.count', -1
-
-
-      must_respond_with :redirect
-      must_redirect_to root_path
-      expect(flash[:result_text]).must_equal "Successfully destroyed book #{id}"
-      expect(Work.find_by(id: id)).must_equal nil
-    end
-
-    it "renders 404 not_found and does not update the DB for a bogus work ID" do
-      id = -1
-     delete work_path(id)
+     it "renders 404 not_found for a bogus work ID" do
+       id = -1
 
      expect {
-      delete work_path(id)
+      patch work_path(id), params: work_hash
     }.wont_change 'Work.count'
 
-    must_respond_with :not_found
+     must_respond_with :not_found
 
+     end
+   end
+
+   describe "destroy" do
+     it "succeeds for an extant work ID" do
+       id = works(:poodr).id
+
+       expect {
+         delete work_path(id)
+       }.must_change 'Work.count', -1
+
+
+       must_respond_with :redirect
+       must_redirect_to root_path
+       expect(flash[:result_text]).must_equal "Successfully destroyed book #{id}"
+       expect(Work.find_by(id: id)).must_equal nil
+     end
+
+     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+       id = -1
+      delete work_path(id)
+
+      expect {
+       delete work_path(id)
+     }.wont_change 'Work.count'
+
+     must_respond_with :not_found
+
+     end
+   end
+
+   describe "upvote" do
+
+     let (:work_hash) do
+     {
+       work: {
+       title: 'White Teeth',
+       creator: 'dan',
+       description: 'Good book',
+       publication_year: 2012,
+       category: 'book'
+       }
+     }
     end
-  end
-
-  describe "upvote" do
 
 
-    it "redirects to the work page if no user is logged in" do
+     it "redirects to the work page if no user is logged in" do
+       perform_login(dan)
+       delete logout_path(dan)
 
-
-
-    end
-
-    it "redirects to the work page after the user has logged out" do
+       expect(session[:user_id]).must_be_nil
 
 
 
-    end
+     end
 
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
-
-
-
-
-    end
-
-    it "redirects to the work page if the user has already voted for that work" do
+     it "redirects to the work page after the user has logged out" do
 
 
 
-    end
-  end
+     end
+
+     it "succeeds for a logged-in user and a fresh user-vote pair" do
+       perform_login(dan)
+       expect(session[:user_id]).must_be dan.id
+
+
+
+
+     end
+
+     it "redirects to the work page if the user has already voted for that work" do
+
+
+
+     end
+   end
+
+
+
+ end
+
+ describe "Guest users" do
+   # we allow only the book index page for our guest users
+   # so we'll want to verify the redirect to root and message for these
+ end
+
+
+
+  # describe "index" do
+  #   it "succeeds when there are works" do
+  #
+  #     get works_path
+  #     must_respond_with :success
+  #
+  #   end
+  #
+  #   it "succeeds when there are no works" do
+  #     delete work_path(poodr.id)
+  #     delete work_path(movie.id)
+  #     delete work_path(album.id)
+  #     delete work_path(another_album.id)
+  #     expect(Work.all).must_equal []
+  #
+  #     get works_path
+  #     must_respond_with :success
+  #   end
+  # end
+  #
+  # describe "new" do
+  #   it "succeeds" do
+  #     get new_work_path
+  #     must_respond_with :success
+  #   end
+  # end
+  #
+  # describe "create" do
+  #   let(:dan) {users(:dan)}
+  #
+  #   it "creates a work with valid data for a real category" do
+  #
+  #     work_hash = {
+  #       work: {
+  #       title: 'White Teeth',
+  #       creator: 'dan',
+  #       description: 'Good book',
+  #       publication_year: 2012,
+  #       category: 'book'
+  #       }
+  #      }
+  #
+  #      expect {
+  #      post works_path, params: work_hash
+  #      }.must_change 'Work.count', 1
+  #
+  #    must_respond_with  :redirect
+  #    must_redirect_to work_path(Work.last.id)
+  #
+  #    id = Work.last.id
+  #    expect(flash.now[:result_text]).must_equal "Successfully created book #{id}"
+  #
+  #    expect(Work.last.title).must_equal work_hash[:work][:title]
+  #    expect(Work.last.creator).must_equal work_hash[:work][:creator]
+  #    expect(Work.last.description).must_equal work_hash[:work][:description]
+  #    expect(Work.last.publication_year).must_equal work_hash[:work][:publication_year]
+  #    expect(Work.last.category).must_equal work_hash[:work][:category]
+  #
+  #   end
+  #
+  #   it "renders bad_request and does not update the DB for bogus data" do
+  #     work_hash = {
+  #       work: {
+  #
+  #       creator: 'dan',
+  #       description: 'Good book',
+  #       publication_year: 2012,
+  #       category: 'book'
+  #       }
+  #      }
+  #
+  #      expect {
+  #      post works_path, params: work_hash
+  #      }.wont_change 'Work.count'
+  #
+  #      must_respond_with :bad_request
+  #      expect(flash.now[:result_text]).must_equal "Could not create book"
+  #
+  #   end
+  #
+  #   it "renders 400 bad_request for bogus categories" do
+  #     work_hash = {
+  #       work: {
+  #       title: 'White Teeth',
+  #       creator: 'dan',
+  #       description: 'Good book',
+  #       publication_year: 2012,
+  #       category: 'xxx'
+  #       }
+  #      }
+  #
+  #      expect {
+  #      post works_path, params: work_hash
+  #      }.wont_change 'Work.count'
+  #
+  #      must_respond_with :bad_request
+  #      expect(flash.now[:result_text]).must_equal "Could not create xxx"
+  #
+  #   end
+  #
+  # end
+  #
+  # describe "show" do
+  #   it "succeeds for an extant work ID" do
+  #
+  #     get work_path(poodr.id)
+  #
+  #     must_respond_with :success
+  #
+  #   end
+  #
+  #   it "renders 404 not_found for a bogus work ID" do
+  #    id = -1
+  #    get work_path(id)
+  #
+  #    must_respond_with :not_found
+  #
+  #   end
+  # end
+  #
+  # describe "edit" do
+  #   it "succeeds for an extant work ID" do
+  #     get edit_work_path(poodr.id)
+  #
+  #     must_respond_with :success
+  #
+  #   end
+  #
+  #   it "renders 404 not_found for a bogus work ID" do
+  #     id = -1
+  #     get edit_work_path(id)
+  #
+  #     must_respond_with :not_found
+  #
+  #   end
+  # end
+  #
+  # describe "update" do
+  #   let (:work_hash) do
+  #   {
+  #     work: {
+  #     title: 'White Teeth',
+  #     creator: 'dan',
+  #     description: 'Good book',
+  #     publication_year: 2012,
+  #     category: 'book'
+  #     }
+  #   }
+  #  end
+  #
+  #   it "succeeds for valid data and an extant work ID" do
+  #     id = works(:poodr).id
+  #     expect {
+  #      patch work_path(id), params: work_hash
+  #    }.wont_change 'Work.count'
+  #
+  #     must_respond_with  :redirect
+  #     must_redirect_to work_path(id:id)
+  #
+  #     poodr = Work.find_by(id:id)
+  #
+  #     expect(poodr.title).must_equal work_hash[:work][:title]
+  #     expect(poodr.creator).must_equal work_hash[:work][:creator]
+  #     expect(poodr.description).must_equal work_hash[:work][:description]
+  #     expect(poodr.publication_year).must_equal work_hash[:work][:publication_year]
+  #     expect(poodr.category).must_equal work_hash[:work][:category]
+  #   end
+  #
+  #   it "renders bad_request for bogus data" do
+  #
+  #     work_hash[:work][:title] = nil
+  #
+  #     id = works(:poodr).id
+  #     old_poodr = works(:poodr)
+  #
+  #     expect {
+  #      patch work_path(id), params: work_hash
+  #    }.wont_change 'Work.count'
+  #
+  #    new_poodr = Work.find_by(id:id)
+  #
+  #    must_respond_with :bad_request
+  #
+  #    expect(flash.now[:result_text]).must_equal "Could not update book"
+  #    expect(old_poodr.title).must_equal new_poodr.title
+  #    expect(old_poodr.creator).must_equal new_poodr.creator
+  #    expect(old_poodr.description).must_equal new_poodr.description
+  #    expect(old_poodr.publication_year).must_equal new_poodr.publication_year
+  #    expect(old_poodr.category).must_equal new_poodr.category
+  #
+  #   end
+  #
+  #   it "renders 404 not_found for a bogus work ID" do
+  #     id = -1
+  #
+  #   expect {
+  #    patch work_path(id), params: work_hash
+  #  }.wont_change 'Work.count'
+  #
+  #   must_respond_with :not_found
+  #
+  #   end
+  # end
+  #
+  # describe "destroy" do
+  #   it "succeeds for an extant work ID" do
+  #     id = works(:poodr).id
+  #
+  #     expect {
+  #       delete work_path(id)
+  #     }.must_change 'Work.count', -1
+  #
+  #
+  #     must_respond_with :redirect
+  #     must_redirect_to root_path
+  #     expect(flash[:result_text]).must_equal "Successfully destroyed book #{id}"
+  #     expect(Work.find_by(id: id)).must_equal nil
+  #   end
+  #
+  #   it "renders 404 not_found and does not update the DB for a bogus work ID" do
+  #     id = -1
+  #    delete work_path(id)
+  #
+  #    expect {
+  #     delete work_path(id)
+  #   }.wont_change 'Work.count'
+  #
+  #   must_respond_with :not_found
+  #
+  #   end
+  # end
+  #
+  # describe "upvote" do
+  #
+  #   let (:work_hash) do
+  #   {
+  #     work: {
+  #     title: 'White Teeth',
+  #     creator: 'dan',
+  #     description: 'Good book',
+  #     publication_year: 2012,
+  #     category: 'book'
+  #     }
+  #   }
+  #  end
+  #
+  #
+  #   it "redirects to the work page if no user is logged in" do
+  #     perform_login(dan)
+  #     delete logout_path(dan)
+  #
+  #     expect(session[:user_id]).must_be_nil
+  #
+  #
+  #
+  #   end
+  #
+  #   it "redirects to the work page after the user has logged out" do
+  #
+  #
+  #
+  #   end
+  #
+  #   it "succeeds for a logged-in user and a fresh user-vote pair" do
+  #     perform_login(dan)
+  #     expect(session[:user_id]).must_be dan.id
+  #
+  #
+  #
+  #
+  #   end
+  #
+  #   it "redirects to the work page if the user has already voted for that work" do
+  #
+  #
+  #
+  #   end
+  # end
 end

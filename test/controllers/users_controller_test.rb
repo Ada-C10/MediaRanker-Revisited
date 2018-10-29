@@ -41,7 +41,7 @@ describe UsersController do
 
       expect{get users_path}.wont_change('User.count')
 
-      expect(flash[:result_text]).must_equal "Please log in to access the page."
+      expect(flash[:result_text]).must_equal "You must be logged in to view this section"
       must_redirect_to root_path
 
     end
@@ -62,9 +62,9 @@ describe UsersController do
       perform_login(dan)
       delete logout_path(dan)
 
-      session[:user_id].must_be_nil
+      expect(session[:user_id]).must_be_nil
       expect{get user_path(dan)}.wont_change('User.count')
-      expect(flash[:result_text]).must_equal "Not allowed."
+      expect(flash[:result_text]).must_equal "You must be logged in to view this section"
       must_redirect_to root_path
 
     end

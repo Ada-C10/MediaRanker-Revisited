@@ -34,7 +34,7 @@
       </ul>
       <ul class="nav app-header__user-nav-container">
 
-        <% if session[:user_id] %>
+        <% if @login_user %>
 
         <li class="nav-item app-header__nav_item">
           <%= link_to "Logged in as #{@login_user.username}", user_path(@login_user), class: "btn btn-primary" %>

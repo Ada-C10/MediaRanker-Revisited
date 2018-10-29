@@ -2,6 +2,7 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :find_user
 
   def root
     @albums = Work.best_albums
@@ -11,11 +12,21 @@ class WorksController < ApplicationController
   end
 
   def index
-    @works_by_category = Work.to_category_hash
+    if @login_user
+      @works_by_category = Work.to_category_hash
+    else
+      flash[:result_text] = "Please log in to view all media. "
+      redirect_to root_path
+    end
   end
 
   def new
-    @work = Work.new
+    if @login_user
+      @work = Work.new
+    else
+      flash[:result_text] = "Please log in to access the add a new work page. "
+      redirect_to root_path
+    end
   end
 
   def create
@@ -34,19 +45,26 @@ class WorksController < ApplicationController
   end
 
   def show
-    @votes = @work.votes.order(created_at: :desc)
+    if @login_user
+      @votes = @work.votes.order(created_at: :desc)
+    else
+      flash[:result_text] = "Please log in to access the page. "
+      redirect_to root_path
+    end
   end
 
   def edit
   end
 
   def update
+
     @work.update_attributes(media_params)
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
       redirect_to work_path(@work)
     elsif @work && !@wrk.valid?
+
       flash.now[:status] = :failure
       flash.now[:result_text] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages

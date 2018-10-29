@@ -275,36 +275,29 @@ describe WorksController do
 
   describe "upvote" do
 
+
     it "redirects to the work page if no user is logged in" do
 
-       id = poodr.id
-       post upvote_path(id:id)
 
-       must_respond_with :redirect
-       must_redirect_to work_path(poodr)
-       expect(flash[:result_text]).must_equal "You must log in to do that"
+
     end
 
     it "redirects to the work page after the user has logged out" do
-      post login_path params: {username:'dan'}
-      expect(session[:user_id]).wont_be_nil
 
-      post logout_path
-      expect(session[:user_id]).to_equal nil
-      id = poodr.id
-      post upvote_path(id:id)
 
-      must_respond_with :redirect
-      must_redirect_to work_path(poodr)
-      expect(flash[:result_text]).must_equal "You must log in to do that"
 
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
 
+
+
+
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+
+
 
     end
   end

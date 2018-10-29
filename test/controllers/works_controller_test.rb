@@ -70,12 +70,11 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "Logged In Users" do
-    before do
-      perform_login(users(:dan))
-    end
 
     describe "index" do
       it "succeeds when there are works" do
+        perform_login(users(:dan))
+
         get works_path
 
         must_respond_with :success
@@ -83,6 +82,8 @@ describe WorksController do
       end
 
       it "succeeds when there are no works" do
+        perform_login(users(:dan))
+
         delete_all
 
         get works_path
@@ -93,6 +94,8 @@ describe WorksController do
 
     describe "new" do
       it "succeeds" do
+        perform_login(users(:dan))
+
         get new_work_path
 
         must_respond_with :success
@@ -101,6 +104,8 @@ describe WorksController do
 
     describe "create" do
       it "creates a work with valid data for a real category" do
+        perform_login(users(:dan))
+
         CATEGORIES.each do |category|
 
           work_data[:work][:category] = category
@@ -117,6 +122,8 @@ describe WorksController do
       end
 
       it "renders bad_request and does not update the DB for bogus data" do
+        perform_login(users(:dan))
+
         work_data[:work][:title] = nil
 
         test_work = Work.new(work_data[:work])
@@ -130,6 +137,8 @@ describe WorksController do
       end
 
       it "renders 400 bad_request for bogus categories" do
+        perform_login(users(:dan))
+
 
         INVALID_CATEGORIES.each do |category|
           work_data[:work][:category] = category
@@ -150,12 +159,16 @@ describe WorksController do
     describe "show" do
 
       it "succeeds for an extant work ID" do
+        perform_login(users(:dan))
+
         get work_path(existing_work.id)
 
         must_respond_with :success
       end
 
       it "renders 404 not_found for a bogus work ID" do
+        perform_login(users(:dan))
+
         existing_work.destroy
 
         get work_path(existing_work.id)
@@ -166,12 +179,16 @@ describe WorksController do
 
     describe "edit" do
       it "succeeds for an extant work ID" do
+        perform_login(users(:dan))
+
         get edit_work_path(existing_work.id)
 
         must_respond_with :success
       end
 
       it "renders 404 not_found for a bogus work ID" do
+        perform_login(users(:dan))
+
         existing_work.destroy
 
         get edit_work_path(existing_work.id)
@@ -182,6 +199,8 @@ describe WorksController do
 
     describe "update" do
       it "succeeds for valid data and an extant work ID" do
+        perform_login(users(:dan))
+
         test_work = Work.new(work_data[:work])
         test_work.must_be :valid?, "Work data was invalid. Please fix."
 
@@ -197,6 +216,9 @@ describe WorksController do
       end
 
       it "renders bad_request for bogus data" do
+        perform_login(users(:dan))
+
+
         work_data[:work][:title] = existing_work.title
         work_data[:work][:category] = "boooo"
         test_work = Work.new(work_data[:work])
@@ -210,6 +232,8 @@ describe WorksController do
       end
 
       it "renders 404 not_found for a bogus work ID" do
+        perform_login(users(:dan))
+
         existing_work.destroy
 
         patch work_path(existing_work.id), params: work_data
@@ -220,6 +244,8 @@ describe WorksController do
 
     describe "destroy" do
       it "succeeds for an extant work ID" do
+        perform_login(users(:dan))
+
         expect{
           delete work_path(existing_work.id)
         }.must_change('Work.count', -1)
@@ -229,6 +255,8 @@ describe WorksController do
       end
 
       it "renders 404 not_found and does not update the DB for a bogus work ID" do
+        perform_login(users(:dan))
+
         existing_work.destroy
 
         expect{
@@ -243,17 +271,18 @@ describe WorksController do
     describe "upvote" do
 
       it "succeeds for a logged-in user and a fresh user-vote pair" do
+        perform_login(users(:dan))
 
         expect{
           post upvote_path(existing_work.id)
-        }.must_change('existing_work.votes.length', +1)
+        }.must_change('Vote.count', +1)
 
+        expect(flash[:status]).must_equal :success
         must_redirect_to work_path(existing_work.id)
       end
-      it "redirects to the work page after the user has logged out" do
-        
-      end
+
       it "redirects to the work page if the user has already voted for that work" do
+        perform_login(users(:dan))
 
         dan = users(:dan)
         vote = Vote.create!(user: dan, work: existing_work)

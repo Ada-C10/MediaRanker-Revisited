@@ -319,6 +319,25 @@ describe WorksController do
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      #someone can log in and vote for something they havent before
+      #arrange
+      # user = User.all.first
+      #
+      # OmniAuth.config.mock_auth[:github] =
+      #   OmniAuth::AuthHash.new(mock_auth_hash(user))
+      #
+      # perform_login(user)
+
+      id = works(:poodr).id
+
+      #act /assert
+      expect {
+        post upvote_path(id)
+      }.must_change 'Vote.count', 1
+
+
+      expect(flash.now[:success]).must_equal "Successfully upvoted!"
+      must_respond_with :redirect
 
     end
 

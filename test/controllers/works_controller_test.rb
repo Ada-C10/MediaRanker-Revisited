@@ -4,7 +4,8 @@ describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
-
+      get root_path
+      must_respond_with :success
     end
 
     it "succeeds with one media type absent" do

@@ -3,7 +3,7 @@ require "test_helper"
 describe SessionsController do
   let (:dan) { users(:dan) }
 
-  describe "auth_callback" do
+  describe "create with auth_callback" do
     it "logs in an existing user and redirects to the root route" do
       expect {
         perform_login(dan)
@@ -46,6 +46,12 @@ describe SessionsController do
       expect(flash[:result_text]).must_equal "Could not log in"
 
       must_redirect_to root_path
+    end
+  end
+
+  describe "destory" do
+    it "logs a user out if they are logged in" do
+      skip
     end
   end
 

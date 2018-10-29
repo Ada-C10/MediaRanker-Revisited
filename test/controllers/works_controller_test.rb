@@ -23,7 +23,6 @@ describe WorksController do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
 
-
       get root_path
 
       must_respond_with :success
@@ -102,6 +101,7 @@ describe WorksController do
         expect(Work.last.description).must_equal work_hash[:work][:description]
         expect(Work.last.publication_year).must_equal work_hash[:work][:publication_year]
         expect(Work.last.category).must_equal work_hash[:work][:category]
+        expect(Work.last.user).must_equal dan
 
         expect(flash[:result_text]).must_equal "Successfully created #{Work.last.category} #{Work.last.id}"
       end
@@ -118,7 +118,7 @@ describe WorksController do
         expect(flash[:result_text]).must_equal "Could not create #{work_hash[:work][:category]}"
       end
 
-      it "renders 400 bad_request for bogus categories" do
+      it "renders bad_request for bogus categories" do
         work_hash[:work][:category] = "spoken word"
 
         expect {
@@ -129,7 +129,6 @@ describe WorksController do
         must_respond_with :bad_request
         expect(flash[:result_text]).must_equal "Could not create #{work_hash[:work][:category]}"
       end
-
     end
 
     describe "show" do
@@ -151,7 +150,7 @@ describe WorksController do
     end
 
     describe "edit" do
-      it "succeeds for an extant work ID" do
+      it "succeeds for an extant work ID and a work the user created" do
         perform_login(dan)
         get edit_work_path(poodr.id)
 
@@ -167,10 +166,20 @@ describe WorksController do
         # Arrange
         must_respond_with :not_found
       end
+
+      it "does not permit access if logged in user is not the user the work belongs to" do
+        perform_login(dan)
+        get work_path(movie.id)
+
+        # Arrange
+        must_respond_with :redirect
+        must_redirect_to works_path
+        expect(flash[:result_text]).must_equal "You can only edit works you added to the site"
+      end
     end
 
     describe "update" do
-      it "succeeds for valid data and an extant work ID" do
+      it "succeeds for valid data and an extant work ID and a work the user created" do
         work_hash[:work][:description] = "a new description"
 
         expect {
@@ -225,6 +234,24 @@ describe WorksController do
 
         must_respond_with :not_found
       end
+
+      it "does not update work if logged in user is not the user the work belongs to" do
+        perform_login(dan)
+        patch work_path(movie.id), params: work_hash
+
+        must_respond_with :redirect
+        must_redirect_to works_path
+        expect(flash[:result_text]).must_equal "You can only edit works you added to the site"
+
+        # expect no change
+        work = Work.find_by(id: movie.id)
+
+        expect(work.title).must_equal movie.title
+        expect(work.creator).must_equal movie.creator
+        expect(work.description).must_equal movie.description
+        expect(work.publication_year).must_equal movie.publication_year
+        expect(work.category).must_equal movie.category
+      end
     end
 
     describe "destroy" do
@@ -248,6 +275,24 @@ describe WorksController do
         }.wont_change 'Work.count'
 
         must_respond_with :not_found
+      end
+
+      it "does not delete work if logged in user is not the user the work belongs to" do
+        expect {
+          perform_login(dan)
+          delete work_path(movie.id), params: work_hash
+        }.wont_change 'Work.count'
+
+        must_respond_with :redirect
+        must_redirect_to works_path
+        expect(flash[:result_text]).must_equal "You can only delete works you added to the site"
+
+        # expect no change
+        expect(Work.find_by(id: movie.id).title).must_equal movie.title
+        expect(Work.find_by(id: movie.id).creator).must_equal movie.creator
+        expect(Work.find_by(id: movie.id).description).must_equal movie.description
+        expect(Work.find_by(id: movie.id).publication_year).must_equal movie.publication_year
+        expect(Work.find_by(id: movie.id).category).must_equal movie.category
       end
     end
 
@@ -356,11 +401,13 @@ describe WorksController do
         must_redirect_to root_path
         expect(flash[:result_text]).must_equal "You must be logged in to view this section"
 
-        expect(poodr.title).must_equal "Practical Object Oriented Design in Ruby"
-        expect(poodr.creator).must_equal "Sandi Metz"
-        expect(poodr.description).must_equal "programming!"
-        expect(poodr.publication_year).must_equal 2012
-        expect(poodr.category).must_equal "book"
+        work = Work.find_by(id: poodr.id)
+
+        expect(work.title).must_equal "Practical Object Oriented Design in Ruby"
+        expect(work.creator).must_equal "Sandi Metz"
+        expect(work.description).must_equal "programming!"
+        expect(work.publication_year).must_equal 2012
+        expect(work.category).must_equal "book"
       end
     end
 
@@ -374,11 +421,11 @@ describe WorksController do
         must_redirect_to root_path
         expect(flash[:result_text]).must_equal "You must be logged in to view this section"
 
-        expect(poodr.title).must_equal "Practical Object Oriented Design in Ruby"
-        expect(poodr.creator).must_equal "Sandi Metz"
-        expect(poodr.description).must_equal "programming!"
-        expect(poodr.publication_year).must_equal 2012
-        expect(poodr.category).must_equal "book"
+        expect(Work.find_by(id: poodr.id).title).must_equal "Practical Object Oriented Design in Ruby"
+        expect(Work.find_by(id: poodr.id).creator).must_equal "Sandi Metz"
+        expect(Work.find_by(id: poodr.id).description).must_equal "programming!"
+        expect(Work.find_by(id: poodr.id).publication_year).must_equal 2012
+        expect(Work.find_by(id: poodr.id).category).must_equal "book"
       end
     end
 

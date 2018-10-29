@@ -38,13 +38,14 @@ describe WorksController do
 
 
 
-  CATEGORIES = %w(albums books movies)
-  INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
 
 
 
   describe 'User who is logged in' do
+    CATEGORIES = %w(albums books movies)
+    INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
+
     #perform login before any of these tests
     #having issues with this before so not using it
     before do

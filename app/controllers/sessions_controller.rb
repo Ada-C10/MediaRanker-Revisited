@@ -1,3 +1,4 @@
+require 'pry'
 class SessionsController < ApplicationController
   def create
     auth_hash = request.env['omniauth.auth']
@@ -18,11 +19,9 @@ class SessionsController < ApplicationController
         flash.now[:status] = :failure
         flash.now[:result_text] = "Could not log in"
         flash.now[:messages] = user.errors.messages
-        render "login_form", status: :bad_request
       end
     end
 
-    session[:user_id] = user.id
     redirect_to root_path
   end
 

@@ -1,8 +1,56 @@
 require "test_helper"
 
 describe SessionsController do
+  let (:dan) { users(:dan) }
+
+  describe "auth_callback" do
+    it "logs in an existing user and redirects to the root route" do
+      expect {
+        perform_login(dan)
+      }.wont_change 'User.count'
+
+      expect(session[:user_id]).must_equal dan.id
+
+      must_redirect_to root_path
+    end
+
+    it "creates an account for a new user and redirects to the root route" do
+      user = User.new(provider: "github", uid: 99999, username: "test_user", name: "Test Person")
+
+      expect {
+        perform_login(user)
+      }.must_change 'User.count', 1
+
+      new_user = User.find_by(username: user.username)
+
+      expect(new_user).wont_be_nil
+      expect(session[:user_id]).must_equal new_user.id
+
+      must_redirect_to root_path
+
+      expect(flash[:result_text]).must_equal "Successfully created new user #{new_user.username}"
+    end
+
+    it "redirects to the login route if given invalid user data" do
+      user = User.new(provider: "github", uid: 99999, username: nil, name: "Test Person")
+
+      expect {
+        perform_login(user)
+      }.wont_change 'User.count'
+
+      invalid_user = User.find_by(username: user.username)
+
+      expect(invalid_user).must_be_nil
+      expect(session[:user_id]).must_be_nil
+
+      expect(flash[:result_text]).must_equal "Could not log in"
+
+      must_redirect_to root_path
+    end
+  end
+
   # THESE TESTS NO LONGER NEEDED AFTER OAUTH
-  
+
   # let (:dan) { users(:dan) }
   #
   # it "login form" do

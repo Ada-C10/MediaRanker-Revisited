@@ -1,6 +1,7 @@
 require 'test_helper'
 
 describe WorksController do
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -12,6 +13,7 @@ describe WorksController do
       # Precondition: there is at least one media in two of the categories
       work = Work.where(category: "movie")
       delete work_path(work.ids)
+      # is this some weird rails magic where its pluralizing it because its an array?
 
       get root_path
       must_respond_with :success
@@ -127,26 +129,39 @@ describe WorksController do
     end
 
   end
-  #
-  # describe "show" do
-  #   it "succeeds for an extant work ID" do
-  #
-  #   end
-  #
-  #   it "renders 404 not_found for a bogus work ID" do
-  #
-  #   end
-  # end
-  #
-  # describe "edit" do
-  #   it "succeeds for an extant work ID" do
-  #
-  #   end
-  #
-  #   it "renders 404 not_found for a bogus work ID" do
-  #
-  #   end
-  # end
+
+  describe "show" do
+    it "succeeds for an extant work ID" do
+      work = works(:poodr)
+
+      get works_path(work)
+
+      must_respond_with :success
+    end
+
+    it "renders 404 not_found for a bogus work ID" do
+      work = Work.first
+      delete work_path(work.id)
+
+      get work_path(work)
+      must_respond_with :not_found
+    end
+  end
+
+  describe "edit" do
+    it "succeeds for an extant work ID" do
+      get edit_work_path(Work.first)
+      must_respond_with :success
+    end
+
+    it "renders 404 not_found for a bogus work ID" do
+      work = Work.first
+      delete work_path(work.id)
+
+      get edit_work_path(work)
+      must_respond_with :not_found
+    end
+  end
   #
   # describe "update" do
   #   it "succeeds for valid data and an extant work ID" do

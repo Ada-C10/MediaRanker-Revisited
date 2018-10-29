@@ -49,7 +49,7 @@ describe WorksController do
 
       works.destroy_all
 
-      get root_path
+      get works_path
 
       must_respond_with :success
     end
@@ -318,17 +318,26 @@ describe WorksController do
       user = users(:kari)
       perform_login(user)
 
-      post upvote_path(work_id)
+      expect {
+        post upvote_path(work_id)
+      }.must_change('Vote.count', +1)
+
+      valid_vote_count = Vote.count
 
       flash[:status].must_equal :success
       flash[:result_text].must_equal "Successfully upvoted!"
+      must_redirect_to work_path(work_id)
 
-      post upvote_path(work_id)
+      expect {
+        post upvote_path(work_id)
+      }.wont_change('Vote.count')
+
 
       flash[:status].must_equal :failure
       flash[:result_text].must_equal "Could not upvote"
       flash[:messages].must_include :user
       must_redirect_to work_path(work_id)
+      expect(Vote.count).must_equal valid_vote_count
     end
   end
 

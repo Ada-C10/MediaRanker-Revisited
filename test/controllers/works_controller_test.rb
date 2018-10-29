@@ -162,20 +162,66 @@ describe WorksController do
       must_respond_with :not_found
     end
   end
-  #
-  # describe "update" do
-  #   it "succeeds for valid data and an extant work ID" do
-  #
-  #   end
-  #
-  #   it "renders bad_request for bogus data" do
-  #
-  #   end
-  #
-  #   it "renders 404 not_found for a bogus work ID" do
-  #
-  #   end
-  # end
+
+  describe "update" do
+    it "succeeds for valid data and an extant work ID" do
+      work = works(:poodr)
+
+      updated_title = "Addy waz here"
+      put work_path(work), params: {
+        work: {
+          title: updated_title
+        }
+      }
+      work.reload
+      assert_equal updated_title, work.title
+    end
+
+    it "renders bad_request for bogus data" do
+      work = works(:another_album)
+
+      updated_title = "Old Title"
+      put work_path(work), params: {
+        work: {
+          title: updated_title
+        }
+      }
+
+      must_respond_with :bad_request
+
+      updated_title = ""
+      put work_path(work), params: {
+        work: {
+          title: updated_title
+        }
+      }
+
+      must_respond_with :bad_request
+
+      updated_category = "bumblebeetuna"
+      put work_path(work), params: {
+        work: {
+          category: updated_category
+        }
+      }
+
+      must_respond_with :bad_request
+    end
+
+    it "renders 404 not_found for a bogus work ID" do
+
+      work = works(:another_album)
+      delete work_path(work.id)
+
+      put work_path(work), params: {
+        work: {
+          title: "nada"
+        }
+      }
+
+      must_respond_with :not_found
+    end
+  end
   #
   # describe "destroy" do
   #   it "succeeds for an extant work ID" do

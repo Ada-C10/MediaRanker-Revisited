@@ -38,7 +38,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    if @login_user
+    if @user
       session[:user_id] = nil
       flash[:result_text] = "Successfully logged out!"
     end

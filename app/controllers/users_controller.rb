@@ -2,21 +2,20 @@ class UsersController < ApplicationController
   before_action :find_user
 
   def index
-    if @login_user
+    if @user
       @users = User.all
     else
-      flash[:result_text] = "Please log in to access the page. "
-      redirect_to root_path, status: :success
+      flash[:result_text] = "Please log in to access the page."
+      redirect_to root_path
     end
   end
 
   def show
-    if @login_user
-      @user = User.find_by(id: params[:id])
-      render_404 unless @user
-    else
-      flash[:result_text] = "Please log in to access the page. "
+    unless @user && @user.id == params[:id].to_i
+
+      flash[:result_text] = "Not allowed."
       redirect_to root_path
     end
   end
+
 end

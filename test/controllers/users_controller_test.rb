@@ -1,5 +1,5 @@
 require 'test_helper'
-
+require 'pry'
 describe UsersController do
   let(:dan) {users(:dan)}
   let(:kari) {users(:kari)}
@@ -12,22 +12,26 @@ describe UsersController do
     it "succeeds when the user is logged in" do
 
       perform_login(dan)
-      get works_path
+      get users_path
 
       session[:user_id].must_equal dan.id
-      must_respond_with :found
+      must_respond_with :success
 
     end
 
     it "cannot succeed when there is no user " do
+      one.destroy
+      two.destroy
+      three.destroy
 
       dan.destroy
       kari.destroy
       jess.destroy
-      get works_path
+
+      expect{get users_path}.wont_change('User.count')
 
       must_respond_with :redirect
-      must_redirect_to  root_patch
+      must_redirect_to root_path
 
     end
 
@@ -35,9 +39,10 @@ describe UsersController do
       perform_login(dan)
       delete logout_path(dan)
 
-      expect(flash[:result_text]).must_equal "Please log in to access the page."
+      expect{get users_path}.wont_change('User.count')
 
-      must_respond_with :not_found
+      expect(flash[:result_text]).must_equal "Please log in to access the page."
+      must_redirect_to root_path
 
     end
 
@@ -45,26 +50,31 @@ describe UsersController do
 
   describe "show" do
     it " succeed for logged in users " do
+      perform_login(dan)
 
-      get user_path(dan.id)
+      expect{get user_path(dan)}.wont_change('User.count')
 
-      must_respond_with :found
-
-    end
-
-    it "renders 404 not_found for a user who is not logged in" do
-     id = -1
-     get user_path(id)
-
-     must_respond_with :not_found
+      must_respond_with :success
 
     end
 
-    it "renders 404 not_found for a bogus user ID" do
-     id = -1
-     get user_path(id)
+    it "redirect to root_path for a user who is not logged in" do
+      perform_login(dan)
+      delete logout_path(dan)
 
-     must_respond_with :not_found
+      session[:user_id].must_be_nil
+      expect{get user_path(dan)}.wont_change('User.count')
+      expect(flash[:result_text]).must_equal "Not allowed."
+      must_redirect_to root_path
+
+    end
+
+    it "redirect to root_path for a user who try to view other user's profile" do
+     perform_login(dan)
+
+     get user_path(jess)
+     expect(flash[:result_text]).must_equal "Not allowed."
+     must_redirect_to root_path
 
     end
   end

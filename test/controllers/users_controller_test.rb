@@ -26,7 +26,7 @@ describe UsersController do
   describe "show" do
     it "succeeds for an extant user ID" do
 
-      get users_path(users(:user1))
+      get users_path(users(:nick))
 
       must_respond_with :success
     end

@@ -5,14 +5,14 @@
 # below each fixture, per the syntax in the comments below
 #
 
-user1:
-  username: Nick
+nick:
+  username: nick
   uid: 1
   provider: github
   email: nick@ada_test.org
 
-user2:
-  username: Dionisia
+dionisia:
+  username: dionisia
   uid: 2
   provider: github
   email: dionisia@ada_test.org

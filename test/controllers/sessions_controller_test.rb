@@ -1,4 +1,5 @@
 require "test_helper"
+# require 'pry'
 
 describe SessionsController do
   describe 'login do' do
@@ -8,7 +9,7 @@ describe SessionsController do
       start_count = User.count
 
       # Get a user from the fixtures
-      user = users(:user1)
+      user = users(:nick)
 
       # Tell OmniAuth to use this user's info when it sees
       # an auth callback from github
@@ -33,18 +34,15 @@ describe SessionsController do
     end
 
     it 'creates an account for a new user and redirects to the root route' do
-      start_count = User.count
-      new_user = User.new(username: 'John', uid: 3, provider: 'github', email: 'john@ada_test.org')
-
-      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(new_user))
-      get auth_callback_path(:github)
-
-      must_redirect_to root_path
-
-      session[:user_id].must_equal User.last.id
-      User.count.must_equal start_count + 1
-
-    end
+     start_count = User.count
+     user = User.new(username: 'john', uid: 3, provider: 'github', email: 'john@ada_test.org')
+     OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+     get auth_callback_path(:github)
+     # binding.pry
+     must_redirect_to root_path
+     User.count.must_equal (start_count + 1)
+     session[:user_id].must_equal User.last.id
+  end
 
     it 'redirects to the login route if given invalid user data' do
       start_count = User.count
@@ -61,10 +59,10 @@ describe SessionsController do
 
   describe 'logout' do
     it 'can log out the user' do
-      user = users(:user1)
+      user = users(:nick)
       OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
       get auth_callback_path(:github)
-      expect ( session[:user_id] ).must_equal users(:user1).id
+      expect ( session[:user_id] ).must_equal users(:nick).id
 
       delete logout_path
 

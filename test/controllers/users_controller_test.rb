@@ -1,9 +1,30 @@
 require 'test_helper'
 
 describe UsersController do
+  before do
+    user = users(:dan)
+    # Make fake session
+    # Tell OmniAuth to use this user's info when it sees
+   # an auth callback from github
+    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+    get auth_callback_path('github')
+
+
+
+  end
 
   describe 'index' do
+
     it 'should get index' do
+
+      user = User.create(username: "test_person", uid: 99999, provider: 'github')
+      # Make fake session
+      # Tell OmniAuth to use this user's info when it sees
+     # an auth callback from github
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      get auth_callback_path('github')
+      # Logging in
+
       get users_path
 
       must_respond_with :success
@@ -14,6 +35,14 @@ describe UsersController do
   describe 'show' do
 
     it "should get a user's show page" do
+
+      user = User.create(username: "test_person", uid: 99999, provider: 'github')
+      # Make fake session
+      # Tell OmniAuth to use this user's info when it sees
+     # an auth callback from github
+      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+      get auth_callback_path('github')
+      
       id = users(:dan).id
 
       #Act
@@ -36,5 +65,5 @@ describe UsersController do
 
     end
   end
-  
+
 end

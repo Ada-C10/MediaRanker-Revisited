@@ -13,25 +13,25 @@ describe SessionsController do
       # Tell OmniAuth to use this user's info when it sees
       # an auth callback from github
       OmniAuth.config.mock_auth[:github] =
-        OmniAuth::AuthHash.new(mock_auth_hash(user))
+      OmniAuth::AuthHash.new(mock_auth_hash(user))
 
-     #act
-     # Send a login request for that user
-     # Note that we're using the named path for the callback, as defined
-     # in the `as:` clause in `config/routes.rb`
-     expect {
-       get auth_callback_path('github')
-     }.wont_change('User.count')
+      #act
+      # Send a login request for that user
+      # Note that we're using the named path for the callback, as defined
+      # in the `as:` clause in `config/routes.rb`
+      expect {
+        get auth_callback_path('github')
+      }.wont_change('User.count')
 
 
-     #assert
-     must_redirect_to root_path
+      #assert
+      must_redirect_to root_path
 
-     # Since we can read the session, check that the user ID was set as expected
+      # Since we can read the session, check that the user ID was set as expected
       session[:user_id].must_equal user.id
 
-     # Should *not* have created a new user
-     User.count.must_equal start_user_count
+      # Should *not* have created a new user
+      User.count.must_equal start_user_count
 
     end
 
@@ -49,27 +49,27 @@ describe SessionsController do
       OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
       # binding.pry
 
-     #act
-     # Send a login request for that user
-     # Note that we're using the named path for the callback, as defined
-     # in the `as:` clause in `config/routes.rb`
-     # expect {
-     #   get auth_callback_path(:github)
-     # }.must_change('User.count', +1)
+      #act
+      # Send a login request for that user
+      # Note that we're using the named path for the callback, as defined
+      # in the `as:` clause in `config/routes.rb`
+      # expect {
+      #   get auth_callback_path(:github)
+      # }.must_change('User.count', +1)
 
-     expect {
-       perform_login(user)
-     }.must_change('User.count', 1)
+      expect {
+        perform_login(user)
+      }.must_change('User.count', 1)
 
 
-     #assert
-     must_redirect_to root_path
+      #assert
+      must_redirect_to root_path
 
-     # Since we can read the session, check that the user ID was set as expected
+      # Since we can read the session, check that the user ID was set as expected
       expect(session[:user_id]).wont_be_nil
 
-     # Should *not* have created a new user
-     User.count.must_equal start_count
+      # Should *not* have created a new user
+      User.count.must_equal start_count
 
     end
 
@@ -81,47 +81,53 @@ describe SessionsController do
       # Tell OmniAuth to use this user's info when it sees
       # an auth callback from github
       OmniAuth.config.mock_auth[:github] =
-        OmniAuth::AuthHash.new(mock_auth_hash(user))
+      OmniAuth::AuthHash.new(mock_auth_hash(user))
 
-     #act
-     # Send a login request for that user
-     # Note that we're using the named path for the callback, as defined
-     # in the `as:` clause in `config/routes.rb`
-     expect {
-       get auth_callback_path(:github)
-     }.must_change('User.count', 0)
+      #act
+      # Send a login request for that user
+      # Note that we're using the named path for the callback, as defined
+      # in the `as:` clause in `config/routes.rb`
+      expect {
+        get auth_callback_path(:github)
+      }.must_change('User.count', 0)
 
-     # expect {
-     #   perform_login(user)
-     # }.must_change('User.count', 0)
+      # expect {
+      #   perform_login(user)
+      # }.must_change('User.count', 0)
 
 
-     #assert
-     must_redirect_to root_path
+      #assert
+      must_redirect_to root_path
 
-     # Since we can read the session, check that the user ID was set as expected
+      # Since we can read the session, check that the user ID was set as expected
       session[:user_id].must_be_nil
 
-     # Should *not* have created a new user
-     User.count.must_equal start_user_count
+      # Should *not* have created a new user
+      User.count.must_equal start_user_count
     end
   end
 
   describe 'logout ' do
-    it 'wont let you log out if you are not logged in' do
+    it 'allows you to log out if you are alreayd logged in 'do
+    user = users(:dan)
+    perform_login(user)
+    expect(session[:user_id]).must_equal user.id
+    delete logout_path(:dan)
+    expect(session[:user_id]).must_be_nil
+  end
 
-      delete logout_path(:dan)
 
-      delete logout_path(:dan)
-      binding.pry
+  it 'wont let you log out if you are not logged in' do
+
+    delete logout_path(:dan)
+
+    delete logout_path(:dan)
 
 
-
-      must_respond_with :bad_request
-
-    end
-
+    must_respond_with :bad_request
 
   end
+end
+
 
 end

@@ -34,13 +34,16 @@ describe SessionsController do
     end
 
     it 'creates an account for a new user and redirects to the root route' do
-     start_count = User.count
+     # start_count = User.count
      user = User.new(username: 'john', uid: 3, provider: 'github', email: 'john@ada_test.org')
      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
      get auth_callback_path(:github)
      # binding.pry
-     User.count.must_equal start_count + 1
-     session[:user_id].must_equal User.last.id
+     expect {
+        login_test(user)
+      }.must_change('User.count', 1)
+
+     session[:user_id].wont_be_nil
      must_redirect_to root_path
   end
 

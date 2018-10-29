@@ -6,7 +6,7 @@ class UsersController < ApplicationController
       @users = User.all
     else
       flash[:result_text] = "Please log in to access the page. "
-      redirect_to root_path
+      redirect_to root_path, status: :success
     end
   end
 

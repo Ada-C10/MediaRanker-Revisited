@@ -219,6 +219,18 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
+      # invalidate the work
+      work_hash[:work][:title] = nil #user leaves out title when filling in the form
+      id = works(:poodr).id
+      old_poodr = works(:poodr)
+
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
+      new_poodr = Work.find(id)
+
+      must_respond_with :bad_request
+      expect(old_poodr.title)
 
     end
 

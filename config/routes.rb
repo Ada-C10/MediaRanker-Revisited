@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   root 'works#root'
 
 #the callback route
-  get "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/:provider/callback", to: "sessions#create", as: 'auth_callback'
 
   # get '/login', to: 'sessions#login_form', as: 'login'
   # post '/login', to: 'sessions#login'

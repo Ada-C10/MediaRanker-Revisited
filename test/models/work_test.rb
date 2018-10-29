@@ -3,11 +3,11 @@ require 'test_helper'
 describe Work do
   describe "relations" do
     it "has a list of votes" do
-       album = works(:album)
-       album.must_respond_to :votes
-       album.votes.each do |vote|
-         vote.must_be_kind_of Vote
-       end
+      album = works(:album)
+      album.must_respond_to :votes
+      album.votes.each do |vote|
+        vote.must_be_kind_of Vote
+      end
     end
 
     it "has a list of voting users" do
@@ -16,6 +16,12 @@ describe Work do
       album.ranking_users.each do |user|
         user.must_be_kind_of User
       end
+    end
+
+    it "belongs to a user" do
+      album = works(:album)
+      album.must_respond_to :user
+      album.user.must_be_kind_of User
     end
   end
 

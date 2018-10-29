@@ -17,6 +17,14 @@ describe User do
         work.must_be_kind_of Work
       end
     end
+
+    it "has a list of works" do
+      dan = users(:dan)
+      dan.must_respond_to :works
+      dan.works.each do |work|
+        work.must_be_kind_of Work
+      end
+    end
   end
 
   describe "validations" do
@@ -38,7 +46,20 @@ describe User do
       result.must_equal false
       user2.errors.messages.must_include :username
     end
+  end
 
-
+  describe "build_from_github(auth_hash)" do
+    it "builds a user from an auth_hash" do
+      mock_auth_hash = {
+        provider: 'github',
+        uid: 123567,
+        "info" => {
+          "email" => "blank@blank.com",
+          "name" => "jane"
+        }
+      }
+      user = User.build_from_github(mock_auth_hash)
+      user.must_be_kind_of User
+    end
   end
 end

@@ -39,9 +39,9 @@ describe SessionsController do
      OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
      get auth_callback_path(:github)
      # binding.pry
-     must_redirect_to root_path
-     User.count.must_equal (start_count + 1)
+     User.count.must_equal start_count + 1
      session[:user_id].must_equal User.last.id
+     must_redirect_to root_path
   end
 
     it 'redirects to the login route if given invalid user data' do

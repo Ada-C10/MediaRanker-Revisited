@@ -3,7 +3,8 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
   skip_before_action :require_login, only: [:root]
-
+  before_action :user_can_modify?, only: [:edit, :update, :destroy]
+  before_action :check_vote_eligibility, only: [:upvote]
   def root
     @albums = Work.best_albums
     @books = Work.best_books
@@ -22,6 +23,7 @@ class WorksController < ApplicationController
   def create
     @work = Work.new(media_params)
     @media_category = @work.category
+    @work.user = @login_user
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -39,13 +41,14 @@ class WorksController < ApplicationController
   end
 
   def edit
-    check_ownership
+
   end
 
   def update
-    check_ownership
+
 
     @work.update_attributes(media_params)
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
@@ -56,11 +59,12 @@ class WorksController < ApplicationController
       flash.now[:messages] = @work.errors.messages
       render :edit, status: :bad_request
     end
+
+
   end
 
   def destroy
-    check_ownership
-    
+
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
@@ -68,7 +72,9 @@ class WorksController < ApplicationController
   end
 
   def upvote
+
     check_vote_eligibility
+
 
     vote = Vote.new(user: @login_user, work: @work)
     if vote.save
@@ -95,7 +101,7 @@ private
     @media_category = @work.category.downcase.pluralize
   end
 
-  def check_ownership
+  def user_can_modify?
     unless @work.user == @login_user
       flash[:status] = :failure
       flash[:result_text] = "You may only modify your own works."
@@ -104,9 +110,10 @@ private
   end
 
   def check_vote_eligibility
+    
     unless @work.user != @login_user
       flash[:status] = :failure
-      flash[:result_text] = "You cannot vote on your own work."
+      flash[:result_text] = "You cannot vote on your own works."
       redirect_back(fallback_location: root_path)
     end
   end

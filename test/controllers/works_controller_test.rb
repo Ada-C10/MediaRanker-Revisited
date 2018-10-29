@@ -156,7 +156,7 @@ describe WorksController do
 
     describe "update" do
 
-      it "succeeds for valid data and an extant work ID" do
+      it "succeeds for valid data and an extant work ID that logged-in user owns" do
         perform_login(dan)
         expect{
           patch work_path(poodr.id), params: mock_params
@@ -207,7 +207,7 @@ describe WorksController do
     end
 
     describe "destroy" do
-      it "succeeds for an extant work ID" do
+      it "succeeds for an extant work ID that logged-in user owns" do
         perform_login(dan)
         expect{
           delete work_path(poodr.id)
@@ -362,7 +362,9 @@ describe WorksController do
 
       it "redirects to root path if no user is logged in" do
 
-        post upvote_path(album.id)
+        expect{
+                post upvote_path(album.id)
+        }.wont_change 'Vote.count'
 
         must_redirect_to root_path
       end
@@ -371,6 +373,71 @@ describe WorksController do
   end
 
   describe 'logged-in user ownership tests' do
+    describe 'edit' do
+      it 'redirects to root with flash message if not owned by login user' do
+        perform_login(dan)
+        get edit_work_path(album.id)
+
+        must_redirect_to root_path
+        expect(flash[:result_text]).must_equal "You may only modify your own works."
+      end
+    end
+
+    describe 'update' do
+      it 'redirects to root with flash message if not owned by login user' do
+        perform_login(dan)
+
+        old_title = album.title
+        old_creator = album.creator
+        old_description = album.description
+        old_publication_year = album.publication_year
+        old_category = album.category
+
+        patch work_path(album.id), params: mock_params
+
+        album.reload
+
+        expect(album.title).must_equal old_title
+        expect(album.creator).must_equal old_creator
+        expect(album.description).must_equal old_description
+        expect(album.publication_year).must_equal old_publication_year
+        expect(album.category).must_equal old_category
+
+        must_redirect_to root_path
+        expect(flash[:result_text]).must_equal "You may only modify your own works."
+
+
+      end
+    end
+
+    describe 'destroy' do
+      it 'redirects to root with flash message if not owned by login user' do
+        perform_login(dan)
+
+        expect{
+            delete work_path(album.id)
+              }.wont_change 'Work.count'
+
+        must_redirect_to root_path
+        expect(flash[:result_text]).must_equal "You may only modify your own works."
+      end
+    end
+
+    describe 'upvote' do
+      it 'redirects to root with flash message if user owns the work they are voting on' do
+        perform_login(dan)
+
+        expect{
+                post upvote_path(poodr.id)
+        }.wont_change 'Vote.count'
+
+        must_redirect_to root_path
+
+        expect(flash[:result_text]).must_equal "You cannot vote on your own works."
+      end
+    end
+
+
 
   end
 

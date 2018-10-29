@@ -29,10 +29,8 @@ describe SessionsController do
 
     expect(new_user).must_be :valid?, "User is not valid. Please fix. "
 
-    perform_login(new_user)
-
     expect{
-      get callback_path(:github)
+      perform_login(new_user)
     }.must_change('User.count', +1)
 
     must_redirect_to root_path

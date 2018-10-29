@@ -16,14 +16,11 @@ describe UsersController do
     }
   }
 
-  # Logging in
 
-  before do
-    perform_login(existing_user)
-  end
 
   describe "index" do
     it "succeeds with users present" do
+      perform_login(existing_user)
 
       get users_path
 
@@ -33,12 +30,15 @@ describe UsersController do
 
   describe "show" do
     it "succeeds for extant user ID" do
+      perform_login(existing_user)
+
       get user_path(existing_user.id)
 
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus user ID" do
+      perform_login(existing_user)
 
       existing_user.destroy
 

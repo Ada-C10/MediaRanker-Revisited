@@ -215,20 +215,32 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      bogus_id = 0
 
+      expect {
+        delete work_path(bogus_id)
+      }.wont_change 'Work.count'
+
+      must_respond_with :not_found
     end
   end
 
-  # describe "upvote" do
-  #
-  #   it "redirects to the work page if no user is logged in" do
-  #
-  #   end
-  #
-  #   it "redirects to the work page after the user has logged out" do
-  #
-  #   end
-  #
+  describe "upvote" do
+
+    it "redirects to the work page if no user is logged in" do
+      work = Work.first
+
+      expect {
+        post upvote_path(work.id)
+      }.wont_change 'Vote.count'
+
+      must_redirect_to work_path(work)
+    end
+
+    # it "redirects to the work page after the user has logged out" do
+    #
+    # end
+
   #   it "succeeds for a logged-in user and a fresh user-vote pair" do
   #
   #   end
@@ -236,5 +248,5 @@ describe WorksController do
   #   it "redirects to the work page if the user has already voted for that work" do
   #
   #   end
-  # end
+  end
 end

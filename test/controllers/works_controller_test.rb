@@ -222,33 +222,70 @@ describe WorksController do
       must_respond_with :not_found
     end
   end
-  #
-  # describe "destroy" do
-  #   it "succeeds for an extant work ID" do
-  #
-  #   end
-  #
-  #   it "renders 404 not_found and does not update the DB for a bogus work ID" do
-  #
-  #   end
-  # end
-  #
-  # describe "upvote" do
-  #
-  #   it "redirects to the work page if no user is logged in" do
-  #
-  #   end
-  #
-  #   it "redirects to the work page after the user has logged out" do
-  #
-  #   end
-  #
-  #   it "succeeds for a logged-in user and a fresh user-vote pair" do
-  #
-  #   end
-  #
-  #   it "redirects to the work page if the user has already voted for that work" do
-  #
-  #   end
-  # end
+
+  describe "destroy" do
+    it "succeeds for an extant work ID" do
+      work = works(:another_album)
+      expect {
+        delete work_path(work.id)
+      }.must_change('Work.count', -1)
+
+    end
+
+    it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      work = works(:another_album)
+
+      expect {
+        delete work_path(work.id)
+      }.must_change('Work.count', -1)
+
+      expect {
+        delete work_path(work.id)
+      }.wont_change('Work.count')
+
+      must_respond_with :not_found
+    end
+  end
+
+  describe "upvote" do
+
+    it "redirects to the work page if no user is logged in" do
+      work = works(:poodr)
+
+      post upvote_path(work)
+
+      assert_redirected_to work_path(work)
+      assert_equal :failure, flash[:status]
+    end
+
+    # it "redirects to the work page after the user has logged out" do
+    #
+    # end
+    #
+    it "succeeds for a logged-in user and a fresh user-vote pair" do
+      work = works(:poodr)
+      user = User.first
+      perform_login(user)
+
+      post upvote_path(work)
+
+      assert_redirected_to work_path(work)
+      assert_equal :success, flash[:status]
+    end
+
+    it "redirects to the work page if the user has already voted for that work" do
+      work = works(:poodr)
+      user = User.first
+      perform_login(user)
+
+      post upvote_path(work)
+
+      assert_redirected_to work_path(work)
+      assert_equal :success, flash[:status]
+
+      post upvote_path(work)
+      assert_redirected_to work_path(work)
+      assert_equal 'Could not upvote', flash[:result_text]
+    end
+  end
 end

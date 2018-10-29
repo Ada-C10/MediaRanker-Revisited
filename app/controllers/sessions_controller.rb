@@ -35,16 +35,19 @@ class SessionsController < ApplicationController
   def create
    auth_hash = request.env['omniauth.auth']
 
+
    #UID specific to user for this provider
    user = User.find_by(uid: auth_hash[:uid], provider: auth_hash[:provider])
    if user
      # User was found in the database
+     session[:user_id] = user.id
      flash[:status] = :success
      flash[:result_text] = "Logged in as returning user #{user.name}"
 
    else
      # User doesn't match anything in the DB
      # Attempt to create a new user
+
      user = User.build_from_github(auth_hash)
 
      if user.save

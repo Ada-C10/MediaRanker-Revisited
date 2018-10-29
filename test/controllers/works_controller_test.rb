@@ -276,10 +276,10 @@ describe WorksController do
     it "redirects to the work page if no user is logged in" do
 
       #arrange
-
-      #act
       id = works(:poodr).id
 
+
+      #act
       #assert
       expect {
         post upvote_path(id)
@@ -290,6 +290,31 @@ describe WorksController do
     end
 
     it "redirects to the work page after the user has logged out" do
+      #arrange
+      # 1) login a user
+      user = User.all.first
+
+      # Tell OmniAuth to use this user's info when it sees
+      # an auth callback from github
+      OmniAuth.config.mock_auth[:github] =
+        OmniAuth::AuthHash.new(mock_auth_hash(user))
+
+      perform_login(user)
+
+      # 2) get a work id
+      id = works(:poodr).id
+
+      #act /assert
+      # 3) upvote something
+      expect {
+        post upvote_path(id)
+      }.must_change 'Vote.count', 1
+
+      #logout
+      logout_path(user)
+
+      #must redirect tot he work root page
+      must_respond_with :redirect
 
     end
 

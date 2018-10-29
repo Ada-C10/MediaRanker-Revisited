@@ -8,6 +8,7 @@ end
 gem 'simplecov', require: false, group: :test
 
 gem 'omniauth'
+gem 'omniauth-oauth2'
 gem 'omniauth-github'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails'
@@ -50,6 +51,8 @@ group :development, :test do
 
   # Use pry for rails console
   gem 'pry-rails'
+
+  gem 'dotenv-rails'
 end
 
 group :test do
@@ -67,7 +70,7 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 
-  gem 'dotenv-rails'
+
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

@@ -3,6 +3,7 @@ class WorksController < ApplicationController
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
   skip_before_action :require_login, only: [:root]
+  
   def root
     @albums = Work.best_albums
     @books = Work.best_books

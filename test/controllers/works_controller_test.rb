@@ -1,10 +1,12 @@
 require 'test_helper'
+# TODO: PRECONDITIONS?
 
 describe WorksController do
   CATEGORIES = %w(albums books movies)
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   let(:kari) {users(:kari)}
+  let(:poodr) {works(:poodr)}
   let(:new_work_params) {{
     work: {
       title: 'rubber soul',
@@ -33,10 +35,7 @@ describe WorksController do
       end
 
       it "succeeds with no media" do
-        works(:album).destroy
-        works(:another_album).destroy
-        works(:poodr).destroy
-        works(:movie).destroy
+        Work.all.each { |work| work.destroy}
 
         Work.all.count.must_equal 0
         get root_path
@@ -60,9 +59,10 @@ describe WorksController do
     end
 
     describe "new" do
-      it "succeeds" do
+      before do
         log_user_in(kari)
-
+      end
+      it "succeeds" do
         get new_work_path
         must_respond_with :success
       end
@@ -72,8 +72,6 @@ describe WorksController do
       # let(:log_in) {log_user_in(kari)}
 
       it "creates a work with valid data for a real category" do
-        log_user_in(kari)
-
         expect {
           post works_path, params: new_work_params
         }.must_change 'Work.count', 1
@@ -87,8 +85,6 @@ describe WorksController do
       end
       #
       it "renders bad_request and does not update the DB for bogus data" do
-        log_user_in(kari)
-
         new_work_params[:work][:title] = nil
 
         expect {
@@ -101,8 +97,6 @@ describe WorksController do
       end
 
       it "renders 400 bad_request for bogus categories" do
-        log_user_in(kari)
-
         INVALID_CATEGORIES.each do |category|
           new_work_params[:work][:category] = category
 
@@ -124,7 +118,7 @@ describe WorksController do
       end
 
       it "succeeds for an extant work ID" do
-        get work_path(works(:poodr).id)
+        get work_path(poodr.id)
         must_respond_with :success
       end
 
@@ -140,7 +134,7 @@ describe WorksController do
       end
 
       it "succeeds for an extant work ID" do
-        get edit_work_path(works(:poodr).id)
+        get edit_work_path(poodr.id)
         must_respond_with :success
       end
 
@@ -157,7 +151,7 @@ describe WorksController do
 
       it "succeeds for valid data and an extant work ID" do
         expect{
-          put work_path(works(:poodr).id), params: new_work_params
+          put work_path(poodr.id), params: new_work_params
         }.wont_change 'Work.count'
 
         updated_work = Work.find_by(title: 'rubber soul')
@@ -174,7 +168,7 @@ describe WorksController do
         new_work_params[:work][:title] = nil
 
         expect {
-          put work_path(works(:poodr).id), params: new_work_params
+          put work_path(poodr.id), params: new_work_params
         }.wont_change 'Work.count'
 
         must_respond_with :bad_request
@@ -196,7 +190,7 @@ describe WorksController do
 
       it "succeeds for an extant work ID" do
         expect {
-          delete work_path(works(:poodr).id)
+          delete work_path(poodr.id)
         }.must_change 'Work.count', -1
 
         must_respond_with :redirect
@@ -220,19 +214,59 @@ describe WorksController do
       end
 
       it "redirects to the work page if no user is logged in" do
-        skip
+        get work_path(poodr.id)
+
+        delete logout_path
+        expect(session[:user_id]).must_be_nil
+
+        expect {
+          post upvote_path(poodr.id)
+        }.wont_change 'Vote.count'
+
+        must_respond_with :redirect
+        must_redirect_to work_path(poodr.id)
       end
 
       it "redirects to the work page after the user has logged out" do
-        skip
+        expect(session[:user_id]).must_equal kari.id
+
+        get work_path(poodr.id)
+
+        delete logout_path
+        expect(session[:user_id]).must_be_nil
+
+        expect {
+          post upvote_path(poodr.id)
+        }.wont_change 'Vote.count'
+
+        must_respond_with :redirect
+        must_redirect_to work_path(poodr.id)
       end
 
       it "succeeds for a logged-in user and a fresh user-vote pair" do
-        skip
+        expect(session[:user_id]).must_equal kari.id
+
+        expect {
+          post upvote_path(poodr.id)
+        }.must_change 'Vote.count', 1
+
+        must_respond_with :redirect
+        must_redirect_to work_path(poodr.id)
       end
 
       it "redirects to the work page if the user has already voted for that work" do
-        skip
+        expect(session[:user_id]).must_equal kari.id
+
+        expect {
+          post upvote_path(poodr.id)
+        }.must_change 'Vote.count', 1
+
+        expect {
+          post upvote_path(poodr.id)
+        }.wont_change 'Vote.count'
+
+        must_respond_with :redirect
+        must_redirect_to work_path(poodr.id)
       end
     end
   end

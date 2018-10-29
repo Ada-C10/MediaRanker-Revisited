@@ -188,33 +188,51 @@ describe WorksController do
         must_respond_with 404
       end
     end
-    #
-    #   describe "destroy" do
-    #     it "succeeds for an extant work ID" do
-    #
-    #     end
-    #
-    #     it "renders 404 not_found and does not update the DB for a bogus work ID" do
-    #
-    #     end
-    #   end
-    #
-    #   describe "upvote" do
-    #
-    #     it "redirects to the work page if no user is logged in" do
-    #
-    #     end
-    #
-    #     it "redirects to the work page after the user has logged out" do
-    #
-    #     end
-    #
-    #     it "succeeds for a logged-in user and a fresh user-vote pair" do
-    #
-    #     end
-    #
-    #     it "redirects to the work page if the user has already voted for that work" do
-    #
-    #     end
-    #   end
+
+    describe "destroy" do
+      before do
+        log_user_in(kari)
+      end
+
+      it "succeeds for an extant work ID" do
+        expect {
+          delete work_path(works(:poodr).id)
+        }.must_change 'Work.count', -1
+
+        must_respond_with :redirect
+        must_redirect_to root_path
+
+        expect(flash[:status]).must_equal :success
+      end
+
+      it "renders 404 not_found and does not update the DB for a bogus work ID" do
+        expect {
+          delete work_path(0)
+        }.wont_change 'Work.count'
+
+        must_respond_with 404
+      end
+    end
+
+    describe "upvote" do
+      before do
+        log_user_in(kari)
+      end
+
+      it "redirects to the work page if no user is logged in" do
+        skip
+      end
+
+      it "redirects to the work page after the user has logged out" do
+        skip
+      end
+
+      it "succeeds for a logged-in user and a fresh user-vote pair" do
+        skip
+      end
+
+      it "redirects to the work page if the user has already voted for that work" do
+        skip
+      end
+    end
   end

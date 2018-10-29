@@ -238,9 +238,12 @@ describe WorksController do
     #
     # end
 
-    # it "succeeds for a logged-in user and a fresh user-vote pair" do
-    #
-    # end
+    it "succeeds for a logged-in user and a fresh user-vote pair" do
+      post upvote_path(existing_work.id), params: {
+        vote: { user: users(:user2), work: existing_work }
+      }
+      must_respond_with :redirect
+    end
 
     it "redirects to the work page if the user has already voted for that work" do
       2.times do

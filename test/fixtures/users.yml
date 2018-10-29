@@ -6,4 +6,13 @@
 #
 
 user1:
-  username: John
+  username: Nick
+  uid: 1
+  provider: github
+  email: nick@ada_test.org
+
+user2:
+  username: Dionisia
+  uid: 2
+  provider: github
+  email: dionisia@ada_test.org

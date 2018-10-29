@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pry'
 
 describe Vote do
   describe "relations" do
@@ -29,9 +30,9 @@ describe Vote do
     end
 
     it "allows multiple users to vote for a work" do
-      vote1 = Vote.new(user: user1, work: work1)
+      vote1 = Vote.new(user: users.first, work: works.last)
       vote1.save!
-      vote2 = Vote.new(user: user2, work: work1)
+      vote2 = Vote.new(user: users.last, work: works.last)
       vote2.valid?.must_equal true
     end
 

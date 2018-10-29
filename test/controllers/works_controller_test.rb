@@ -19,7 +19,7 @@ describe WorksController do
   }
   let(:dan) {users(:dan)}
 
-  describe "root" do
+  describe "root" do # any user regardless of login
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
       get root_path
@@ -267,6 +267,95 @@ describe WorksController do
   end
 
   describe 'guest users' do
+
+    describe "index" do
+
+      it "redirects to root path if no user is logged in" do
+
+        get works_path
+
+        must_redirect_to root_path
+      end
+    end
+
+    describe "new" do
+
+      it "redirects to root path if no user is logged in" do
+
+        get new_work_path
+
+        must_redirect_to root_path
+      end
+    end
+
+    describe "create" do
+
+      it "redirects to root path if no user is logged in" do
+
+        expect {
+                  post works_path, params: mock_params
+                }.wont_change 'Work.count'
+
+        must_redirect_to root_path
+      end
+    end
+
+    describe "show" do
+
+      it "redirects to root path if no user is logged in" do
+
+        get work_path(album.id)
+
+        must_redirect_to root_path
+      end
+    end
+
+    describe "edit" do
+
+      it "redirects to root path if no user is logged in" do
+
+        get edit_work_path(album.id)
+
+        must_redirect_to root_path
+      end
+    end
+
+    describe "update" do
+
+      it "redirects to root path if no user is logged in" do
+
+        old_title = album.title
+        old_creator = album.creator
+        old_description = album.description
+        old_publication_year = album.publication_year
+        old_category = album.category
+
+        patch work_path(album.id), params: mock_params
+
+        album.reload
+
+        expect(album.title).must_equal old_title
+        expect(album.creator).must_equal old_creator
+        expect(album.description).must_equal old_description
+        expect(album.publication_year).must_equal old_publication_year
+        expect(album.category).must_equal old_category
+
+        must_redirect_to root_path
+      end
+    end
+
+    describe "destroy" do
+
+      it "redirects to root path if no user is logged in" do
+
+        expect{
+          delete work_path(album.id)
+        }.wont_change 'Work.count'
+
+        must_redirect_to root_path
+      end
+    end
+
 
     describe "upvote" do
 

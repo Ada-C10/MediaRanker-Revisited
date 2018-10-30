@@ -1,6 +1,12 @@
 require 'test_helper'
 
 describe WorksController do
+
+
+  let(:dan) { users(:dan) }
+
+
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -308,6 +314,11 @@ describe WorksController do
 
   describe "upvote" do
 
+    before do
+      perform_login(users(:dan))
+    end
+
+
     it "redirects to the work page if no user is logged in" do
 
       # arrange
@@ -321,18 +332,20 @@ describe WorksController do
 
     it "redirects to the work page after the user has logged out" do
       # arrange
-
+      id = works(:movie).id
       # act
-
+      delete logout_path(id)
       # assert
+      must_respond_with :redirect
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
       # arrange
-
+      vote = works(:movie).id
       # act
-
+      post upvote_path(vote)
       # assert
+      must_respond_with :success
     end
 
     it "redirects to the work page if the user has already voted for that work" do
@@ -341,6 +354,23 @@ describe WorksController do
       # act
 
       # assert
+      must_respond_with :redirect
+    end
+  end
+
+  describe "Guest users" do
+    it "can access the index" do
+      get works_path
+      must_respond_with :success
+    end
+
+    it "cannot access show" do
+      existing_work = works(:poodr)
+
+      get work_path(existing_work.id)
+
+      must_redirect_to root_path
+      flash[:message].must_equal "You must be logged in to see that page!"
     end
   end
 end

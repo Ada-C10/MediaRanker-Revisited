@@ -4,24 +4,16 @@ describe SessionsController do
 
   it "can successfully login an existing user via github" do
 
-    #arrange
-    #make sure everything is configured for existing user
     dan = users(:dan)
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new( mock_auth_hash( dan ))
+    perform_login(dan)
 
-    #act
-    #simulate successful login given oauth hash
-    get login_path(:github)
-
-    #assert
-    #must redirect
     must_redirect_to root_path
     expect(session[:user_id]).must_equal dan.id
 
-    #check on flash that there is key called success
     expect(flash[:success]).must_equal "Logged in as returning user #{dan.username}"
   end
+
 
   it "creates a new user successfully when logging in with a new valid user" do
 
@@ -31,9 +23,7 @@ describe SessionsController do
 
     expect(new_user.valid?).must_equal true
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new( mock_auth_hash( new_user ))
-
-    get login_path(:github)
+    perform_login(new_user)
 
     must_redirect_to root_path
 
@@ -43,6 +33,7 @@ describe SessionsController do
 
   end
 
+
   it "does not create a new user when logging in with an invalid new user" do
 
     start_count = User.count
@@ -51,9 +42,7 @@ describe SessionsController do
 
     expect(invalid_user.valid?).must_equal false
 
-    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new( mock_auth_hash( invalid_user ))
-
-    get login_path(:github)
+    perform_login(invalid_user)
 
     must_redirect_to root_path
 

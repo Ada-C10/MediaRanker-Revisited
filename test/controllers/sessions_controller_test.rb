@@ -1,14 +1,16 @@
 require "test_helper"
 
 describe SessionsController do
-  describe "auth_callback" do
-    it "logs in an existing user and redirects to the root route" do
+  describe "Login" do
+    it "logs in existing user and redirects to roote path" do
 
       start_count = User.count
 
       user = users(:grace)
 
-      perform_login(user)
+      expect {
+        perform_login(user)
+      }.wont_change 'User.count'
 
       must_redirect_to root_path
 
@@ -18,35 +20,46 @@ describe SessionsController do
       User.count.must_equal start_count
     end
 
-    it "creates an account for a new user and redirects to the root route" do
+    it "creates a new user and redirects to root path" do
       user = users(:ada)
       user.destroy
 
-      perform_login(user)
-      must_redirect_to root_path
-
       # Should have created a new user
-      expect do
-        get auth_callback_path(:github).must_change('User.count' +1)
-      end
-
+      expect {
+        perform_login(user)
+      }.must_change 'User.count', 1
+      must_redirect_to root_path
       # The new user's ID should be set in the session
       session[:user_id].must_equal User.last.id
     end
 
-    it "redirects to the login route if given invalid user data" do
-      puts users.count
+    it "if given invalid user data redirects root path " do
+
       user = users(:ada)
       user.uid = nil
-      user.provider = nil
+      #user.provider = nil
+
+      expect {
+        perform_login(user)
+      }.wont_change 'User.count'
+
+      must_redirect_to root_path
+    end
+  end
+
+  describe 'Logout' do
+    it 'should logout user and redirect to root path' do
+      user = users(:ada)
 
       perform_login(user)
-      must_redirect_to root_path
+      login_id = session[:user_id]
+      delete logout_path
+      logout_id = session[:user_id]
 
-      expect do
-        get auth_callback_path(:github).wont_change('User.count')
-      end
-      puts users.count
+      expect(login_id).must_equal users(:ada).id
+      expect(logout_id).must_be_nil
+
+      must_redirect_to root_path
     end
   end
 end

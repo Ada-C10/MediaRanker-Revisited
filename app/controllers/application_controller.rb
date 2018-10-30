@@ -1,7 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  before_action :require_login, except: [:root,:find_user]
+
   before_action :find_user
+  before_action :require_login, except: [:root,:find_user]
 
 
   def render_404

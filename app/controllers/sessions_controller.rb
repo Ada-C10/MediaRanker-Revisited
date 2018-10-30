@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
     else
       flash[:notice] = "Log in not successful."
       # User doesn't match anything in the DB
-      # TODO: Attempt to create a new user
+      # create a new user
       # user = User.new(uid: auth_hash[:uid] provider: 'github')
 
       user = User.add_user_from_github(auth_hash)

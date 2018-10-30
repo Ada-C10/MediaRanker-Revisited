@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  
+
   def login
     auth_hash = request.env['omniauth.auth']
 
@@ -12,7 +12,8 @@ class SessionsController < ApplicationController
       if user.save
         flash[:success] = "Logged in as new user #{user.name}"
       else
-        flash[:error] = "Could not create new user account: #{user.errors.messages}"
+        flash[:status] = :error
+        flash[:result_text] = "Could not create new user account: #{user.errors.messages}"
         redirect_to root_path
         return
       end

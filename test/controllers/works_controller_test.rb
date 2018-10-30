@@ -238,12 +238,27 @@ describe WorksController do
     end
 
     # it "redirects to the work page after the user has logged out" do
-    #
+      # logged_in_user = users(:dan)
+      # post login_path, params: user_params
+      # expect (:session[:user_id]).must_equal logged_in_user.id
+      #
+      # user
     # end
 
-  #   it "succeeds for a logged-in user and a fresh user-vote pair" do
-  #
-  #   end
+    it "succeeds for a logged-in user and a fresh user-vote pair" do
+      user = users(:dan)
+
+      user_hash = {
+        username: user.username,
+        provider: user.provider,
+        uid: user.uid
+      }
+
+      count = Vote.all.count
+      get login_path('github'), params: user_hash
+
+      expect(session[:user_id]).must_equal user.id
+    end
   #
   #   it "redirects to the work page if the user has already voted for that work" do
   #

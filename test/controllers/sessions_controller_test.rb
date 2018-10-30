@@ -18,7 +18,7 @@ describe SessionsController do
   # }
 
   describe 'create' do
-    it 'will log in existing user and redirect to root' do
+    it 'will log in existing user and redirect to root but not change DB' do
 
       start_count = User.all.count
 
@@ -54,7 +54,14 @@ describe SessionsController do
   end
 
   describe 'destroy' do
-    it 'will log in existing user' do
+    it 'will log out logged in user and redirect to root path' do
+
+      logged_in_user
+      expect(session[:user_id]).must_equal @dan.id
+
+      delete logout_path
+      must_redirect_to root_path
+      expect(session[:user_id]).must_be_nil
     end
   end
 

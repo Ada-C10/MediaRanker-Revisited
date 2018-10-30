@@ -10,7 +10,6 @@ class SessionsController < ApplicationController
       # User was found in the database
       flash[:status] = "success"
       flash[:result_text] = "Logged in as returning user #{user.username}"
-      flash[:messages] = user.errors.messages
 
     else
       # User doesn't match anything in the DB

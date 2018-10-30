@@ -273,19 +273,53 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is #logged in" do
+      expect{
+        post upvote_path(@book)
+      }.wont_change 'Work.count'
 
+      must_redirect_to work_path(@book.id)
     end
 
-    it "redirects to the work page after the user has #logged out" do
+    it "redirects to the root page after the user has #logged out" do
 
+      logged_in_user
+
+      post upvote_path(@book)
+
+      delete logout_path
+      must_redirect_to root_path
     end
 
     it "succeeds for a #logged-in user and a fresh user-vote pair" do
 
+      logged_in_user
+
+      start_votes = @movie.votes.count
+
+      post upvote_path(@movie)
+      must_redirect_to work_path(@movie.id)
+
+      end_votes = @movie.votes.count
+      user_vote = @movie.votes.last
+
+      expect(end_votes).must_equal start_votes + 1
+
+      expect(user_vote.user_id).must_equal @user.id
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      logged_in_user
 
+      post upvote_path(@album)
+      must_redirect_to work_path(@album.id)
+
+      after_vote_count = @album.votes.count
+      post upvote_path(@album)
+      must_redirect_to work_path(@album.id)
+
+      second_vote_count = @album.votes.count
+
+      expect(after_vote_count).must_equal second_vote_count
     end
   end
 end

@@ -11,54 +11,84 @@ class WorksController < ApplicationController
   end
 
   def index
-    @works_by_category = Work.to_category_hash
+    if session[:user_id] == nil
+      flash[:result_text] = "Must be logged in to do that"
+      redirect_back fallback_location: root_path
+    else
+      @works_by_category = Work.to_category_hash
+    end
   end
 
   def new
-    @work = Work.new
+    if session[:user_id] == nil
+      flash[:result_text] = "Must be logged in to do that"
+      redirect_back fallback_location: root_path
+    else
+      @work = Work.new
+    end
   end
 
   def create
-    @work = Work.new(media_params)
-    @media_category = @work.category
-    if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
-      redirect_to work_path(@work)
+    if session[:user_id] == nil
+      flash[:result_text] = "Must be logged in to do that"
+      redirect_back fallback_location: root_path
     else
-      flash[:status] = :failure
-      flash[:result_text] = "Could not create #{@media_category.singularize}"
-      flash[:messages] = @work.errors.messages
-      render :new, status: :bad_request
+      @work = Work.new(media_params)
+      @media_category = @work.category
+      if @work.save
+        flash[:status] = :success
+        flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
+        redirect_to work_path(@work)
+      else
+        flash[:status] = :failure
+        flash[:result_text] = "Could not create #{@media_category.singularize}"
+        flash[:messages] = @work.errors.messages
+        render :new, status: :bad_request
+      end
     end
   end
 
   def show
-    @votes = @work.votes.order(created_at: :desc)
+    if session[:user_id] == nil
+      flash[:result_text] = "Must be logged in to do that"
+      redirect_back fallback_location: root_path
+    else
+      @votes = @work.votes.order(created_at: :desc)
+    end
   end
 
   def edit
   end
 
   def update
-    @work.update_attributes(media_params)
-    if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
-      redirect_to work_path(@work)
+    if session[:user_id] == nil
+      flash[:result_text] = "Must be logged in to do that"
+      redirect_back fallback_location: root_path
     else
-      flash.now[:status] = :failure
-      flash.now[:result_text] = "Could not update #{@media_category.singularize}"
-      flash.now[:messages] = @work.errors.messages
-      render :edit, status: :bad_request
+      @work.update_attributes(media_params)
+      if @work.save
+        flash[:status] = :success
+        flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
+        redirect_to work_path(@work)
+      else
+        flash.now[:status] = :failure
+        flash.now[:result_text] = "Could not update #{@media_category.singularize}"
+        flash.now[:messages] = @work.errors.messages
+        render :edit, status: :bad_request
+      end
     end
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    if session[:user_id] == nil
+      flash[:result_text] = "Must be logged in to do that"
+      redirect_back fallback_location: root_path
+    else
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    end
   end
 
   def upvote
@@ -81,7 +111,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: work_path(@work)
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end

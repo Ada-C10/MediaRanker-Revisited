@@ -14,4 +14,10 @@ private
       @login_user = User.find_by(id: session[:user_id])
     end
   end
+  def require_login
+    if find_user.nil?
+      flash[:warning] = "You must be logged in to view this section"
+      redirect_to root_path
+    end
+  end
 end

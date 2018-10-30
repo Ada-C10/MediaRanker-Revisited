@@ -6,6 +6,13 @@ describe WorksController do
   CATEGORIES = %w(album book movie)
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
+  def login()
+    post login_path, params: {
+      username: users(:dan).name
+    }
+  end
+
+
   describe "root" do
     it "succeeds with all media types" do
       get root_path
@@ -188,19 +195,51 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
-      skip
+      expect{
+        post upvote_path(works(:poodr)), params: {
+          vote: {user: nil, work: works(:poodr)}
+        }
+      }.wont_change('Vote.count')
+
+      must_redirect_to work_path()
+
     end
 
-    it "redirects to the work page after the user has logged out" do
-      skip
-    end
 
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
-      skip
-    end
+    # it "succeeds for a logged-in user and a fresh user-vote pair" do
+    #   login()
+    #
+    #   expect{
+    #     post upvote_path(works(:poodr)), params: {
+    #       vote: {work: works(:poodr)}
+    #     }
+    #   }.must_change('Vote.count', +1)
+    #
+    #   must_respond_with :success
+    # end
 
     it "redirects to the work page if the user has already voted for that work" do
-      skip
+      # test passing wo
+      expect{
+        post upvote_path(works(:album)), params: {
+          vote: {
+            user: users(:dan),
+            work: works(:album)
+          }
+        }
+      }.wont_change('Vote.count')
+
+      must_redirect_to work_path()
     end
+
+    # it "redirects to the work page after the user has logged out" do
+    #   skip
+    #   expect{
+    #     post upvote_path
+    #   }
+    #
+    #   must_redirect_to work_path()
+    #
+    # end
   end
 end

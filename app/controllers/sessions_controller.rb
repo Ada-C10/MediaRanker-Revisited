@@ -1,5 +1,6 @@
 class SessionsController < ApplicationController
 
+skip_before_action :require_login
 
   def create
     auth_hash = request.env['omniauth.auth']
@@ -51,7 +52,7 @@ class SessionsController < ApplicationController
 
     session[:user_id] = user.id
     redirect_to root_path
-
+binding.pry
     #
     # name = params[:name]
     # if name and user = User.find_by(name: name)

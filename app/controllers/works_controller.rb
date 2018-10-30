@@ -63,6 +63,9 @@ class WorksController < ApplicationController
 
   def upvote
     flash[:status] = :failure
+
+    puts "session is: #{session[:user_id]}"
+    puts "login is: #{@login_user} and work is: #{@work}"
     if @login_user
       vote = Vote.new(user: @login_user, work: @work)
       if vote.save

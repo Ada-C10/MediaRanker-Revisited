@@ -1,9 +1,10 @@
 class SessionsController < ApplicationController
   skip_before_action :logged_in?, only: [:create], raise: false
-  
+
   def create
     auth_hash = request.env['omniauth.auth']
     user = User.find_by(uid: auth_hash[:uid], provider: 'github')
+
     if user
       # User was found in the database
       flash[:status] = :success
@@ -23,9 +24,9 @@ class SessionsController < ApplicationController
         flash[:status] = :success
         flash[:result_text] = "Logged in as new user #{user.name}"
       else
-        flash.now[:status] = :failure
-        flash.now[:result_text] = "Something went wrong... Please try again ?"
-        render :root_path, status: :bad_request
+        flash[:status] = :failure
+        flash[:result_text] = "Something went wrong... Please try again ?"
+        redirect_to root_path
       end
     end
 

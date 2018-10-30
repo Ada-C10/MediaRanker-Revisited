@@ -21,7 +21,7 @@ describe WorksController do
       must_respond_with :success
     end
 
-    it "succeeds with no media" do
+    it "responds success with no media" do
       Work.all.each do |work|
         work.destroy
       end
@@ -32,6 +32,9 @@ describe WorksController do
       must_respond_with :success
     end
   end
+
+  CATEGORIES = %w(albums books movies)
+  INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
 

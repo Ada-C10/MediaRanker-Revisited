@@ -45,7 +45,10 @@
         <% else %>
 
         <li class="nav-item app-header__nav_item">
-          <%= link_to "Login with Github", "/auth/github", class: "btn btn-primary" %>
+          <%= link_to "Sign in with Github", "/auth/github", class: "btn btn-primary" %>
+        </li>
+        <li class="nav-item app-header__nav_item">
+          <%= link_to "Sign in with Google", "/auth/google_oauth2", class: "btn btn-primary" %>
         </li>
         <% end %>
 

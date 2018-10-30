@@ -3,11 +3,17 @@
 dan:
   username: dan
   name: Dan
-  uid: 123123
+  uid: "123123"
   provider: github
 
 kari:
   username: kari
   name: Kari
-  uid: 456456
+  uid: "456456"
   provider: github
+
+google_user:
+  username: goog
+  name: Goog
+  uid: "789789"
+  provider: google_oauth2

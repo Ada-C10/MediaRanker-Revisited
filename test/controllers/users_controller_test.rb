@@ -25,7 +25,7 @@ describe UsersController do
 
         expect(User.count).must_equal 0
 
-        user = User.new(provider: "github", uid: 99999, username: "test_user", name: "Test Person")
+        user = User.new(provider: "github", uid: "400400", username: "test_user", name: "Test Person")
 
         perform_login(user)
         get users_path

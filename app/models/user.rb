@@ -12,7 +12,18 @@ class User < ApplicationRecord
 
     user.provider = 'github'
     user.uid = auth_hash[:uid]
-    user.username = auth_hash[:info][:nickname]
+    user.username = auth_hash[:info][:email]
+    user.name = auth_hash[:info][:name]
+
+    return user
+  end
+
+  def self.build_from_google(auth_hash)
+    user = User.new
+
+    user.provider = 'google_oauth2'
+    user.uid = auth_hash[:uid]
+    user.username = auth_hash[:info][:email]
     user.name = auth_hash[:info][:name]
 
     return user

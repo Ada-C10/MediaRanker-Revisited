@@ -9,3 +9,8 @@
 #
 # two: {}
 # column: value
+june:
+  uid: 3
+  username: june
+  email: june-juny@gmail.com
+  provider: Github

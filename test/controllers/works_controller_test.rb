@@ -2,14 +2,23 @@ require 'test_helper'
 
 describe WorksController do
   describe "root" do
-    it "succeeds with all media types" do
+
+    let(:person){users(:june)}
+
+    it "A logged in user can...succeeds with all media types" do
       # Precondition: there is at least one media of each category
+      # person = users(:june)
+
+      perform_login(person)
       get works_path
       must_respond_with :success
     end
 
-    it "succeeds with one media type absent" do
+    it "A logged in user can...succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      # person = users(:june)
+
+      perform_login(person)
       work_to_destroy = works(:movie)
       work_to_destroy.destroy
 
@@ -17,7 +26,9 @@ describe WorksController do
       must_respond_with :success
     end
 
-    it "succeeds with no media" do
+    it "A logged in user can...succeeds with no media" do
+      perform_login(person)
+
       works(:album).destroy
       works(:another_album).destroy
       works(:poodr).destroy
@@ -32,12 +43,18 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
-    it "succeeds when there are works" do
+
+    let(:person){users(:june)}
+
+    it "A logged in user can...succeeds when there are works" do
+      perform_login(person)
       get works_path
       must_respond_with :success
     end
 
-    it "succeeds when there are no works" do
+    it "A logged in user can...succeeds when there are no works" do
+      perform_login(person)
+
       works(:album).destroy
       works(:another_album).destroy
       works(:poodr).destroy
@@ -49,14 +66,22 @@ describe WorksController do
   end
 
   describe "new" do
-    it "succeeds" do
+
+    let(:person){users(:june)}
+
+    it "A logged in user can...succeeds" do
+      perform_login(person)
       get new_work_path
       must_respond_with :success
     end
   end
 
   describe "create" do
-    it "creates a work with valid data for a real category" do
+
+    let(:person){users(:june)}
+
+    it "A logged in user can...creates a work with valid data for a real category" do
+      perform_login(person)
       work = {
         work: {
           title: "Sound of Music",
@@ -68,7 +93,8 @@ describe WorksController do
       must_redirect_to work_path(Work.last)
     end
 
-    it "renders bad_request and does not update the DB for bogus data" do
+    it "A logged in user can...renders bad_request and does not update the DB for bogus data" do
+      perform_login(person)
       work = {
           work: {
             title: "Sound of Music",
@@ -80,7 +106,9 @@ describe WorksController do
       must_respond_with :bad_request
     end
 
-    it "renders 400 bad_request for bogus categories" do
+    it "A logged in user can...renders 400 bad_request for bogus categories" do
+
+      perform_login(person)
       work = {
           another_movie: {
             title: "Sound of Music",
@@ -94,13 +122,19 @@ describe WorksController do
   end
 
   describe "show" do
-    it "succeeds for an extant work ID" do
+
+    let(:person){users(:june)}
+
+    it "A logged in user can...succeeds for an extant work ID" do
+      perform_login(person)
       work = works(:album)
       get work_path(work.id)
       must_respond_with :success
     end
 
-    it "renders 404 not_found for a bogus work ID" do
+    it "A logged in user can...renders 404 not_found for a bogus work ID" do
+
+      perform_login(person)
       work = works(:album)
       work.id = 0
       get work_path(work.id)
@@ -109,13 +143,19 @@ describe WorksController do
   end
 
   describe "edit" do
-    it "succeeds for an extant work ID" do
+
+    let(:person){users(:june)}
+
+    it "A logged in user can...succeeds for an extant work ID" do
+      perform_login(person)
       id = works(:album)
       get edit_work_path(id)
       must_respond_with :success
     end
 
-    it "renders 404 not_found for a bogus work ID" do
+    it "A logged in user can...renders 404 not_found for a bogus work ID" do
+
+      perform_login(person)
       work = works(:album)
       work.id = 0
       get edit_work_path(work.id)
@@ -150,7 +190,12 @@ describe WorksController do
   # end
 
   describe "destroy" do
-    it "succeeds for an extant work ID" do
+
+    let(:person){users(:june)}
+
+    it "A logged in user can...succeeds for an extant work ID" do
+
+      perform_login(person)
       work = works(:poodr)
       before_count = Work.count
 
@@ -160,7 +205,9 @@ describe WorksController do
       must_redirect_to root_path
     end
 
-    it "renders 404 not_found and does not update the DB for a bogus work ID" do
+    it "A logged in user can...renders 404 not_found and does not update the DB for a bogus work ID" do
+
+      perform_login(person)
       work = works(:poodr)
       work.destroy
 

@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
     else
       user = User.build_from_github(auth_hash) if auth_hash[:provider] == 'github'
       user = User.build_from_google(auth_hash) if auth_hash[:provider] == 'google_oauth2'
-      
+
       if user.save
         session[:user_id] = user.id
         flash[:status] = :success

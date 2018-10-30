@@ -14,8 +14,18 @@ describe SessionsController do
       must_redirect_to root_path
     end
 
+    it "logs in an existing google user and redirects to the root route" do
+      expect {
+        perform_google_login(users(:google_user))
+      }.wont_change 'User.count'
+
+      expect(session[:user_id]).must_equal users(:google_user).id
+
+      must_redirect_to root_path
+    end
+
     it "creates an account for a new user and redirects to the root route" do
-      user = User.new(provider: "github", uid: 99999, username: "test_user", name: "Test Person")
+      user = User.new(provider: "github", uid: "400400", username: "test_user", name: "Test Person")
 
       expect {
         perform_login(user)
@@ -32,7 +42,7 @@ describe SessionsController do
     end
 
     it "redirects to the login route if given invalid user data" do
-      user = User.new(provider: "github", uid: 99999, username: nil, name: "Test Person")
+      user = User.new(provider: "github", uid: "99999", username: nil, name: "Test Person")
 
       expect {
         perform_login(user)

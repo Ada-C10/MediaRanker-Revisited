@@ -11,5 +11,9 @@ describe UsersController do
       must_respond_with :success
     end
 
+    it 'a guest cannot view the Users#index page' do
+      get users_path
+      must_respond_with :redirect
+    end
   end
 end

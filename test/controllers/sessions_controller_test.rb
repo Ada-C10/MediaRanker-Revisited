@@ -14,7 +14,7 @@ describe SessionsController do
     end
 
     it "logs in new user with good data" do
-      user = users(:chris)
+      user = users(:kari)
       user.destroy
 
       expect { perform_login(user) }.must_change('User.count', +1)

@@ -37,7 +37,7 @@ describe UsersController do
         id = users(:dan).id
         get user_path(id)
 
-        must_respond_with :success #or should this be success?
+        must_respond_with :success
       end
     end
   end

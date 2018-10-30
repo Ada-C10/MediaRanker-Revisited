@@ -4,15 +4,29 @@ describe WorksController do
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
+      get root_path
+
+      must_respond_with :success
 
     end
 
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
+      movie = works(:movie)
+      movie.destroy
 
+      expect(Work.find_by(category: 'movie')).must_be_nil
     end
 
     it "succeeds with no media" do
+      total_works = Work.count
+
+      expect {
+        Work.destroy_all
+      }.must_change('Work.count', -total_works)
+
+      get root_path
+      must_respond_with :success
 
     end
   end
@@ -21,19 +35,22 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
-    it "succeeds when there are works" do
+    test "succeeds when there are works" do
       get works_path
-      must_respond_with :success
+      assert_response :success
 
     end
 
     it "succeeds when there are no works" do
 
+
     end
   end
 
   describe "new" do
-    it "succeeds" do
+    test "succeeds" do
+      get new_work_path
+      assert_response :success
 
     end
   end
@@ -55,6 +72,9 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      work = works(:album)
+      get users_path
+      assert_response :success
 
     end
 

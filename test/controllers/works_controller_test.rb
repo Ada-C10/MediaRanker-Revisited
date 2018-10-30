@@ -42,11 +42,11 @@ describe WorksController do
 
     it "succeeds when there are no works" do
 
-    Work.destroy_all
+      Work.destroy_all
 
       get works_path
       must_respond_with :success
-     expect(Work.all.count).must_equal 0
+      expect(Work.all.count).must_equal 0
     end
   end
 
@@ -54,20 +54,20 @@ describe WorksController do
     it "succeeds" do
       get new_work_path
 
-          # Assert
+      # Assert
       must_respond_with :success
     end
   end
 
   describe "create" do
     let (:work_hash) do
-  {
-    work: {
-        title: 'Eternal Sunshine of the spotless mind',
-        category: 'movie'
-    }
-  }
-end
+      {
+        work: {
+          title: 'Eternal Sunshine of the spotless mind',
+          category: 'movie'
+        }
+      }
+    end
     it "creates a work with valid data for a real category" do
       # Act-Assert
       expect {
@@ -75,7 +75,7 @@ end
       }.must_change 'Work.count', 1
 
       must_respond_with :redirect
-       must_redirect_to work_path(Work.last.id)
+      must_redirect_to work_path(Work.last.id)
       expect(Work.last.title).must_equal work_hash[:work][:title]
       expect(Work.last.description).must_equal work_hash[:work][:description]
     end
@@ -109,13 +109,13 @@ end
   describe "show" do
     it "succeeds for an existing work ID" do
       # Arrange
-          id = works(:poodr).id
+      id = works(:poodr).id
 
-          # Act
-          get work_path(id)
+      # Act
+      get work_path(id)
 
-          # Assert
-          must_respond_with :success
+      # Assert
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
@@ -154,17 +154,17 @@ end
   end
 
   describe "update" do
-          let (:work_hash) do
-        {
-          work: {
-            title: 'Eat Pray Love',
-            creator: "Elizabeth Gilbert",
-            description:"beautiful life memoir",
-            publication_year: 2004,
-            category: "book"
-          }
+    let (:work_hash) do
+      {
+        work: {
+          title: 'Eat Pray Love',
+          creator: "Elizabeth Gilbert",
+          description:"beautiful life memoir",
+          publication_year: 2004,
+          category: "book"
         }
-      end
+      }
+    end
     it "succeeds for valid data and an existing work ID" do
 
       id = works(:poodr).id
@@ -174,7 +174,7 @@ end
       }.wont_change 'Work.count'
 
       must_respond_with :redirect
-       must_redirect_to work_path(id)
+      must_redirect_to work_path(id)
 
       new_work = Work.find_by(id: id)
 
@@ -201,13 +201,13 @@ end
     end
 
     it "renders 404 not_found for a bogus work ID" do
-        id = -1
+      id = -1
 
-        expect {
-          patch work_path(id), params: work_hash
-        }.wont_change 'Work.count'
+      expect {
+        patch work_path(id), params: work_hash
+      }.wont_change 'Work.count'
 
-        must_respond_with :not_found
+      must_respond_with :not_found
 
     end
   end
@@ -223,7 +223,7 @@ end
       }.must_change 'Work.count', -1
 
       must_respond_with :redirect
-       must_redirect_to root_path
+      must_redirect_to root_path
 
       expect(Work.find_by(id: id)).must_equal nil
     end
@@ -241,21 +241,46 @@ end
   end
 
   describe "upvote" do
-
     it "redirects to the work page if no user is logged in" do
+      id = works(:poodr).id
+
+      expect{
+        post upvote_path(id)}.wont_change 'Vote.count'
+
+        must_redirect_to work_path(id)
+        # expect(flash[:warning]).must_equal "You must be logged in to vote for a work."
 
     end
 
-    it "redirects to the work page after the user has logged out" do
 
-    end
+      it "redirects to the work page after the user has logged out" do
+      end
 
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
+      it "succeeds for a logged-in user and a fresh user-vote pair" do
+        user = users(:grace)
+        id = works(:poodr).id
+        vote = Vote.new(user: @login_user, work: @work)
 
-    end
+        perform_login(user)
 
-    it "redirects to the work page if the user has already voted for that work" do
+        post upvote_path(id)
 
-    end
+        must_redirect_to work_path(id)
+
+      end
+
+      it "redirects to the work page if the user has already voted for that work" do
+        user = users(:grace)
+        id = works(:poodr).id
+        vote = votes(:one)
+
+        perform_login(user)
+
+        post upvote_path(id)
+        expect{ post upvote_path(id)}.wont_change 'Vote.count'
+
+          # expect(flash[:result_text]).must_equal "Could not upvote"
+          # must_redirect_to work_path(@work)
+        end
+      end
   end
-end

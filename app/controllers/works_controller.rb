@@ -63,6 +63,7 @@ class WorksController < ApplicationController
 
   def upvote
     flash[:status] = :failure
+
     if @login_user
       vote = Vote.new(user: @login_user, work: @work)
       if vote.save
@@ -79,6 +80,7 @@ class WorksController < ApplicationController
     # Refresh the page to show either the updated vote count
     # or the error message
     redirect_back fallback_location: work_path(@work)
+
   end
 
 private

@@ -2,7 +2,7 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
-    before_action :require_login, except: [:root, :show, :upvote]
+  before_action :require_login, except: [:root, :show, :upvote]
 
   def root
     @albums = Work.best_albums
@@ -22,6 +22,7 @@ class WorksController < ApplicationController
   def create
     @work = Work.new(media_params)
     @media_category = @work.category
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -39,6 +40,11 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if session[:user_id] != @work.user_id
+      redirect_back fallback_location: root_path
+      flash[:status] = :error
+      flash[:result_text] = "Sorry, can't edit a work that you don't own."
+    end
   end
 
   def update
@@ -56,6 +62,11 @@ class WorksController < ApplicationController
   end
 
   def destroy
+    if session[:user_id] != @work.user_id
+      redirect_back fallback_location: root_path
+      flash[:status] = :error
+      flash[:result_text] = "Sorry, can't edit a work that you don't own."
+    end
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
@@ -82,7 +93,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: work_path(@work)
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end

@@ -201,12 +201,20 @@ describe WorksController do
       must_redirect_to root_path
     end
 
-    it "succeeds for an extant work ID" do
+    it "succeeds for an extant work ID that belongs to the logged in user" do
 
       logged_in_user
 
       get edit_work_path(@book)
       must_respond_with :success
+    end
+
+    it "does not succeed for an extant work ID that does not belong to the logged in user" do
+
+      logged_in_user
+
+      get edit_work_path(@album)
+      assert_redirected_to root_path
     end
 
     it "renders 404 not_found for a bogus work ID" do
@@ -239,7 +247,7 @@ describe WorksController do
       expect(start_title).must_equal end_title
     end
 
-    it "succeeds for valid data and an extant work ID" do
+    it "succeeds for valid data and an extant work ID that belongs to logged in user" do
 
       logged_in_user
 
@@ -289,9 +297,24 @@ describe WorksController do
       must_redirect_to root_path
     end
 
-    it "succeeds for an extant work ID" do
+    it "succeeds for an extant work ID that belongs to the logged in user" do
 
       logged_in_user
+
+      expect(@book.user_id).must_equal @user.id
+
+      expect {
+        delete work_path(@book)
+      }.must_change 'Work.count', -1
+
+      must_redirect_to root_path
+    end
+
+    it "does is not successful for an extant work ID that does not to the logged in user" do
+
+      logged_in_user
+
+      expect(@album.user_id).wont_equal @user.id
 
       expect {
         delete work_path(@book)

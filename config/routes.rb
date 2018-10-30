@@ -9,8 +9,7 @@ Rails.application.routes.draw do
   post '/works/:id/upvote', to: 'works#upvote', as: 'upvote'
 
   resources :users, only: [:index, :show]
-# get "/auth/:provider/callback", to: "sessions#login", as: "logging_in"
-  get "/auth/:provider/callback", to: "sessions#login", as: "login"
 
+  get "/auth/:provider/callback", to: "sessions#login", as: "login"
   delete "/logout", to: "sessions#logout", as: "logout"
 end

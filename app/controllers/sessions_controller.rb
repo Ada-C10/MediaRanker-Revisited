@@ -1,11 +1,13 @@
 class SessionsController < ApplicationController
+  skip_before_action :logged_in?, only: [:create], raise: false
+  
   def create
     auth_hash = request.env['omniauth.auth']
     user = User.find_by(uid: auth_hash[:uid], provider: 'github')
     if user
       # User was found in the database
       flash[:status] = :success
-      flash[:result_text] = "Logged in as returning user #{user.name}"
+      flash[:result_text] = "Logged in as returning user #{user.username}"
     else
       # User doesn't match anything in the DB
       # TODO: Attempt to create a new user

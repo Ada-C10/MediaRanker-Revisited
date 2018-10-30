@@ -33,22 +33,9 @@
         </li>
       </ul>
       <ul class="nav app-header__user-nav-container">
-        <% if @login_user %>
-
         <li class="nav-item app-header__nav_item">
-          <%= link_to "Logged in as #{render_username}", user_path(@login_user), class: "btn btn-primary" %>
+          <%= log_in_out_link %>
         </li>
-        <li class="nav-item app-header__nav_item">
-          <%= link_to "Log out", logout_path, method: :delete, class: "btn btn-primary" %>
-        </li>
-
-        <% else %>
-
-        <li class="nav-item app-header__nav_item">
-          <%= link_to "Log in with Github", "auth/github", class: "btn btn-primary" %>
-        </li>
-        <% end %>
-
       </ul>
     </nav>
   </header>

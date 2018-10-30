@@ -2,6 +2,7 @@
 
 dan:
   username: dan
+  email: dan@dan.com
   uid: 123e
   provider: 'github'
 

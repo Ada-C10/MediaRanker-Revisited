@@ -5,6 +5,7 @@ describe WorksController do
 
     let(:person){users(:june)}
 
+
     it "A logged in user can...succeeds with all media types" do
       # Precondition: there is at least one media of each category
       # person = users(:june)
@@ -46,6 +47,11 @@ describe WorksController do
 
     let(:person){users(:june)}
 
+    it "A non-logged in user cannot access view templates associated with the index action" do
+      get works_path
+      must_respond_with :redirect
+    end
+
     it "A logged in user can...succeeds when there are works" do
       perform_login(person)
       get works_path
@@ -69,6 +75,11 @@ describe WorksController do
 
     let(:person){users(:june)}
 
+    it "A non-logged in user cannot access view templates associated with the new action" do
+      get works_path
+      must_respond_with :redirect
+    end
+
     it "A logged in user can...succeeds" do
       perform_login(person)
       get new_work_path
@@ -79,6 +90,11 @@ describe WorksController do
   describe "create" do
 
     let(:person){users(:june)}
+
+    it "A non-logged in user cannot access view templates associated with the create action" do
+      get works_path
+      must_respond_with :redirect
+    end
 
     it "A logged in user can...creates a work with valid data for a real category" do
       perform_login(person)
@@ -125,6 +141,11 @@ describe WorksController do
 
     let(:person){users(:june)}
 
+    it "A non-logged in user cannot access view templates associated with the show action" do
+      get works_path
+      must_respond_with :redirect
+    end
+
     it "A logged in user can...succeeds for an extant work ID" do
       perform_login(person)
       work = works(:album)
@@ -145,6 +166,11 @@ describe WorksController do
   describe "edit" do
 
     let(:person){users(:june)}
+
+    it "A non-logged in user cannot access view templates associated with the edit action" do
+      get works_path
+      must_respond_with :redirect
+    end
 
     it "A logged in user can...succeeds for an extant work ID" do
       perform_login(person)
@@ -192,6 +218,11 @@ describe WorksController do
   describe "destroy" do
 
     let(:person){users(:june)}
+
+    it "A non-logged in user cannot access view templates associated with the destroy action" do
+      get works_path
+      must_respond_with :redirect
+    end
 
     it "A logged in user can...succeeds for an extant work ID" do
 

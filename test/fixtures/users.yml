@@ -7,4 +7,4 @@ dan:
 kari:
   username: kari
   uid: 456
-  provider: blahblah
+  provider: github

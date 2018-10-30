@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
     if session[:user_id].nil?
       flash[:status] = :failure
       flash[:result_text] = "You need to login to review this page"
-      redirect root_path
+      redirect_to root_path
     end
   end
 

@@ -189,22 +189,35 @@ describe WorksController do
     end
   end
 
-  # describe "update" do
-    # it "succeeds for valid data and an extant work ID" do
-    #   work_to_change = works(:poodr)
-    #   new_work_title = "99 Bottles"
-    #   work = {
-    #     work: {
-    #       title: new_work_title,
-    #       category: "movie"
-    #     }
-    #   }
-    #
-    #
-    #   patch work_path(work_to_change.id), params: work
-    #   expect(work_to_change.title).must_equal new_work_title
-    #   must_redirect_to work_path
-    # end
+  describe "update" do
+    let(:person){users(:june)}
+
+    it "A non-logged in user cannot access view templates associated with the update action" do
+      get works_path
+      must_respond_with :redirect
+    end
+
+#     it "a logged in user can...succeeds for valid data and an extant work ID" do
+#
+#       perform_login(person)
+#
+#       work_to_change = works(:poodr)
+# # binding.pry
+#       new_work_title = "99 Bottles"
+# # binding.pry
+#       work = {
+#         work: {
+#           title: new_work_title
+#         }
+#       }
+# # binding.pry
+#
+#       patch work_path(work_to_change.id), params[:work]
+# # binding.pry
+#       expect(work_to_change.title).must_equal new_work_title
+# # binding.pry
+#       must_redirect_to work_path(work_to_change)
+#     end
 
     # it "renders bad_request for bogus data" do
     #
@@ -213,7 +226,7 @@ describe WorksController do
     # it "renders 404 not_found for a bogus work ID" do
     #
     # end
-  # end
+  end
 
   describe "destroy" do
 

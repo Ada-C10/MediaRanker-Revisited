@@ -28,6 +28,20 @@ describe WorksController do
         must_respond_with :success
       end
 
+      it 'succeds with two media type absent' do
+        perform_login(users(:dan))
+
+        missing_media_1 = works(:movie)
+        missing_media_1.destroy
+
+        missing_media_2 = works(:poodr)
+        missing_media_2.destroy
+
+        get root_path
+
+        must_respond_with :success
+      end
+
       it "succeeds with no media" do
         perform_login(users(:dan))
 
@@ -256,6 +270,7 @@ describe WorksController do
 
     describe "destroy" do
       it "succeeds for an extant work ID" do
+
         perform_login(users(:dan))
 
         work_id = works(:another_album).id
@@ -303,9 +318,11 @@ describe WorksController do
       end
 
       it "succeeds for a logged-in user and a fresh user-vote pair" do
+
+        # First user vote
         user_1 = users(:dan)
         perform_login(user_1)
-        # First user vote
+          
         work_id = works(:movie).id
         start_count = Vote.count
 
@@ -454,7 +471,7 @@ describe WorksController do
         must_redirect_to root_path
       end
 
-      it "cannot access upvote and redirects to the work page if no user is logged in" do
+      it "cannot access upvote and redirects to the work page" do
 
         work_id = works(:poodr).id
         start_count = Vote.count

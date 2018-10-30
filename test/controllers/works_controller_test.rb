@@ -3,6 +3,17 @@ require 'pry'
 
 describe WorksController do
 
+  describe "Logged in users" do
+
+  end
+
+  describe "Guest users" do
+
+  end
+
+
+  
+
   describe "root" do
     it "succeeds with all media types" do
       # Precondition: there is at least one media of each category
@@ -296,7 +307,7 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
-      # 
+      #
       # binding.pry
       #
       # post login_path

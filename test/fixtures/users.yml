@@ -14,3 +14,8 @@ june:
   username: june
   email: june-juny@gmail.com
   provider: Github
+penny:
+  uid: 9
+  username: penny
+  email: penny@gmail.com
+  provider: Github

@@ -1,5 +1,7 @@
 class SessionsController < ApplicationController
 
+  skip_before_action :find_user, only: [:create]
+
   def create
     auth_hash = request.env['omniauth.auth']
 

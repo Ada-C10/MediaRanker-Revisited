@@ -255,7 +255,9 @@ describe WorksController do
       }
 
       count = Vote.all.count
-      get login_path('github'), params: user_hash
+      perform_login(user)
+
+      # get login_path('github'), params: user_hash
 
       expect(session[:user_id]).must_equal user.id
     end

@@ -105,9 +105,8 @@ describe WorksController do
 
     it "renders bad_request and does not update the DB for bogus data" do
 
-      bad_hash = {
+      test_hash = {
         work: {
-          title: "test-title",
           creator: "test-creator",
           description: "test-description",
           publication_year: 2020,
@@ -116,7 +115,7 @@ describe WorksController do
       }
 
       expect {
-        post works_path, params: bad_hash
+        post works_path, params: test_hash
       }.wont_change "Work.count"
 
       must_respond_with :bad_request
@@ -136,7 +135,7 @@ describe WorksController do
       }
 
       expect {
-      post works_path, params: bad_hash
+      post works_path, params: work_hash
       }.wont_change 'Work.count'
 
       must_respond_with :bad_request
@@ -145,6 +144,14 @@ describe WorksController do
   end
 
   describe "show" do
+
+    before do
+        login_for_test(users(:dee))
+      end
+
+    let(:existing_work) { Work.first }
+
+
     it "succeeds for an extant work ID" do
 
       work = Work.last.id + 1
@@ -156,6 +163,13 @@ describe WorksController do
 
     it "renders 404 not_found for a bogus work ID" do
 
+      user = User.first
+
+      id = existing_work.id
+      existing_work.destroy
+
+      get work_path(existing_work)
+      must_respond_with 404
     end
   end
 

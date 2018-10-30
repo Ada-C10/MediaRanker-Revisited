@@ -34,12 +34,27 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
+
+    it "redirects to the root path if no user is logged in" do
+
+      get works_path
+
+      assert_redirected_to root_path
+      assert_equal 'Must be logged in to do that', flash[:result_text]
+    end
+
     it "succeeds when there are works" do
+      user = User.first
+      perform_login(user)
+
       get works_path
       must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+      user = User.first
+      perform_login(user)
+
       works = Work.all
       works.each do |work|
         delete work_path(work.id)
@@ -51,14 +66,37 @@ describe WorksController do
   end
 
   describe "new" do
+
+    it "redirects to the root path if no user is logged in" do
+
+      get works_path
+
+      assert_redirected_to root_path
+      assert_equal 'Must be logged in to do that', flash[:result_text]
+    end
+
     it "succeeds" do
+      user = User.first
+      perform_login(user)
+
       get new_work_path
       must_respond_with :success
     end
   end
 
   describe "create" do
+
+    it "redirects to the root path if no user is logged in" do
+
+      get works_path
+
+      assert_redirected_to root_path
+      assert_equal 'Must be logged in to do that', flash[:result_text]
+    end
+
     it "creates a work with valid data for a real category" do
+      user = User.first
+      perform_login(user)
 
       CATEGORIES.each do |cat|
 
@@ -81,6 +119,9 @@ describe WorksController do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      user = User.first
+      perform_login(user)
+
       work_hash = {
         work: {
           title: "Practical Object Oriented Design in Ruby",
@@ -96,6 +137,9 @@ describe WorksController do
     end
 
     it "does allow duplication of a title if the title exists in different category" do
+      user = User.first
+      perform_login(user)
+
       work_hash = {
         work: {
           title: "Practical Object Oriented Design in Ruby",
@@ -111,6 +155,9 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
+      user = User.first
+      perform_login(user)
+
       INVALID_CATEGORIES.each do |cat|
 
         work_hash = {
@@ -131,7 +178,20 @@ describe WorksController do
   end
 
   describe "show" do
+
+    it "redirects to the root path if no user is logged in" do
+      work = works(:poodr)
+
+      get work_path(work)
+
+      assert_redirected_to root_path
+      assert_equal 'Must be logged in to do that', flash[:result_text]
+    end
+
     it "succeeds for an extant work ID" do
+      user = User.first
+      perform_login(user)
+
       work = works(:poodr)
 
       get work_path(work)
@@ -140,6 +200,9 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      user = User.first
+      perform_login(user)
+
       work = Work.first
       delete work_path(work.id)
 
@@ -149,12 +212,19 @@ describe WorksController do
   end
 
   describe "edit" do
+
     it "succeeds for an extant work ID" do
+      user = User.first
+      perform_login(user)
+
       get edit_work_path(Work.first)
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      user = User.first
+      perform_login(user)
+
       work = Work.first
       delete work_path(work.id)
 
@@ -164,7 +234,11 @@ describe WorksController do
   end
 
   describe "update" do
+
     it "succeeds for valid data and an extant work ID" do
+      user = User.first
+      perform_login(user)
+
       work = works(:poodr)
 
       updated_title = "Addy waz here"
@@ -178,6 +252,9 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
+      user = User.first
+      perform_login(user)
+
       work = works(:another_album)
 
       updated_title = "Old Title"
@@ -209,6 +286,8 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      user = User.first
+      perform_login(user)
 
       work = works(:another_album)
       delete work_path(work.id)
@@ -224,7 +303,20 @@ describe WorksController do
   end
 
   describe "destroy" do
+
+    it "redirects to the root path if no user is logged in" do
+      work = works(:another_album)
+
+      delete work_path(work.id)
+
+      assert_redirected_to root_path
+      assert_equal 'Must be logged in to do that', flash[:result_text]
+    end
+
     it "succeeds for an extant work ID" do
+      user = User.first
+      perform_login(user)
+
       work = works(:another_album)
       expect {
         delete work_path(work.id)
@@ -233,6 +325,9 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      user = User.first
+      perform_login(user)
+
       work = works(:another_album)
 
       expect {
@@ -250,6 +345,7 @@ describe WorksController do
   describe "upvote" do
 
     it "redirects to the work page if no user is logged in" do
+
       work = works(:poodr)
 
       post upvote_path(work)

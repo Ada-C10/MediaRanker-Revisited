@@ -134,7 +134,7 @@ describe WorksController do
     it "succeeds for an extant work ID" do
       work = works(:poodr)
 
-      get works_path(work)
+      get work_path(work)
 
       must_respond_with :success
     end

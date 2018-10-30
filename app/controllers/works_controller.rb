@@ -2,6 +2,8 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  skip_before_action :require_login, only: [:root, :show]
+
 
   def root
     @albums = Work.best_albums
@@ -35,6 +37,7 @@ class WorksController < ApplicationController
 
   def show
     @votes = @work.votes.order(created_at: :desc)
+
   end
 
   def edit
@@ -50,7 +53,7 @@ class WorksController < ApplicationController
       flash.now[:status] = :failure
       flash.now[:result_text] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
-      render :edit, status: :not_found
+      render :edit, status: :bad_request
     end
   end
 
@@ -63,8 +66,8 @@ class WorksController < ApplicationController
 
   def upvote
     flash[:status] = :failure
-    if @login_user
-      vote = Vote.new(user: @login_user, work: @work)
+    if logged_in?
+      vote = Vote.new(user: current_user, work: @work)
       if vote.save
         flash[:status] = :success
         flash[:result_text] = "Successfully upvoted!"

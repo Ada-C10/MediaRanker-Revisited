@@ -1,34 +1,25 @@
 class SessionsController < ApplicationController
-  def login_form
-  end
+  skip_before_action :require_login, only: [:create]
 
-  def login
-    username = params[:username]
-    if username and user = User.find_by(username: username)
+  def create
+    auth_hash = request.env['omniauth.auth']
+
+    user = User.find_by(uid: auth_hash[:uid], provider: 'github') ||
+      User.create_from_github(auth_hash)
+
+    if user
+      flash[:result_text] = "Logged in as returning user #{user.username}"
       session[:user_id] = user.id
-      flash[:status] = :success
-      flash[:result_text] = "Successfully logged in as existing user #{user.username}"
+      redirect_to root_path
     else
-      user = User.new(username: username)
-      if user.save
-        session[:user_id] = user.id
-        flash[:status] = :success
-        flash[:result_text] = "Successfully created new user #{user.username} with ID #{user.id}"
-      else
-        flash.now[:status] = :failure
-        flash.now[:result_text] = "Could not log in"
-        flash.now[:messages] = user.errors.messages
-        render "login_form", status: :bad_request
-        return
-      end
+      flash[:error] = "Could not create new user account: #{user.errors.messages}"
+      redirect_to root_path
     end
-    redirect_to root_path
   end
 
-  def logout
+  def destroy
     session[:user_id] = nil
-    flash[:status] = :success
-    flash[:result_text] = "Successfully logged out"
+    flash[:result_text] = "Logged you out!"
     redirect_to root_path
   end
 end

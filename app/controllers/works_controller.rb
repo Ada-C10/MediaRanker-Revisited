@@ -2,6 +2,8 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  # before_action :find_user, except: [:root]
+  before_action :require_login, except: [:root]
 
   def root
     @albums = Work.best_albums
@@ -11,11 +13,12 @@ class WorksController < ApplicationController
   end
 
   def index
-    @works_by_category = Work.to_category_hash
+
+      @works_by_category = Work.to_category_hash
   end
 
   def new
-    @work = Work.new
+      @work = Work.new
   end
 
   def create
@@ -34,19 +37,21 @@ class WorksController < ApplicationController
   end
 
   def show
-    @votes = @work.votes.order(created_at: :desc)
+      @votes = @work.votes.order(created_at: :desc)
   end
 
   def edit
   end
 
   def update
+
     @work.update_attributes(media_params)
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
       redirect_to work_path(@work)
-    elsif @work && !@wrk.valid?
+
+    elsif @work && !@work.valid?
       flash.now[:status] = :failure
       flash.now[:result_text] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
@@ -63,8 +68,8 @@ class WorksController < ApplicationController
 
   def upvote
     flash[:status] = :failure
-    if @login_user
-      vote = Vote.new(user: @login_user, work: @work)
+
+      vote = Vote.new(user: @user, work: @work)
       if vote.save
         flash[:status] = :success
         flash[:result_text] = "Successfully upvoted!"
@@ -72,9 +77,6 @@ class WorksController < ApplicationController
         flash[:result_text] = "Could not upvote"
         flash[:messages] = vote.errors.messages
       end
-    else
-      flash[:result_text] = "You must log in to do that"
-    end
 
     # Refresh the page to show either the updated vote count
     # or the error message

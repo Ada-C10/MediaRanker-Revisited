@@ -221,14 +221,6 @@ describe WorksController do
 
     describe "upvote" do
 
-      it "redirects to the root page if no user is logged in" do
-        id = works(:album).id
-        post upvote_path(id)
-
-        must_respond_with :redirect
-        must_redirect_to root_path
-      end
-
       it "redirects to root path after the user has logged out" do
         perform_login(user)
         # could use delete logout
@@ -290,6 +282,14 @@ describe WorksController do
 
       must_redirect_to root_path
       flash[:warning].must_equal "You must be logged in to view this section"
+    end
+
+    it "redirects to the root page if no user is logged in" do
+      id = works(:album).id
+      post upvote_path(id)
+
+      must_respond_with :redirect
+      must_redirect_to root_path
     end
 
     it "cannot access destroy" do

@@ -56,6 +56,12 @@ describe WorksController do
   }
 
   describe "index" do
+    it "redirects to root for guest user" do
+
+      get works_path
+      must_redirect_to root_path
+    end
+
     it "succeeds when there are works" do
 
       logged_in_user
@@ -78,6 +84,12 @@ describe WorksController do
   end
 
   describe "new" do
+    it "redirects to root for guest user" do
+
+      get new_work_path(@book.id)
+      must_redirect_to root_path
+    end
+
     it "succeeds" do
 
       logged_in_user
@@ -87,21 +99,31 @@ describe WorksController do
     end
   end
 
+  let(:valid_work_data) {
+    valid_work_data = {
+      work:
+      { title: "Unique Title", category: 'book' }
+    }
+  }
+
   describe "create" do
+
+    it "redirects to root for guest user" do
+      expect {
+        post works_path params: valid_work_data
+        must_redirect_to root_path
+      }.wont_change 'Work.count'
+    end
+
     it "creates a work with valid data for a real category" do
 
       logged_in_user
 
-      work_data = {
-        work:
-        { title: "Unique Title", category: 'book' }
-      }
-
-      test_work = Work.new(work_data[:work])
+      test_work = Work.new(valid_work_data[:work])
       test_work.must_be :valid?, "Work data was invalid. Please come fix this test."
 
       expect {
-        post works_path params: work_data
+        post works_path params: valid_work_data
       }.must_change 'Work.count', +1
 
       must_redirect_to work_path(Work.last)
@@ -147,6 +169,13 @@ describe WorksController do
   end
 
   describe "show" do
+
+    it "succeeds for guest user" do
+
+      get work_path(@book)
+      must_respond_with :success
+    end
+
     it "succeeds for an extant work ID" do
 
       logged_in_user
@@ -165,6 +194,13 @@ describe WorksController do
   end
 
   describe "edit" do
+
+    it "redirects to root for guest user" do
+
+      get edit_work_path(@book)
+      must_redirect_to root_path
+    end
+
     it "succeeds for an extant work ID" do
 
       logged_in_user
@@ -182,30 +218,30 @@ describe WorksController do
     end
   end
 
-
-  # work_data = {
-  #   work:
-  #   { title: "Unique Title", category: 'book' }
-  #   }
-  #
-  # test_work = Work.new(work_data[:work])
-  # test_work.must_be :valid?, "Work data was invalid. Please come fix this test."
-  #
-  # expect {
-  #   post works_path params: work_data
-  # }.must_change 'Work.count', +1
-  #
-  # must_redirect_to work_path(Work.last)
-
   describe "update" do
-    it "succeeds for valid data and an extant work ID" do
 
-      logged_in_user
-
+    let(:updated_work_data) {
       updated_work_data = {
         work:
         { title: @movie.title }
       }
+    }
+
+    it "redirects to root for guest user" do
+
+      start_title = @book.title
+
+      put work_path(@book), params: updated_work_data
+      must_redirect_to root_path
+
+      end_title = @book.title
+
+      expect(start_title).must_equal end_title
+    end
+
+    it "succeeds for valid data and an extant work ID" do
+
+      logged_in_user
 
       expect{
         put work_path(@book), params: updated_work_data
@@ -245,6 +281,14 @@ describe WorksController do
   end
 
   describe "destroy" do
+
+    it "redirects to root for guest user" do
+      expect {
+        delete work_path(@book)
+      }.wont_change 'Work.count'
+      must_redirect_to root_path
+    end
+
     it "succeeds for an extant work ID" do
 
       logged_in_user

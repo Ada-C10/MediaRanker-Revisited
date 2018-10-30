@@ -25,7 +25,7 @@ describe SessionsController do
     end
 
     it "creates an account for a new user and redirects to the root route" do
-      user = User.new(provider: "github", uid: "400400", username: "test_user", name: "Test Person")
+      user = User.new(provider: "github", uid: 400400, username: "test_user", name: "Test Person")
 
       expect {
         perform_login(user)

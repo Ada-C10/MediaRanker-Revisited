@@ -12,7 +12,7 @@ class User < ApplicationRecord
 
     user.provider = 'github'
     user.uid = auth_hash[:uid]
-    user.username = auth_hash[:info][:email]
+    user.username = auth_hash[:info][:nickname]
     user.name = auth_hash[:info][:name]
 
     return user

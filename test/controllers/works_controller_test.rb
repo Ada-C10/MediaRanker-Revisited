@@ -61,7 +61,7 @@ describe WorksController do
       {
         work: {
           title: 'White Teeth',
-          creator: users(:dan).id,
+          creator: users(:dan),
           description: 'Good book',
           publication_year: '2018',
           category: 'album'
@@ -98,13 +98,42 @@ describe WorksController do
       it "succeeds for valid data and an extant work ID" do
         id = works(:album).id
 
+        expect {
+          patch work_path(id), params: work_hash
+        }.wont_change 'Work.count'
+
+        must_redirect_to work_path(id)
+
+        new_work = Work.find_by(id: id)
+
+        expect(new_work.title).must_equal work_hash[:work][:title]
+        expect(new_work.category).must_equal work_hash[:work][:category]
       end
 
       it "renders bad_request for bogus data" do
+        work_hash[:work][:title] = nil
+        id = works(:album).id
+        old_work = works(:album)
 
+        expect {
+          patch work_path(id), params: work_hash
+        }.wont_change 'Work.count'
+        new_work = Work.find(id)
+
+        must_respond_with :bad_request
+        expect(old_work.title).must_equal new_work.title
+        expect(old_work.creator).must_equal new_work.creator
+        expect(old_work.description).must_equal new_work.description
       end
 
       it "renders 404 not_found for a bogus work ID" do
+        id = -1
+
+        expect {
+          patch work_path(id), params: work_hash
+        }.wont_change 'Work.count'
+
+        must_respond_with :not_found
 
       end
     end

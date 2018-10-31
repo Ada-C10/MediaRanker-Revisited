@@ -9,7 +9,4 @@ class UsersController < ApplicationController
     render_404 unless @user
   end
 
-  def new
-    @user = User.new
-  end
 end

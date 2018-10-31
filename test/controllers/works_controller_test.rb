@@ -157,7 +157,7 @@ describe WorksController do
      it "succeeds for an exist work ID" do
 
        expect{get edit_work_path(album.id)}.wont_change('Work.count')
-
+       must_respond_with :success
 
      end
 
@@ -260,7 +260,7 @@ describe WorksController do
        delete work_path(id)
      }.wont_change 'Work.count'
 
-     must_respond_with :not_found
+      must_respond_with :not_found
 
      end
    end
@@ -291,42 +291,69 @@ describe WorksController do
 
  describe "Guest users" do
 
-   describe "index" do
-     it "succeeds when there are works" do
+    it "cannot view the product index page" do
 
-       get works_path
-       must_redirect_to root_path
+      get works_path
+      must_respond_with :redirect
+    end
 
-     end
 
-     it "succeeds when there are no works" do
-       poodr.destroy
-       movie.destroy
-       album.destroy
-       another_album.destroy
+    it "cannot view the product show page" do
+       works_path(album.id)
 
-       get works_path
-       must_redirect_to root_path
+       must_respond_with :redirect
+       must redirect_to root_path
+    end
 
-     end
-   end
+    it "cannot access the form for new product" do
+        id = -1
+        get new_work_path
 
-   describe "show" do
-     it "succeeds for an extant work ID" do
+        must_respond_with :redirect
+    end
 
-       get work_path(album.id)
-       must_redirect_to root_path
+    it "cannot create new product" do
 
-     end
+        get works_path
+        must_respond_with :redirect
 
-     it "renders 404 not_found for a bogus work ID" do
-      id = -1
-      get work_path(id)
+    end
 
+
+    it "cannot edit existing product" do
+         id = -1
+         get work_path(id)
+
+         must_respond_with :not_found
+
+    end
+
+    it "cannot update existing product" do
+      id = movie.id
+      expect {
+       patch works_path(id), params: work_hash
+     }.wont_change 'Work.count'
+
+      must_respond_with  :bad_request
+    end
+
+    it "cannot delete a product" do
+      id = poodr.id
+
+      expect {
+        delete work_path(id)
+      }.wont_change('Work.count')
+
+      must_respond_with :redirect
       must_redirect_to root_path
 
-     end
-   end
+    end
 
- end
+    it "cannot upvote a product" do
+      get work_path(movie.id)
+      expect{post upvote_path}.wont_change("Vote.count")
+      must_respond_with :redirect
+
+    end
+  end
 end

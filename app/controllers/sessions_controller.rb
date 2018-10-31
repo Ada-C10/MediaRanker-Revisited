@@ -21,7 +21,7 @@ class SessionsController < ApplicationController
         flash.now[:status] = :failure
         flash.now[:result_text] = "Could not log in"
         flash.now[:messages] = user.errors.messages
-        redirect_to root_path
+        redirect_to auth_callback_path("google_oauth2")
         return
       end
     end

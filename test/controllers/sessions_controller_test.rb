@@ -7,9 +7,9 @@ describe SessionsController do
     it "logs in an existing user" do
       # Tell OmniAuth to use this user's info when it sees
       # an auth callback from github
-      perform_login(dan)
 
       expect {
+        perform_login(dan)
         get auth_callback_path('google_oauth2')
       }.wont_change 'User.count'
 
@@ -38,7 +38,7 @@ describe SessionsController do
         perform_login(user)
       }.wont_change('User.count')
 
-      must_redirect_to root_path
+      must_redirect_to auth_callback_path("google_oauth2")
       session[:user_id].must_be_nil
     end
   end

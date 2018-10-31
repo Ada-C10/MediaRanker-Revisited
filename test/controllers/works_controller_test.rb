@@ -28,10 +28,7 @@ describe WorksController do
     it "succeeds with one media type absent" do
       # Precondition: there is at least one media in two of the categories
       work = Work.find_by(category: "book")
-
-      expect {
-        work.destroy
-      }.must_change 'Work.count', -1
+      work.destroy
 
       get root_path
 
@@ -39,9 +36,7 @@ describe WorksController do
     end
 
     it "succeeds with no media" do
-      works.each do |work|
-        work.destroy
-      end
+      Work.destroy_all
 
       new_count = Work.all.count
       expect(new_count).must_equal 0

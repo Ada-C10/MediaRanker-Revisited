@@ -193,7 +193,6 @@ describe WorksController do
   end
 
   describe "upvote" do
-
     it "redirects to the work page if no user is logged in" do
       expect{
         post upvote_path(works(:poodr)), params: {
@@ -202,24 +201,20 @@ describe WorksController do
       }.wont_change('Vote.count')
 
       must_redirect_to work_path()
-
     end
 
+    it "succeeds for a logged-in user and a fresh user-vote pair" do
+      perform_login(users(:dan))
 
-    # it "succeeds for a logged-in user and a fresh user-vote pair" do
-    #   login()
-    #
-    #   expect{
-    #     post upvote_path(works(:poodr)), params: {
-    #       vote: {work: works(:poodr)}
-    #     }
-    #   }.must_change('Vote.count', +1)
-    #
-    #   must_respond_with :success
-    # end
+      expect{
+        post upvote_path(works(:poodr)), params: {
+          vote: {work: works(:poodr)}
+        }
+      }.must_change('Vote.count', +1)
+      must_redirect_to work_path()
+    end
 
     it "redirects to the work page if the user has already voted for that work" do
-      # test passing wo
       expect{
         post upvote_path(works(:album)), params: {
           vote: {
@@ -228,18 +223,11 @@ describe WorksController do
           }
         }
       }.wont_change('Vote.count')
-
       must_redirect_to work_path()
     end
 
-    # it "redirects to the work page after the user has logged out" do
-    #   skip
-    #   expect{
-    #     post upvote_path
-    #   }
-    #
-    #   must_redirect_to work_path()
-    #
-    # end
+    it "redirects to the work page after the user has logged out" do
+      # not sure what this is asking?
+    end
   end
 end

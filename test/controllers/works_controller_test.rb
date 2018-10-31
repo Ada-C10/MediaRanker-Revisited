@@ -141,32 +141,57 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      id = works(:album).id
+      get work_path(id)
 
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      id = -1
+      get work_path(id)
 
+      must_respond_with :not_found
     end
   end
 
   describe "edit" do
     it "succeeds for an extant work ID" do
+      id = works(:album).id
+      get edit_work_path(id)
 
+      must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      id = -1
+      get edit_work_path(id)
 
+      must_respond_with :not_found
     end
   end
 
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      id = works(:album).id
 
+      expect {
+        delete work_path(id)
+      }.must_change 'Work.count', -1
+
+      must_respond_with :redirect
+      must_redirect_to root_path
+      expect(Work.find_by(id: id)).must_equal nil
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      id = -1
+      expect {
+        delete work_path(id)
+      }.wont_change 'Work.count'
 
+      must_respond_with :not_found
     end
   end
 

@@ -4,6 +4,7 @@ describe User do
   describe "relations" do
     it "has a list of votes" do
       dan = users(:dan)
+      # binding.pry
       dan.must_respond_to :votes
       dan.votes.each do |vote|
         vote.must_be_kind_of Vote
@@ -28,15 +29,31 @@ describe User do
 
     it "requires a unique username" do
       username = "test username"
-      user1 = User.new(username: username)
+      user1 = User.new(username: username, uid: 12345, provider: 'github')
 
       # This must go through, so we use create!
       user1.save!
 
-      user2 = User.new(username: username)
+      user2 = User.new(username: username, uid: 12345, provider: 'github')
       result = user2.save
       result.must_equal false
       user2.errors.messages.must_include :username
+    end
+
+    it "requires a uid" do
+      username = "test two"
+      user1 = User.new(username: username, provider: 'github')
+      result = user1.save
+      result.must_equal false
+      user1.errors.messages.must_include :uid
+    end
+
+    it "requires a provider" do
+      username = "test three"
+      user1 = User.new(username: username, uid: 12345)
+      result = user1.save
+      result.must_equal false
+      user1.errors.messages.must_include :provider
     end
 
 

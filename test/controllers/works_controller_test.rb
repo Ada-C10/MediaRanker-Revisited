@@ -31,6 +31,8 @@ describe WorksController do
 
   CATEGORIES = %w(albums books movies)
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
+describe "logged in users" do
+  let(:user) {users(:dan)}
 
   describe "index" do
     it "succeeds when there are works" do
@@ -50,6 +52,7 @@ describe WorksController do
 
   describe "new" do
     it "succeeds" do
+      perform_login(user)
       get new_work_path
       must_respond_with :success
     end
@@ -68,6 +71,7 @@ describe WorksController do
       }
     }
     it "creates a work with valid data for a real category" do
+      perform_login(user)
       expect {
         post works_path, params: media_hash
       }.must_change 'Work.count', 1
@@ -91,6 +95,7 @@ describe WorksController do
     end
 
     it "renders 400 bad_request for bogus categories" do
+      perform_login(user)
       media_hash[:work][:category] = "bogus"
        expect {
         post works_path, params: media_hash
@@ -103,12 +108,14 @@ describe WorksController do
 
   describe "show" do
     it "succeeds for an extant work ID" do
+      perform_login(user)
       id = works(:album).id
       get work_path(id)
       must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      perform_login(user)
       id = -1
        get work_path(id)
        must_respond_with :not_found
@@ -117,12 +124,14 @@ describe WorksController do
 
   describe "edit" do
     it "succeeds for an extant work ID" do
+      perform_login(user)
       id = works(:album).id
        get edit_work_path(id)
        must_respond_with :success
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      perform_login(user)
       id = -1
        get work_path(id)
        must_respond_with :not_found
@@ -142,6 +151,7 @@ describe WorksController do
       }
     }
     it "succeeds for valid data and an extant work ID" do
+      perform_login(user)
       id = works(:movie).id
        expect {
         patch work_path(id), params: media_hash
@@ -158,6 +168,7 @@ describe WorksController do
     end
 
     it "renders bad_request for bogus data" do
+      perform_login(user)
       media_hash[:work][:category] = nil
        old_media = works(:movie)
       id = old_media.id
@@ -174,6 +185,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found for a bogus work ID" do
+      perform_login(user)
       id = -1
        expect {
         patch work_path(id), params: media_hash
@@ -184,6 +196,7 @@ describe WorksController do
 
   describe "destroy" do
     it "succeeds for an extant work ID" do
+      perform_login(user)
       id = works(:movie).id
        expect {
         delete work_path(id)
@@ -193,6 +206,7 @@ describe WorksController do
     end
 
     it "renders 404 not_found and does not update the DB for a bogus work ID" do
+      perform_login(user)
       id = -1
        expect {
         delete work_path(id)
@@ -202,27 +216,84 @@ describe WorksController do
   end
 
   describe "upvote" do
+    it "redirects to root path after the user has logged out" do
+        perform_login(user)
+        # could use delete logout
+        # but need to change logout verb in routes to delete
+        delete logout_path
+        expect(session[:user_id]).must_equal nil
 
-    it "redirects to the work page if no user is logged in" do
-      @login_user = nil
-      id = works(:movie).id
-       expect {
+        id = works(:album).id
         post upvote_path(id)
-      }.wont_change 'Vote.count'
-       must_respond_with :redirect
-      must_redirect_to work_path(id)
-    end
 
-    it "redirects to the work page after the user has logged out" do
+        must_redirect_to root_path
+      end
 
-    end
+      it "succeeds for a logged-in user and a fresh user-vote pair" do
+        perform_login(user)
+        id = works(:poodr).id
 
-    it "succeeds for a logged-in user and a fresh user-vote pair" do
+        post upvote_path(id)
 
-    end
+        must_respond_with :redirect
+      end
 
-    it "redirects to the work page if the user has already voted for that work" do
+      it "redirects to the work page if the user has already voted for that work" do
+        perform_login(user)
+        id = works(:album).id
+        post upvote_path(id)
 
-    end
+        expect { post upvote_path(id) }.wont_change 'Vote.count'
+
+        must_redirect_to work_path(id)
+      end
+
   end
+end  
+
+  describe "guest users" do
+   it "cannot access index" do
+     get works_path
+     must_redirect_to root_path
+     flash[:warning].must_equal "You must be logged in to view this section"
+   end
+   it "cannot access new" do
+     get new_work_path
+     must_redirect_to root_path
+     flash[:warning].must_equal "You must be logged in to view this section"
+   end
+
+   it "cannot edit work" do
+     id = works(:album).id
+     get edit_work_path(id)
+
+     must_redirect_to root_path
+     flash[:warning].must_equal "You must be logged in to view this section"
+   end
+
+   it "cannot access show" do
+     id = works(:album).id
+
+     get work_path(id)
+
+     must_redirect_to root_path
+     flash[:warning].must_equal "You must be logged in to view this section"
+   end
+
+   it "redirects to the root page if no user is logged in" do
+     id = works(:album).id
+     post upvote_path(id)
+
+     must_respond_with :redirect
+     must_redirect_to root_path
+   end
+
+   it "cannot access destroy" do
+     id = works(:album).id
+     delete work_path(id)
+
+     must_redirect_to root_path
+     flash[:warning].must_equal "You must be logged in to view this section"
+   end
+ end
 end

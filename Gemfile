@@ -7,6 +7,12 @@ end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails'
+
+gem 'autoprefixer-rails', '8.6.5'
+
+gem "omniauth"
+gem "omniauth-github"
+
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 0.18'
 # Use Puma as the app server
@@ -56,6 +62,7 @@ group :test do
 end
 
 group :development do
+  gem 'dotenv-rails'
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '~> 3.0.5'

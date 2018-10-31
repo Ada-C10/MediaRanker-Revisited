@@ -4,14 +4,14 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one:
-  user: kari
-  work: album
-
-two:
-  user: dan
-  work: another_album
-
-three:
-  user: dan
-  work: album
+# one:
+#   user: kari
+#   work: album
+#
+# two:
+#   user: dan
+#   work: another_album
+#
+# three:
+#   user: dan
+#   work: album

@@ -14,6 +14,7 @@ describe SessionsController do
     end
 
     it "can log in a new user with good data" do
+
       user = users(:bob)
       user.destroy
 

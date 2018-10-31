@@ -36,7 +36,7 @@ class ActiveSupport::TestCase
       uid: user.uid,
       info: {
         email: user.email,
-        nickname: user.username
+        username: user.username
       }
     }
   end

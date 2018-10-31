@@ -58,20 +58,9 @@ describe WorksController do
   end
 
   describe "new" do
-        let (:new_work)
-      {
-          creator: "leanne",
-          publication_year: 2018,
-          category: "book",
-          title: "i am is awesome and so am i",
-          description: "pullitzer prize-winning autobiography"
-      }
-
-
     it "succeeds" do
-      id = works(:album).id
 
-      get new_work_path(id)
+      get new_work_path
 
       must_respond_with :success
 
@@ -79,40 +68,52 @@ describe WorksController do
   end
 
   describe "create" do
-
+    let (:new_work)  do
+        { work: {
+          creator: "leanne",
+          publication_year: 2018,
+          category: "book",
+          title: "i am is awesome and so am i",
+          description: "pullitzer prize-winning autobiography"
+        }
+      }
+    end
 
     it "creates a work with valid data for a real category" do
-      new_hash = { book:  {
-          creator: "frank herbert",
-          publication_year: 1965,
-          category: "book",
-          title: "Dune",
-          description: "classic science-fiction adventure"
-      } }
-
-
       expect {
-        post works_path, params: new_hash
+        post works_path, params: new_work
       }.must_change 'Work.count', 1
-
-      must_respond_with :success
-
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
-      update_this = bogus_work
-      update_this.title = nil
+      bogus_work =  { work: {
+          creator: "leanne",
+          publication_year: 2018,
+          category: "book",
+          title: nil,
+          description: "pullitzer prize-winning autobiography"
+        }
+      }
+
+      assert_nil(bogus_work['title'])
 
       expect {
         post works_path, params: bogus_work
       }.wont_change 'Work.count'
 
-      expect(update_this.save?).must_equal false
       must_respond_with :bad_request
 
     end
 
     it "renders 400 bad_request for bogus categories" do
+      bogus_work =  { work: {
+          creator: "leanne",
+          publication_year: 2018,
+          category: "video games",
+          title: nil,
+          description: "pullitzer prize-winning autobiography"
+        }
+      }
 
         expect {
           post works_path, params: bogus_work
@@ -120,7 +121,7 @@ describe WorksController do
 
         must_respond_with :bad_request
     end
-
+    #
     it "should create a new work" do
 
       expect {
@@ -174,11 +175,15 @@ describe WorksController do
   end
 
   describe "update" do
-    let (:work) {works(:poodr)}
+    let (:work) { works(:poodr) }
 
     it "succeeds for valid data and an extant work ID" do
+      update_work = work
+      update_work.title = "POODR THE SEQUEL"
+
+
       expect {
-        patch work_path(id), params: work
+        patch work_path(update_work.id)
       }.wont_change 'Work.count'
 
       must_respond_with :success
@@ -241,21 +246,33 @@ describe WorksController do
   end
 
   describe "upvote" do
-
+    let (:user) { users(:dan) }
     it "redirects to the work page if no user is logged in" do
+      work = works(:album)
 
-    end
+      post upvote_path(work.id)
 
-    it "redirects to the work page after the user has logged out" do
+      must_redirect_to work_path(work.id)
 
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
+      perform_login(user)
+      id = works(:poodr)
+
+      expect {
+        post upvote_path(id)
+      }.must_change 'user.votes.count', 1
 
     end
 
     it "redirects to the work page if the user has already voted for that work" do
+      perform_login(user)
+      id = works(:another_album).id
 
+      expect{
+          post upvote_path(id)
+       }.wont_change 'user.votes.count'
     end
   end
 end

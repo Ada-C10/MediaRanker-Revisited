@@ -36,12 +36,13 @@ describe "logged in users" do
 
   describe "index" do
     it "succeeds when there are works" do
+      perform_login(user)
       get works_path
-       must_respond_with :success
-
+      must_respond_with :success
     end
 
     it "succeeds when there are no works" do
+      perform_login(user)
       Work.all.each do |work|
         work.destroy
       end
@@ -87,6 +88,7 @@ describe "logged in users" do
     end
 
     it "renders bad_request and does not update the DB for bogus data" do
+      perform_login(user)
       media_hash[:work][:title] = nil
        expect {
         post works_path, params: media_hash
@@ -249,7 +251,7 @@ describe "logged in users" do
       end
 
   end
-end  
+end
 
   describe "guest users" do
    it "cannot access index" do

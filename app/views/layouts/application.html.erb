@@ -33,24 +33,18 @@
         </li>
       </ul>
       <ul class="nav app-header__user-nav-container">
-        <% if @login_user %>
 
-        <li class="nav-item app-header__nav_item">
-          <%= link_to "Logged in as #{@login_user.username}", user_path(@login_user), class: "btn btn-primary" %>
-        </li>
-        <li class="nav-item app-header__nav_item">
-          <%= link_to "Log Out", logout_path, method: :post, class: "btn btn-primary" %>
-        </li>
-
-        <% else %>
-
-        <li class="nav-item app-header__nav_item">
-          <%= link_to "Log In", login_path, class: "btn btn-primary" %>
-        </li>
-        <% end %>
-
-      </ul>
-    </nav>
+      <ul class="nav app-header__user-nav-container>"
+          <li class="nav-item app-header__nav_item">
+            <% if @current_user %>
+              <%= link_to "Log out, #{@current_user.handle}", logout_path, method: :delete, class: "btn btn-primary" %> </li>
+              <li class="nav-item app-header__nav_item"> <%= link_to "My account", user_path(session[:user_id]), class: "btn btn-primary" %> </li>
+            <% else %>
+              <%= link_to "Log In", auth_callback_path, class: "btn btn-primary" %> </li>
+            <% end %>
+          </li>
+        </ul>
+      </nav>
   </header>
 
   <% if flash[:result_text] or flash[:messages] %>

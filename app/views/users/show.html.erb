@@ -1,3 +1,5 @@
+<% if logged_in? %>
+
 <h2>User Summary: <%= link_to @user.username, user_path(@user) %></h2>
 <p>Joined site <%= render_date @user.created_at %></p>
 
@@ -29,3 +31,8 @@
 
 <%= link_to "See all Users", users_path, class: "btn btn-secondary" %>
 <%= link_to "Back to Media List", root_path, class: "btn btn-primary" %>
+<% else %>
+
+<h1> FORBIDDEN </h1>
+
+<%end%>

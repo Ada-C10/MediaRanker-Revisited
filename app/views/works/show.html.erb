@@ -1,3 +1,5 @@
+<% if logged_in? %>
+
 <section>
   <h2><%= @work.title %></h2>
   <p>Created by: <%= @work.creator %></p>
@@ -29,3 +31,9 @@
     <% end %>
   </ul>
 </section>
+
+<% else %>
+
+<h1> FORBIDDEN </h1>
+
+<%end%>

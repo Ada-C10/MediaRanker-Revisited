@@ -4,6 +4,7 @@ require "rails/test_help"
 require "minitest/rails"
 require "minitest/skip_dsl"
 require "minitest/reporters"  # for Colorized output
+require "pry"
 
 #  For colorful output!
 Minitest::Reporters.use!(

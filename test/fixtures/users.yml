@@ -2,6 +2,12 @@
 
 dan:
   username: dan
+  uid: 234
+  provider: google_oauth2
+  email: ada@adadevelopersacademy.org
 
 kari:
   username: kari
+  uid: 245
+  provider: google_oauth2
+  email: grace@hooper.net

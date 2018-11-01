@@ -33,19 +33,27 @@
         </li>
       </ul>
       <ul class="nav app-header__user-nav-container">
+        <!-- <li class="nav-item app-header__nav_item">
+          <section>
+            <%= form_tag(works_path, method: 'get', class: 'navbar-form navbar-right form-inline') do %>
+              <%= text_field_tag :term, params[:term], class: 'form-control', placeholder: 'Search'  %>
+              <%= submit_tag "Submit", class: 'btn btn-default', :name => nil %>
+            <% end %>
+          </section>
+        </li> -->
         <% if @login_user %>
 
         <li class="nav-item app-header__nav_item">
           <%= link_to "Logged in as #{@login_user.username}", user_path(@login_user), class: "btn btn-primary" %>
         </li>
         <li class="nav-item app-header__nav_item">
-          <%= link_to "Log Out", logout_path, method: :post, class: "btn btn-primary" %>
+          <%= link_to "Log Out", logout_path, method: :delete, class: "btn btn-primary" %>
         </li>
 
         <% else %>
 
         <li class="nav-item app-header__nav_item">
-          <%= link_to "Log In", login_path, class: "btn btn-primary" %>
+          <%= link_to "Login with Google", "/auth/google_oauth2", class: "btn btn-primary" %>
         </li>
         <% end %>
 

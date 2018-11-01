@@ -2,6 +2,8 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :check_owner, only: [:edit, :update, :destroy]
+  skip_before_action :require_login, only: [:root]
 
   def root
     @albums = Work.best_albums
@@ -50,7 +52,7 @@ class WorksController < ApplicationController
       flash.now[:status] = :failure
       flash.now[:result_text] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
-      render :edit, status: :not_found
+      render :edit, status: :bad_request
     end
   end
 
@@ -74,6 +76,7 @@ class WorksController < ApplicationController
       end
     else
       flash[:result_text] = "You must log in to do that"
+      redirect_to root_path
     end
 
     # Refresh the page to show either the updated vote count
@@ -83,12 +86,20 @@ class WorksController < ApplicationController
 
 private
   def media_params
-    params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
+    params.require(:work).permit(:title, :category, :creator, :description, :publication_year, :user_id)
   end
 
   def category_from_work
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def check_owner
+    unless @work.user.id == @login_user.id
+      flash[:status] = :failure
+      flash[:result_text] = "You can only edit works you added to the site"
+      redirect_to works_path
+    end
   end
 end

@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  before_action :require_login
   def index
     @users = User.all
   end
@@ -7,4 +8,5 @@ class UsersController < ApplicationController
     @user = User.find_by(id: params[:id])
     render_404 unless @user
   end
+
 end

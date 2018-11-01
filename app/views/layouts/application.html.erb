@@ -18,6 +18,7 @@
     </h1>
 
     <nav class="app-header__nav">
+      <% if @login_user %>
       <ul class="nav app-header__site-nav-container">
         <li class="nav-item app-header__nav_item">
           <%= link_to "View top media", root_path, class: "nav-link" %>
@@ -32,6 +33,7 @@
           <%= link_to "View all users", users_path, class: "nav-link" %>
         </li>
       </ul>
+      <% end %>
       <ul class="nav app-header__user-nav-container">
         <% if @login_user %>
 
@@ -39,13 +41,13 @@
           <%= link_to "Logged in as #{@login_user.username}", user_path(@login_user), class: "btn btn-primary" %>
         </li>
         <li class="nav-item app-header__nav_item">
-          <%= link_to "Log Out", logout_path, method: :post, class: "btn btn-primary" %>
+          <%= link_to "Log out", logout_path, method: "delete", class: "btn btn-primary" %>
         </li>
 
         <% else %>
 
         <li class="nav-item app-header__nav_item">
-          <%= link_to "Log In", login_path, class: "btn btn-primary" %>
+          <%= link_to "Login with Github", "/auth/github", class: "btn btn-primary" %>
         </li>
         <% end %>
 

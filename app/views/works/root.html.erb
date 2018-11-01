@@ -1,13 +1,14 @@
 <% if @best_work %>
-  <section class="spotlight">
-    <h2 class="spotlight__header">
-      <span class="spotlight__header--prefix">Media Spotlight</span>
-      <%= link_to @best_work.title, work_path(@best_work), class: "spotlight__link-to" %> by <%= @best_work.creator %>
-    </h2>
-    <p class="spotlight__description">
-      <%= @best_work.vote_count %> votes - <%= @best_work.description %>
-    </p>
-  </section>
+<section class="spotlight">
+  <!-- <section class="spotlight inactive-link"> -->
+  <h2 class="spotlight__header">
+    <span class="spotlight__header--prefix">Media Spotlight</span>
+    <%= link_to @best_work.title, work_path(@best_work), class: "spotlight__link-to" %> by <%= @best_work.creator %>
+  </h2>
+  <p class="spotlight__description">
+    <%= @best_work.vote_count %> votes - <%= @best_work.description %>
+  </p>
+</section>
 <% end %>
 
 <hr class="root__hr" />

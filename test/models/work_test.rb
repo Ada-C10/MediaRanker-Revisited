@@ -81,13 +81,20 @@ describe Work do
     end
 
     it "tracks the number of votes" do
-      work = Work.create!(title: "test title", category: "movie")
-      4.times do |i|
-        user = User.create!(username: "user#{i}")
-        Vote.create!(user: user, work: work)
-      end
-      work.vote_count.must_equal 4
-      Work.find(work.id).vote_count.must_equal 4
+      # work = Work.create!(title: "test title", category: "movie")
+      work = works(:poodr)
+      user1 = users(:dan)
+      user2 = users(:kari)
+      # 4.times do |i|
+      #   user = User.create!(username: "user#{i}")
+      #   Vote.create!(user: user, work: work)
+      # end
+
+      Vote.create!(user: user1, work: work )
+      Vote.create!(user: user2, work: work )
+
+      work.vote_count.must_equal 2
+      Work.find(work.id).vote_count.must_equal 2
     end
   end
 
@@ -97,7 +104,7 @@ describe Work do
       # Create users to do the voting
       test_users = []
       20.times do |i|
-        test_users << User.create!(username: "user#{i}")
+        test_users << User.create!(provider: "github", uid: 99999, username: "user#{i}", email: "test#{i}@user.com")
       end
 
       # Create media to vote upon

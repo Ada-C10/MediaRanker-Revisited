@@ -2,6 +2,19 @@
 
 dan:
   username: dan
+  email: dan@hereiam.org
+  uid: 0928304984
+  provider: github
+
 
 kari:
   username: kari
+  email: kari@lovely.com
+  uid: 0928304983
+  provider: github
+
+chris:
+  username: chris
+  email: chris@ada.org
+  uid: 0928304989
+  provider: github

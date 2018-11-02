@@ -2,6 +2,7 @@ class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :verify_owner, only: [:edit, :update, :destroy]
 
   def root
     @albums = Work.best_albums
@@ -21,6 +22,7 @@ class WorksController < ApplicationController
   def create
     @work = Work.new(media_params)
     @media_category = @work.category
+    @work.owner = session[:user_id]
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -38,6 +40,7 @@ class WorksController < ApplicationController
   end
 
   def edit
+
   end
 
   def update
@@ -62,7 +65,7 @@ class WorksController < ApplicationController
   end
 
   def upvote
-    flash[:status] = :failure
+    # flash[:status] = :failure
     if @login_user
       vote = Vote.new(user: @login_user, work: @work)
       if vote.save
@@ -71,9 +74,12 @@ class WorksController < ApplicationController
       else
         flash[:result_text] = "Could not upvote"
         flash[:messages] = vote.errors.messages
+        # redirect_to work_path(@work)
       end
     else
       flash[:result_text] = "You must log in to do that"
+      # redirect_to work_path(@work)
+
     end
 
     # Refresh the page to show either the updated vote count
@@ -90,5 +96,13 @@ private
     @work = Work.find_by(id: params[:id])
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
+  end
+
+  def verify_owner
+    if session[:user_id] != @work.owner
+      flash[:status] = :failure
+      flash[:result_text] = "You are not authorized to edit this work"
+      redirect_to root_path
+    end
   end
 end

@@ -1,7 +1,25 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 dan:
-  username: dan
+  username: dangit
+  name: dan
+  uid: 12345
+  provider: github
 
 kari:
-  username: kari
+  username: karigit
+  name: kari
+  uid: 34566
+  provider: github
+
+ada:
+  provider: github
+  uid: 2354234
+  name: ada lovelace
+  username: countess_ada
+
+grace:
+  provider: github
+  uid: 13371337
+  name: grace hopper
+  username: graceful_hopps

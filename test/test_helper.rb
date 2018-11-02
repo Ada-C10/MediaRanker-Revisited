@@ -23,4 +23,35 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
   # Add more helper methods to be used by all tests here...
+  #
+
+  def setup
+    # Once you have enabled test mode, all requests
+    # to OmniAuth will be short circuited to use the mock authentication hash.
+    # A request to /auth/provider will redirect immediately to /auth/provider/callback.
+    OmniAuth.config.test_mode = true
+  end
+
+  def mock_auth_hash(user)
+    # return hash must match the user table in db schema
+    # this turns fake user into an auth_hash
+    # placing this in test - silos it to test development and disallows public interface
+    # test helper stay in test_helper file
+    return {
+        provider: user.provider,
+        uid: user.uid,
+        info: { name: user.name,
+            nickname: user.username
+        }
+    }
+  end
+
+  # helper method
+  def perform_login(user)
+    OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
+    get auth_callback_path(:github)
+  end
+
+
 end
+

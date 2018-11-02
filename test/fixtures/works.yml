@@ -2,10 +2,11 @@
 
 album:
   title: Old Title
-  creator: You Create
+  creator: Old Title
   description: This is an older album
-  publication_year: 1955-11-01
+  publication_year: 1955
   category: album
+  owner: 225478506 # ada id
 
 another_album:
   title: New Title
@@ -13,6 +14,7 @@ another_album:
   description: This is a newer album
   publication_year: 2016-04-08
   category: album
+  owner: 225478506 # ada id
 
 poodr:
   title: Practical Object Oriented Design in Ruby
@@ -20,6 +22,8 @@ poodr:
   description: programming!
   publication_year: 2012
   category: book
+  owner: 370882803 # grace id
+
 
 movie:
   title: test movie - has only required fields

@@ -48,6 +48,11 @@
 <%= link_to "Login", "/auth/github", class: "btn btn-primary" %>
         </li>
         <% end %>
+        <% if session[:user_id] %>
+  <%= link_to "Log out", logout_path, method: "delete"   %>
+<% else %>
+  <%= link_to "Login with Github", "/auth/github" %>
+<% end %>
 
       </ul>
     </nav>

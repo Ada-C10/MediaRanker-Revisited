@@ -25,6 +25,8 @@
       <%= f.text_area :description, class: "form-control" %>
     </div>
 
+    <%= f.hidden_field :user_id, value: @login_user.id %>
+
     <div class="form-group">
       <%= f.submit class: "btn btn-primary" %>
     </div>

@@ -19,6 +19,7 @@ class Work < ApplicationRecord
     CATEGORIES.each do |cat|
       data[cat] = by_category(cat)
     end
+    binding.pry
     return data
   end
 

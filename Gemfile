@@ -19,7 +19,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.2'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
-
+gem "omniauth"
+gem "omniauth-github"
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
@@ -39,11 +40,9 @@ gem 'bootstrap', '~> 4.1.3'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
-
   # Improve the error message you get in the browser
   gem 'better_errors'
   gem 'binding_of_caller'
-
   # Use pry for rails console
   gem 'pry-rails'
 end
@@ -60,6 +59,7 @@ group :development do
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '~> 3.0.5'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'dotenv-rails'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end

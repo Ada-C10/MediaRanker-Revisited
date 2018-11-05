@@ -1,3 +1,5 @@
+<% if @login_user %>
+
 <section>
   <h2><%= @work.title %></h2>
   <p>Created by: <%= @work.creator %></p>
@@ -21,11 +23,15 @@
       </tr>
     </thead>
     <tbody>
-    <% @votes.each do |vote| %>
+      <% @votes.each do |vote| %>
       <tr>
         <td><%= link_to vote.user.username, user_path(vote.user) %></td>
         <td><%= render_date vote.created_at %></td>
       </li>
-    <% end %>
-  </ul>
-</section>
+      <% end %>
+    </ul>
+  </section>
+
+  <% else %>
+  <p>you must be logged in to see this</p>
+  <% end  %>

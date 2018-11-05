@@ -14,7 +14,7 @@ CSV.open('db/media_seeds.csv', "w", :write_headers=> true,
   :headers => ["category", "title", "creator", "publication_year", "description"]) do |csv|
 
   25.times do
-    category = %w(album book).sample
+    category = %w(album book movie).sample
     title = Faker::Coffee.blend_name
     creator = Faker::Name.name
     publication_year = rand(Date.today.year-100..Date.today.year)

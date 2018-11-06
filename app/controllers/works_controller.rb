@@ -1,7 +1,14 @@
 class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
+  before_action :require_login, except: [:root]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+
+
+  # In this wave we will create authorization logic to enforce rules that govern
+  # what pages on the site users and guests (unauthenticated browsers) can view.
+  # The rule we'll use is that guests can only access the main page, and all logged-in
+  #  users can access the show and index pages for all categories of work.
 
   def root
     @albums = Work.best_albums
@@ -50,7 +57,7 @@ class WorksController < ApplicationController
       flash.now[:status] = :failure
       flash.now[:result_text] = "Could not update #{@media_category.singularize}"
       flash.now[:messages] = @work.errors.messages
-      render :edit, status: :not_found
+      render :edit, status: :bad_request
     end
   end
 

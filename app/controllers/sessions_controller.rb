@@ -1,3 +1,4 @@
+require 'pry'
 class SessionsController < ApplicationController
   def login_form
   end
@@ -26,9 +27,52 @@ class SessionsController < ApplicationController
   end
 
   def logout
-    session[:user_id] = nil
-    flash[:status] = :success
-    flash[:result_text] = "Successfully logged out"
+    if !session[:user_id].nil?
+      session[:user_id] = nil
+      flash[:status] = :success
+      flash[:result_text] = "Successfully logged out"
+      redirect_to root_path
+    else
+      redirect_to root_path, status: :bad_request
+    end
+  end
+
+  def create
+    # Save the user's ID in the session
+    auth_hash = request.env['omniauth.auth']
+    user = User.find_by(uid: auth_hash[:uid], provider: 'github')
+    # binding.pry
+    if user
+      # User was found in the database
+      flash[:success] = "Logged in as returning user #{user.username}"
+    else
+      # User doesn't match anything in the DB, so create a new
+      user = User.build_from_github(auth_hash)
+
+      if user.save
+        session[:user_id] = user.id
+        flash[:success] = "Logged in as new user #{user.username}"
+      else
+        # Couldn't save the user for some reason. If we
+        # hit this it probably means there's a bug with the
+        # way we've configured GitHub. Our strategy will
+        # be to display error messages to make future
+        # debugging easier.
+        flash[:error] = "Could not create new user account: #{user.errors.messages}"
+        redirect_to root_path
+        return
+      end
+    end
+
+    session[:user_id] = user.id
     redirect_to root_path
   end
+
+  def destroy
+    session[:user_id] = nil
+    flash[:success] = "Successfully logged out!"
+
+    redirect_to root_path
+  end
+
 end

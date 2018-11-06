@@ -2,6 +2,17 @@
 
 dan:
   username: dan
+  uid: 1243434
+  provider: github
+
 
 kari:
   username: kari
+  uid: 3464
+  provider: github
+
+katie:
+    username: katie
+    uid: 3235
+    provider: github
+    

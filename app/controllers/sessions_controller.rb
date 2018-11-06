@@ -1,17 +1,21 @@
 class SessionsController < ApplicationController
-  def login_form
+
+  def create
+    @auth_hash = request.env['omniauth.auth']
   end
 
   def login
-    username = params[:username]
-    if username and user = User.find_by(username: username)
-      session[:user_id] = user.id
+    current_user = User.find_by(uid: @auth_hash[:uid], provider: 'github')
+
+    if current_user
+      # session[:user_id] = current_user.id
       flash[:status] = :success
       flash[:result_text] = "Successfully logged in as existing user #{user.username}"
     else
-      user = User.new(username: username)
-      if user.save
-        session[:user_id] = user.id
+      #try to make a new user
+      current_user = User.build_from_github(auth_hash)
+
+      if current_user.save
         flash[:status] = :success
         flash[:result_text] = "Successfully created new user #{user.username} with ID #{user.id}"
       else

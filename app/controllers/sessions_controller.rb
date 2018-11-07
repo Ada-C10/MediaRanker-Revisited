@@ -38,7 +38,6 @@ class SessionsController < ApplicationController
 
     redirect_to root_path
   end
-
   def create
     auth_hash = request.env['omniauth.auth']
 
@@ -66,6 +65,7 @@ class SessionsController < ApplicationController
         return
       end
     end
+    # If we get here, we have a valid user instance
     session[:user_id] = user.id
     redirect_to root_path
   end

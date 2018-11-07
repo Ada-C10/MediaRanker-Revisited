@@ -9,6 +9,7 @@ describe UsersController do
     end
 
     it "succeeds when there are no works" do
+      # can't destroy because users have votes
       all = User.all
       all.each do |item|
         item.destroy

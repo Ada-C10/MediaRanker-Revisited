@@ -1,6 +1,8 @@
 require 'test_helper'
 
 describe Vote do
+  let(:grace) {users(:grace)}
+  let(:ada) {users(:ada)}
   describe "relations" do
     it "has a user" do
       v = votes(:one)
@@ -16,8 +18,8 @@ describe Vote do
   end
 
   describe "validations" do
-    let (:user1) { User.new(username: 'chris') }
-    let (:user2) { User.new(username: 'chris') }
+    let (:user1) { User.new(username: 'chris',uid:1, provider: "github") }
+    let (:user2) { User.new(username: 'chris',uid:123, provider: "github") }
     let (:work1) { Work.new(category: 'book', title: 'House of Leaves') }
     let (:work2) { Work.new(category: 'book', title: 'For Whom the Bell Tolls') }
 

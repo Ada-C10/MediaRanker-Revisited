@@ -1,19 +1,18 @@
 require 'test_helper'
 
 describe User do
+  let(:grace) {users(:grace)}
   describe "relations" do
     it "has a list of votes" do
-      dan = users(:dan)
-      dan.must_respond_to :votes
-      dan.votes.each do |vote|
+      grace.must_respond_to :votes
+      grace.votes.each do |vote|
         vote.must_be_kind_of Vote
       end
     end
 
     it "has a list of ranked works" do
-      dan = users(:dan)
-      dan.must_respond_to :ranked_works
-      dan.ranked_works.each do |work|
+      grace.must_respond_to :ranked_works
+      grace.ranked_works.each do |work|
         work.must_be_kind_of Work
       end
     end
@@ -28,12 +27,12 @@ describe User do
 
     it "requires a unique username" do
       username = "test username"
-      user1 = User.new(username: username)
+      user1 = User.new(username: username, uid:1, provider: "github")
 
       # This must go through, so we use create!
       user1.save!
 
-      user2 = User.new(username: username)
+      user2 = User.new(username: username, uid:123, provider: "github")
       result = user2.save
       result.must_equal false
       user2.errors.messages.must_include :username

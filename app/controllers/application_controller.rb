@@ -1,3 +1,4 @@
+require 'pry'
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
@@ -13,5 +14,10 @@ private
     if session[:user_id]
       @login_user = User.find_by(id: session[:user_id])
     end
+  end
+
+  def create
+    auth_hash = request.env['omniauth.auth']
+    raise
   end
 end
